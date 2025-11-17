@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4D Polytope Viewer - Pardesco</title>
+  <meta name="description" content="Interactive 4D polytope viewer with stereographic projection and true 4D rotation">
+</head>
+<body class="overflow-hidden">
+  <!-- Canvas Container -->
+  <div id="viewer-canvas" class="w-full h-screen"></div>
+
+  <!-- Loading Indicator -->
+  <div id="loading" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 hidden">
+    <div class="flex flex-col items-center">
+      <div class="loading-spinner mb-4"></div>
+      <p class="text-white text-xl">Loading polytope...</p>
+    </div>
+  </div>
+
+  <!-- Info Panel (Top Left) -->
+  <div class="fixed top-4 left-4 control-panel max-w-xs z-10">
+    <h2 id="polytope-name" class="text-xl font-bold text-accent mb-3">Loading...</h2>
+    <div class="space-y-2 text-sm">
+      <div class="flex justify-between">
+        <span class="text-gray-400">Vertices:</span>
+        <span id="polytope-vertices" class="text-accent font-bold">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Edges:</span>
+        <span id="polytope-edges" class="text-accent font-bold">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Faces:</span>
+        <span id="polytope-faces" class="text-accent font-bold">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-400">Cells:</span>
+        <span id="polytope-cells" class="text-accent font-bold">-</span>
+      </div>
+      <div class="flex justify-between mt-4 pt-4 border-t border-white/10">
+        <span class="text-gray-400">FPS:</span>
+        <span id="fps-display" class="font-bold">60.0 FPS</span>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400">
+      <strong>Mouse Controls:</strong><br>
+      🖱️ Drag to rotate 3D view<br>
+      🔍 Scroll to zoom
+    </div>
+  </div>
+
+  <!-- Control Panel (Top Right) - Scrollable -->
+  <div class="fixed top-4 right-4 bottom-4 control-panel max-w-sm z-10 overflow-y-auto scrollbar-thin">
+    <h3 class="text-lg font-bold text-secondary mb-4 text-center sticky top-0 bg-dark/95 backdrop-blur-lg py-2 z-20">Controls</h3>
+
+    <!-- Polytope Selector -->
+    <div class="mb-6">
+      <h4 class="text-sm text-gray-400 mb-2">Select Polytope</h4>
+      <div id="polytope-selector"></div>
+    </div>
+
+    <!-- Manual Rotation Control (Desktop Only) - Collapsible -->
+    <div id="manual-rotation-section" class="desktop-only mb-6" style="display: none;">
+      <details class="bg-dark-lighter rounded-lg">
+        <summary class="text-sm font-bold text-secondary p-3 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
+          <span>🎮 4D Rotation Control</span>
+          <span class="text-xs text-gray-500">▼</span>
+        </summary>
+
+        <div class="p-3 pt-0">
+          <!-- Mode Selection -->
+          <div class="mb-4 mt-3">
+        <div class="flex gap-3">
+          <label class="flex items-center cursor-pointer">
+            <input type="radio" name="rotation-mode" id="rotation-mode-auto" value="auto" checked class="mr-2">
+            <span class="text-sm">Auto Rotate</span>
+          </label>
+          <label class="flex items-center cursor-pointer">
+            <input type="radio" name="rotation-mode" id="rotation-mode-manual" value="manual" class="mr-2">
+            <span class="text-sm">Manual</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Manual Control Instructions -->
+      <div id="manual-instructions" class="mb-4 hidden">
+        <div class="text-xs text-gray-400 bg-dark-lighter p-3 rounded space-y-1">
+          <div>🖱️ <strong>Mouse:</strong> XY + ZW</div>
+          <div>⇧ <strong>Shift:</strong> XZ + YW</div>
+          <div>⌃ <strong>Ctrl:</strong> XW + YZ</div>
+          <button id="show-keyboard-help" class="text-secondary hover:text-primary mt-2 underline">
+            [?] Keyboard Shortcuts
+          </button>
+        </div>
+      </div>
+
+      <!-- Current Angles Display -->
+      <div id="angle-display" class="mb-4 hidden">
+        <h5 class="text-xs text-gray-400 mb-2">Current Angles:</h5>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <div>XY: <span id="angle-xy" class="text-accent font-mono">0.0°</span></div>
+          <div>XZ: <span id="angle-xz" class="text-accent font-mono">0.0°</span></div>
+          <div>XW: <span id="angle-xw" class="text-accent font-mono">0.0°</span></div>
+          <div>YZ: <span id="angle-yz" class="text-accent font-mono">0.0°</span></div>
+          <div>YW: <span id="angle-yw" class="text-accent font-mono">0.0°</span></div>
+          <div>ZW: <span id="angle-zw" class="text-accent font-mono">0.0°</span></div>
+        </div>
+      </div>
+
+      <!-- Rotation Presets -->
+      <div id="rotation-presets" class="mb-4 hidden">
+        <h5 class="text-xs text-gray-400 mb-2">Presets:</h5>
+        <div class="grid grid-cols-2 gap-2">
+          <button data-preset="clifford45" class="btn-secondary py-1 px-2 text-xs rotation-preset-btn">Clifford</button>
+          <button data-preset="hopf" class="btn-secondary py-1 px-2 text-xs rotation-preset-btn">Hopf</button>
+          <button data-preset="doubleRotation" class="btn-secondary py-1 px-2 text-xs rotation-preset-btn">Double</button>
+          <button data-preset="isoclinic" class="btn-secondary py-1 px-2 text-xs rotation-preset-btn">Isoclinic</button>
+        </div>
+      </div>
+
+      <!-- Sensitivity Slider -->
+      <div id="sensitivity-control" class="mb-4 hidden">
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs text-gray-400">Sensitivity:</label>
+          <span id="sensitivity-value" class="text-xs text-accent font-mono">0.5</span>
+        </div>
+        <input type="range" id="rotation-sensitivity" min="0.1" max="2.0" step="0.1" value="0.5" class="slider w-full">
+      </div>
+
+      <!-- Reset Button -->
+      <div id="reset-rotation-container" class="hidden">
+        <button id="rotation-reset" class="btn-secondary w-full py-2 text-sm">Reset Rotation</button>
+      </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- 4D Rotation Planes (Auto Mode) - Collapsible -->
+    <div class="mb-6">
+      <details class="bg-dark-lighter rounded-lg">
+        <summary class="text-sm font-bold text-secondary p-3 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
+          <span>🔄 4D Rotation Planes (Auto Mode)</span>
+          <span class="text-xs text-gray-500">▼</span>
+        </summary>
+
+        <div class="p-3 pt-0">
+          <div class="grid grid-cols-3 gap-2 mt-3">
+            <button id="plane-xy" class="btn-secondary py-2 px-3 text-sm font-semibold">XY</button>
+            <button id="plane-xz" class="btn-secondary py-2 px-3 text-sm font-semibold">XZ</button>
+            <button id="plane-xw" class="btn-secondary py-2 px-3 text-sm font-semibold">XW</button>
+            <button id="plane-yz" class="btn-secondary py-2 px-3 text-sm font-semibold">YZ</button>
+            <button id="plane-yw" class="btn-secondary py-2 px-3 text-sm font-semibold">YW</button>
+            <button id="plane-zw" class="btn-secondary py-2 px-3 text-sm font-semibold">ZW</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- View Options - Collapsible -->
+    <div class="mb-6">
+      <details open class="bg-dark-lighter rounded-lg">
+        <summary class="text-sm font-bold text-secondary p-3 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
+          <span>👁️ View Options</span>
+          <span class="text-xs text-gray-500">▼</span>
+        </summary>
+
+        <div class="p-3 pt-0 space-y-3 mt-3">
+          <!-- Projection Toggle Switch -->
+          <div>
+            <label class="text-xs text-gray-400 mb-2 block">Projection Mode:</label>
+            <div class="projection-switch-container">
+              <button id="projection-stereo" class="projection-switch-btn active" data-projection="stereographic">
+                <span class="icon">📐</span>
+                <span class="label">Stereographic</span>
+              </button>
+              <button id="projection-perspective" class="projection-switch-btn" data-projection="perspective">
+                <span class="icon">👁️</span>
+                <span class="label">Perspective</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="toggle-mesh-btn" class="btn-secondary w-full py-2 text-sm">
+            Mesh View: OFF
+          </button>
+          <button id="toggle-vertices-btn" class="btn-secondary w-full py-2 text-sm active">
+            Show Vertices
+          </button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Visual Effects (Desktop Only) - Collapsible -->
+    <div id="bloom-controls" class="desktop-only mb-6" style="display: none;">
+      <details open class="bg-dark-lighter rounded-lg">
+        <summary class="text-sm font-bold text-secondary p-3 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
+          <span>✨ Visual Effects</span>
+          <span class="text-xs text-gray-500">▼</span>
+        </summary>
+
+        <div class="p-3 pt-0 space-y-2 mt-3">
+          <button id="toggle-bloom-btn" class="btn-secondary w-full py-2 text-sm active">
+            Bloom Glow: ON
+          </button>
+          <p class="text-xs text-gray-500 mt-2">✨ Mesh view uses iridescent material on desktop</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Export Container -->
+    <div id="export-container"></div>
+  </div>
+
+  <!-- Bottom Controls -->
+  <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 glass-morphism px-6 py-4 rounded-xl z-10">
+    <div class="flex items-center gap-4">
+      <button id="rotate-3d-btn" class="btn-secondary px-6 py-2 active">
+        3D Rotate: ON
+      </button>
+      <button id="rotate-4d-btn" class="btn-secondary px-6 py-2">
+        4D Rotate: OFF
+      </button>
+      <button id="reset-view-btn" class="btn-primary px-6 py-2">
+        Reset View
+      </button>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Help (Optional) -->
+  <div class="fixed bottom-6 right-6 text-xs text-gray-500">
+    <details>
+      <summary class="cursor-pointer hover:text-gray-300">Keyboard Shortcuts</summary>
+      <div class="mt-2 space-y-1 bg-dark/90 p-3 rounded">
+        <div><kbd>Space</kbd> - Toggle 4D rotation</div>
+        <div><kbd>R</kbd> - Reset view</div>
+        <div><kbd>M</kbd> - Toggle mesh view</div>
+        <div><kbd>V</kbd> - Toggle vertices</div>
+        <div><kbd>P</kbd> - Toggle projection</div>
+        <div><kbd>3</kbd> - Toggle 3D rotation</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Keyboard Shortcuts Overlay (Desktop Only - Manual Rotation) -->
+  <div id="keyboard-shortcuts-overlay" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+    <div class="glass-morphism p-8 rounded-xl max-w-2xl mx-4">
+      <h2 class="text-2xl font-bold text-secondary mb-6 text-center">4D Rotation Shortcuts</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Manual Rotation -->
+        <section>
+          <h3 class="text-lg font-bold text-primary mb-3">Manual Rotation</h3>
+          <div class="space-y-2 text-sm text-gray-300">
+            <div><strong>Mouse Drag</strong> → XY + ZW</div>
+            <div><strong>Shift + Drag</strong> → XZ + YW</div>
+            <div><strong>Ctrl + Drag</strong> → XW + YZ</div>
+          </div>
+        </section>
+
+        <!-- Keyboard Control -->
+        <section>
+          <h3 class="text-lg font-bold text-primary mb-3">Keyboard Control</h3>
+          <div class="space-y-2 text-sm text-gray-300">
+            <div><kbd>W</kbd> / <kbd>S</kbd> → XY plane</div>
+            <div><kbd>A</kbd> / <kbd>D</kbd> → ZW plane</div>
+            <div><kbd>Q</kbd> / <kbd>E</kbd> → XW plane</div>
+            <div><kbd>↑</kbd> / <kbd>↓</kbd> → YZ plane</div>
+            <div><kbd>←</kbd> / <kbd>→</kbd> → XZ plane</div>
+            <div><kbd>Z</kbd> / <kbd>C</kbd> → YW plane</div>
+          </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section>
+          <h3 class="text-lg font-bold text-primary mb-3">Quick Actions</h3>
+          <div class="space-y-2 text-sm text-gray-300">
+            <div><kbd>R</kbd> → Reset rotation</div>
+            <div><kbd>Space</kbd> → Toggle auto/manual</div>
+            <div><kbd>?</kbd> → Show/hide help</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="mt-6 text-center">
+        <button id="close-keyboard-help" class="btn-primary px-8 py-2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Script -->
+  <script type="module" src="/src/js/main.js"></script>
+
+  <style>
+    kbd {
+      @apply bg-dark-accent px-2 py-1 rounded text-xs font-mono border border-white/20;
+    }
+
+    /* Active button state */
+    button.active {
+      @apply bg-gradient-to-r from-primary to-secondary border-transparent shadow-lg shadow-primary/30;
+    }
+
+    /* Details summary styling */
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details[open] summary {
+      @apply text-gray-300;
+    }
+  </style>
+</body>
+</html>

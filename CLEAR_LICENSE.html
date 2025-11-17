@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear License</title>
+</head>
+<body>
+    <h1>Clear 4D Viewer License</h1>
+    <button onclick="clearLicense()">Clear License & Reload</button>
+    <pre id="status"></pre>
+
+    <script>
+        function clearLicense() {
+            const before = localStorage.getItem('4d_viewer_license');
+            document.getElementById('status').textContent = 'Before: ' + (before || 'No license found');
+
+            localStorage.removeItem('4d_viewer_license');
+
+            const after = localStorage.getItem('4d_viewer_license');
+            document.getElementById('status').textContent += '\nAfter: ' + (after || 'License cleared!');
+
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+
+        // Show current license
+        window.onload = () => {
+            const current = localStorage.getItem('4d_viewer_license');
+            document.getElementById('status').textContent = 'Current license: ' + (current || 'None (Free tier)');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Image Generator - 4D Polytopes</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <style>
+    #preview-canvas {
+      width: 600px;
+      height: 600px;
+      margin: 20px auto;
+      display: block;
+      border: 2px solid #8b5cf6;
+      border-radius: 8px;
+    }
+    .controls {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .status {
+      text-align: center;
+      font-size: 18px;
+      margin: 20px 0;
+      min-height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls glass-morphism p-6 rounded-xl">
+    <h1 class="text-3xl font-bold text-center mb-4">Preview Image Generator</h1>
+    <p class="text-center text-gray-400 mb-6">Generate preview images for featured polytopes on the landing page</p>
+
+    <div class="status" id="status">Ready to generate previews</div>
+
+    <div class="flex flex-col gap-4">
+      <button id="generate-all" class="btn-primary px-8 py-3 text-lg">
+        Generate All Preview Images (Tesseract, 24-cell, 120-cell)
+      </button>
+
+      <div class="text-center text-sm text-gray-500">
+        <p>Instructions:</p>
+        <p>1. Click the button above</p>
+        <p>2. Wait for each polytope to render</p>
+        <p>3. Images will auto-download (check your Downloads folder)</p>
+        <p>4. Move the images to <code class="bg-dark-accent px-2 py-1 rounded">public/images/previews/</code></p>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="preview-canvas"></canvas>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { PolytopeViewer } from './src/js/polytope/viewer.js';
+    import { Screenshot } from './src/js/utils/Screenshot.js';
+    import { BloomEffect } from './src/js/effects/BloomEffect.js';
+
+    const canvas = document.getElementById('preview-canvas');
+    const statusEl = document.getElementById('status');
+    const generateBtn = document.getElementById('generate-all');
+
+    // Featured polytopes to generate previews for
+    // Each has a specific 4D rotation plane and angle for visual interest
+    const featuredPolytopes = [
+      { id: '2-tes', name: 'tesseract', displayName: 'Tesseract', plane: 'XW', angle: 0.3 },
+      { id: '4-ico', name: '24-cell', displayName: '24-cell', plane: 'YW', angle: 0.4 },
+      { id: '5-hi', name: '120-cell', displayName: '120-cell', plane: 'ZW', angle: 0.2 }
+    ];
+
+    let viewer = null;
+    let screenshot = null;
+    let bloomEffect = null;
+
+    // Initialize viewer with bloom and effects
+    async function initViewer() {
+      viewer = new PolytopeViewer(canvas);
+      await viewer.init();
+
+      // Initialize bloom effect for beautiful glow
+      bloomEffect = new BloomEffect(
+        viewer.renderer,
+        viewer.scene,
+        viewer.camera,
+        canvas.width,
+        canvas.height
+      );
+      bloomEffect.enabled = true;
+      bloomEffect.setStrength(1.2); // Very strong bloom for dramatic glowing edges
+      bloomEffect.setRadius(0.8);
+      bloomEffect.setThreshold(0.1); // Lower threshold = more glow
+
+      // Get renderer, camera, scene for screenshot
+      screenshot = new Screenshot(
+        viewer.renderer,
+        viewer.camera,
+        viewer.scene
+      );
+    }
+
+    // Generate preview for a single polytope
+    async function generatePreview(polytope) {
+      statusEl.textContent = `Loading ${polytope.displayName}...`;
+
+      // Use line view for beautiful curved edges with bloom
+      viewer.showMeshView = false;
+      viewer.showVertices = false;
+
+      // Load polytope
+      const path = `/data/polytopes/${polytope.id}.off`;
+      await viewer.loadPolytope(path, polytope.displayName);
+
+      // Set optimal camera position (closer for more dramatic view)
+      viewer.camera.position.set(1.5, 1.8, 4.5);
+      viewer.camera.lookAt(0, 0, 0);
+
+      // Apply interesting 4D rotation for visual appeal
+      statusEl.textContent = `Rotating ${polytope.displayName} in 4D (${polytope.plane} plane)...`;
+
+      // Set manual rotation mode for precise control
+      viewer.rotationMode = 'manual';
+      viewer.rotation4D.enableManualMode();
+
+      // Apply rotation in specified plane (lowercase keys)
+      const rotations = { xy: 0, xz: 0, xw: 0, yz: 0, yw: 0, zw: 0 };
+      const planeKey = polytope.plane.toLowerCase(); // Convert XW -> xw
+      rotations[planeKey] = polytope.angle;
+      viewer.rotation4D.setRotationState(rotations);
+
+      // Update to apply rotation
+      viewer.updateProjection();
+
+      // Wait for rendering to stabilize with bloom
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      statusEl.textContent = `Capturing ${polytope.displayName} with bloom effects...`;
+
+      // Render one frame with bloom before capturing
+      if (bloomEffect && bloomEffect.enabled) {
+        bloomEffect.composer.render();
+      }
+
+      // Capture screenshot with bloom effect
+      const filename = `${polytope.name}-preview.png`;
+      screenshot.captureWithBloom(bloomEffect, filename);
+
+      statusEl.textContent = `✓ Saved ${filename} - Beautiful!`;
+
+      // Wait before next capture
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // Generate all previews
+    async function generateAllPreviews() {
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Generating...';
+
+      try {
+        await initViewer();
+
+        for (const polytope of featuredPolytopes) {
+          await generatePreview(polytope);
+        }
+
+        statusEl.textContent = '✓ All previews generated! Check your Downloads folder.';
+        generateBtn.textContent = 'Generate Again';
+      } catch (error) {
+        statusEl.textContent = `Error: ${error.message}`;
+        console.error(error);
+        generateBtn.textContent = 'Try Again';
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    // Attach event listener
+    generateBtn.addEventListener('click', generateAllPreviews);
+  </script>
+</body>
+</html>

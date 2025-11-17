@@ -1,0 +1,446 @@
+/**
+ * Mobile UI Styles (MVP)
+ *
+ * Responsive styles for mobile/tablet devices (<1024px)
+ * Components: FAB, Bottom Sheet, Minimal Overlay
+ */
+
+/* ===================================
+   MOBILE OVERLAY (Top Bar)
+   =================================== */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 100;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+
+  /* Glassmorphism effect */
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Smooth animations */
+  transition: all 0.3s ease;
+}
+
+.mobile-fps {
+  font-size: 14px;
+  font-weight: 600;
+  color: #10b981;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.mobile-polytope-selector {
+  /* Size & Layout */
+  min-height: 40px;
+  padding: 6px 10px;
+  flex: 1;
+  max-width: none;
+
+  /* Visual Style */
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+
+  /* Remove default select styling */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Add dropdown arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 26px;
+
+  /* Interaction */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-polytope-selector:hover,
+.mobile-polytope-selector:focus {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  outline: none;
+}
+
+/* Dropdown options styling */
+.mobile-polytope-selector option {
+  background: #1e293b;
+  color: #ffffff;
+  padding: 8px;
+}
+
+/* ===================================
+   FAB (Floating Action Button)
+   =================================== */
+.mobile-fab {
+  position: relative;
+  z-index: 200;
+
+  /* Size & Shape */
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+
+  /* Visual Style */
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  border: none;
+  box-shadow:
+    0 2px 8px rgba(139, 92, 246, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Interaction */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-fab:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 4px 12px rgba(139, 92, 246, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-fab:active {
+  transform: scale(0.95);
+}
+
+.mobile-fab.active {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+}
+
+.fab-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.mobile-fab.active .fab-icon {
+  transform: rotate(90deg);
+}
+
+/* ===================================
+   BOTTOM SHEET
+   =================================== */
+.mobile-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+
+  /* Size */
+  height: 80vh;
+  max-height: 600px;
+
+  /* Visual Style */
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-top: 2px solid rgba(139, 92, 246, 0.3);
+  box-shadow:
+    0 -4px 20px rgba(0, 0, 0, 0.3),
+    0 -1px 4px rgba(139, 92, 246, 0.2);
+
+  /* Animation */
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mobile-sheet.visible {
+  transform: translateY(0);
+}
+
+/* Sheet Header */
+.sheet-header {
+  flex-shrink: 0;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  position: relative;
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+  transition: background 0.2s ease;
+}
+
+.sheet-handle:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.sheet-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Sheet Content */
+.sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+
+  /* Smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Custom scrollbar for sheet */
+.sheet-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sheet-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.sheet-content::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 3px;
+}
+
+.sheet-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* Mobile Sections (Reused Desktop Controls) */
+.mobile-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Improve touch targets in mobile sections */
+.mobile-section button,
+.mobile-section input,
+.mobile-section select,
+.mobile-section label {
+  min-height: 48px;
+  min-width: 48px;
+  font-size: 16px; /* Prevents iOS zoom on focus */
+}
+
+.mobile-section input[type="checkbox"],
+.mobile-section input[type="radio"] {
+  min-width: 24px;
+  min-height: 24px;
+  transform: scale(1.5);
+  margin: 12px;
+}
+
+/* ===================================
+   RESPONSIVE BEHAVIOR
+   =================================== */
+
+/* Hide mobile UI on desktop */
+@media (min-width: 1024px) {
+  .mobile-overlay,
+  .mobile-fab,
+  .mobile-sheet {
+    display: none !important;
+  }
+}
+
+/* Show mobile UI and hide desktop panels on mobile/tablet */
+@media (max-width: 1023px) {
+  /* Hide desktop control panels */
+  .info-panel,
+  .control-panel {
+    display: none !important;
+  }
+
+  /* Ensure mobile components are visible */
+  .mobile-overlay,
+  .mobile-fab,
+  .mobile-sheet {
+    display: flex;
+  }
+
+  /* Let canvas fill viewport naturally - overlay sits on top */
+  #viewer-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+}
+
+/* ===================================
+   MOBILE VIEWPORT ADJUSTMENTS
+   =================================== */
+
+/* Small phones (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .mobile-fab {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fab-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mobile-polytope-selector {
+    font-size: 12px;
+    padding: 4px 8px;
+    padding-right: 22px;
+  }
+
+  .mobile-fps {
+    font-size: 11px;
+  }
+
+  .mobile-overlay {
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .mobile-sheet {
+    max-height: 70vh;
+  }
+
+  .sheet-content {
+    padding: 16px;
+  }
+
+  .mobile-section {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Tablets (iPad, etc.) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mobile-overlay {
+    height: 64px;
+    padding: 0 24px;
+    gap: 16px;
+  }
+
+  .mobile-fps {
+    font-size: 16px;
+  }
+
+  .mobile-fab {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .mobile-polytope-selector {
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .mobile-sheet {
+    max-height: 500px;
+  }
+
+  .sheet-content {
+    padding: 24px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 1023px) and (orientation: landscape) {
+  .mobile-sheet {
+    max-height: 90vh;
+  }
+
+  .mobile-overlay {
+    height: 48px;
+  }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+
+/* Focus styles for keyboard navigation */
+.mobile-fab:focus-visible {
+  outline: 3px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+.mobile-section button:focus-visible,
+.mobile-section input:focus-visible,
+.mobile-section select:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-fab,
+  .mobile-sheet,
+  .mobile-overlay,
+  .fab-icon,
+  .sheet-handle {
+    transition: none;
+  }
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  .mobile-overlay,
+  .mobile-sheet {
+    border-width: 2px;
+    border-color: #ffffff;
+  }
+
+  .mobile-fab {
+    border: 2px solid #ffffff;
+  }
+}
