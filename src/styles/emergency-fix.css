@@ -1,0 +1,138 @@
+/*
+ * EMERGENCY FIX for broken viewer layout
+ * This file forces correct Z-index layering and positioning
+ */
+
+/* Force canvas to be visible and on correct layer */
+#viewer-canvas {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 5 !important;
+  display: block !important;
+  background: #050810 !important;
+}
+
+/* Fix HUD overlay positioning */
+.hud-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+/* Fix all corner positioning with fixed position */
+.hud-top-left {
+  position: fixed !important;
+  top: 20px !important;
+  left: 20px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 20 !important;
+  max-width: 250px;
+}
+
+.hud-top-right {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: 20 !important;
+  max-width: 200px;
+}
+
+.hud-bottom-left {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 20px !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: 20 !important;
+  max-width: 320px;
+}
+
+.hud-bottom-center {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: 20 !important;
+  min-width: 600px;
+  max-width: 900px;
+}
+
+/* Compact padding for horizontal layout */
+.hud-bottom-center .hud-content {
+  padding: 0.75rem 1.5rem !important;
+}
+
+.hud-bottom-center .hud-title {
+  font-size: 0.875rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Mobile responsive - stack on small screens */
+@media (max-width: 768px) {
+  .hud-bottom-center {
+    min-width: calc(100% - 40px) !important;
+    max-width: none !important;
+    left: 20px !important;
+    right: 20px !important;
+    transform: none !important;
+  }
+}
+
+.hud-bottom-right {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 20 !important;
+  width: 320px;
+  max-width: 400px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .hud-bottom-right {
+    width: calc(100% - 40px) !important;
+    max-width: none !important;
+    right: 20px !important;
+    left: 20px !important;
+  }
+}
+
+/* Ensure panels are clickable */
+.hud-panel {
+  pointer-events: auto !important;
+}
+
+/* Hide any background canvas that might be blocking */
+canvas:not(#viewer-canvas) {
+  z-index: 0 !important;
+}
+
+/* Ensure particle background doesn't block */
+canvas[style*="z-index: 0"] {
+  pointer-events: none !important;
+}
+
+/* Ensure viewer container doesn't interfere */
+.viewer-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background-color: #000 !important;
+}

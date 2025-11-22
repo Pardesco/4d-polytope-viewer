@@ -1,0 +1,116 @@
+/* HUD Panel with Gradient Border (Fixed) */
+.hud-panel {
+  position: relative;
+  --border-thickness: 2px;
+  --corner-size: 20px;
+  --border-color-1: #00ffff;
+  --border-color-2: #ff00ff;
+  
+  /* Outer container for border gradient */
+  background: linear-gradient(135deg, var(--border-color-1), var(--border-color-2));
+  padding: var(--border-thickness);
+  
+  /* Cut corners on outer border */
+  clip-path: polygon(
+    0 var(--corner-size), 
+    var(--corner-size) 0,
+    calc(100% - var(--corner-size)) 0, 
+    100% var(--corner-size),
+    100% calc(100% - var(--corner-size)), 
+    calc(100% - var(--corner-size)) 100%,
+    var(--corner-size) 100%, 
+    0 calc(100% - var(--corner-size))
+  );
+  
+  /* Glow effect */
+  filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
+}
+
+/* Inner content area */
+.hud-content {
+  background: rgba(10, 14, 26, 0.95);
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  
+  /* Match parent clip-path */
+  clip-path: inherit;
+  
+  /* SCANLINE OVERLAY (not blur!) */
+  background-image: 
+    /* Horizontal scanlines */
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0.3) 1px,
+      rgba(0, 0, 0, 0) 2px
+    ),
+    /* Subtle RGB separation */
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.02),
+      rgba(0, 255, 0, 0.02),
+      rgba(0, 0, 255, 0.02)
+    );
+}
+
+/* Corner accent markers */
+.hud-panel::before,
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color-1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-panel::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+  box-shadow: 
+    0 0 10px var(--border-color-1),
+    inset 0 0 10px var(--border-color-1);
+  animation: corner-glow 2s ease-in-out infinite;
+}
+
+.hud-panel::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+  box-shadow: 
+    0 0 10px var(--border-color-2),
+    inset 0 0 10px var(--border-color-2);
+  animation: corner-glow 2s ease-in-out infinite 1s;
+}
+
+@keyframes corner-glow {
+  0%, 100% { 
+    opacity: 0.6;
+    filter: brightness(1);
+  }
+  50% { 
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+}
+
+/* Active panel state */
+.hud-panel.active {
+  --border-color-1: #00ffff;
+  --border-color-2: #00ffff;
+  animation: panel-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes panel-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
+  }
+  50% { 
+    filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+  }
+}

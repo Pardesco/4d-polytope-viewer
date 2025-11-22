@@ -1,6 +1,6 @@
 {
   "tier": "free",
-  "count": 17,
+  "count": 46,
   "polytopes": [
     {
       "id": "1-pen",
@@ -16,7 +16,7 @@
       "category": "Free Tier",
       "file_size_kb": 22.3,
       "vertices": 120,
-      "edges": 720
+      "edges": 1200
     },
     {
       "id": "11-gaghi",
@@ -24,7 +24,7 @@
       "category": "Free Tier",
       "file_size_kb": 22.57,
       "vertices": 120,
-      "edges": 720
+      "edges": 1200
     },
     {
       "id": "12-gishi",
@@ -48,7 +48,7 @@
       "category": "Free Tier",
       "file_size_kb": 28.58,
       "vertices": 120,
-      "edges": 1200
+      "edges": 720
     },
     {
       "id": "15-gax",
@@ -56,7 +56,7 @@
       "category": "Free Tier",
       "file_size_kb": 30.16,
       "vertices": 120,
-      "edges": 1200
+      "edges": 720
     },
     {
       "id": "16-gogishi",
@@ -64,7 +64,7 @@
       "category": "Free Tier",
       "file_size_kb": 62.56,
       "vertices": 600,
-      "edges": 720
+      "edges": 1200
     },
     {
       "id": "17-tho",
@@ -72,7 +72,7 @@
       "category": "Free Tier",
       "file_size_kb": 0.73,
       "vertices": 8,
-      "edges": 32
+      "edges": 24
     },
     {
       "id": "2-tes",
@@ -80,7 +80,7 @@
       "category": "Free Tier",
       "file_size_kb": 0.79,
       "vertices": 16,
-      "edges": 24
+      "edges": 32
     },
     {
       "id": "3-hex",
@@ -88,7 +88,7 @@
       "category": "Free Tier",
       "file_size_kb": 0.75,
       "vertices": 8,
-      "edges": 32
+      "edges": 24
     },
     {
       "id": "4-ico",
@@ -104,7 +104,7 @@
       "category": "Free Tier",
       "file_size_kb": 57.87,
       "vertices": 600,
-      "edges": 720
+      "edges": 1200
     },
     {
       "id": "6-ex",
@@ -112,7 +112,7 @@
       "category": "Free Tier",
       "file_size_kb": 31.16,
       "vertices": 120,
-      "edges": 1200
+      "edges": 720
     },
     {
       "id": "7-fix",
@@ -120,7 +120,7 @@
       "category": "Free Tier",
       "file_size_kb": 28.16,
       "vertices": 120,
-      "edges": 1200
+      "edges": 720
     },
     {
       "id": "8-gohi",
@@ -137,6 +137,238 @@
       "file_size_kb": 23.15,
       "vertices": 120,
       "edges": 720
+    },
+    {
+      "id": "133-srip",
+      "name": "133 Srip",
+      "category": "Free Tier",
+      "file_size_kb": 1.2,
+      "vertices": 30,
+      "edges": 90
+    },
+    {
+      "id": "134-rawvtip",
+      "name": "134 Rawvtip",
+      "category": "Free Tier",
+      "file_size_kb": 1.3,
+      "vertices": 30,
+      "edges": 90
+    },
+    {
+      "id": "135-sirdop",
+      "name": "135 Sirdop",
+      "category": "Free Tier",
+      "file_size_kb": 1.4,
+      "vertices": 30,
+      "edges": 90
+    },
+    {
+      "id": "136-pirpop",
+      "name": "136 Pirpop",
+      "category": "Free Tier",
+      "file_size_kb": 1.3,
+      "vertices": 30,
+      "edges": 90
+    },
+    {
+      "id": "137-garpop",
+      "name": "137 Garpop",
+      "category": "Free Tier",
+      "file_size_kb": 1.5,
+      "vertices": 30,
+      "edges": 90
+    },
+    {
+      "id": "18-tip",
+      "name": "18 Tip",
+      "category": "Free Tier",
+      "file_size_kb": 1.7,
+      "vertices": 20,
+      "edges": 40
+    },
+    {
+      "id": "19-tat",
+      "name": "19 Waro",
+      "category": "Free Tier",
+      "file_size_kb": 5.58,
+      "vertices": 64,
+      "edges": 128
+    },
+    {
+      "id": "20-thex",
+      "name": "20 Dope",
+      "category": "Free Tier",
+      "file_size_kb": 3.87,
+      "vertices": 48,
+      "edges": 120
+    },
+    {
+      "id": "21-tico",
+      "name": "21 Vady",
+      "category": "Free Tier",
+      "file_size_kb": 16.84,
+      "vertices": 192,
+      "edges": 384
+    },
+    {
+      "id": "22-thi",
+      "name": "22 Tit",
+      "category": "Free Tier",
+      "file_size_kb": 255.25,
+      "vertices": 2400,
+      "edges": 4800
+    },
+    {
+      "id": "23-tex",
+      "name": "23 Tope",
+      "category": "Free Tier",
+      "file_size_kb": 184,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "24-tiffix",
+      "name": "24 Ratit",
+      "category": "Free Tier",
+      "file_size_kb": 187.24,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "25-tighi",
+      "name": "25 Ratope",
+      "category": "Free Tier",
+      "file_size_kb": 194.13,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "26-taghi",
+      "name": "26 Hip",
+      "category": "Free Tier",
+      "file_size_kb": 204.14,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "27-tigaghi",
+      "name": "27 Apech",
+      "category": "Free Tier",
+      "file_size_kb": 266.72,
+      "vertices": 2400,
+      "edges": 4800
+    },
+    {
+      "id": "28-tigfix",
+      "name": "28 Srix",
+      "category": "Free Tier",
+      "file_size_kb": 192.37,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "29-taggix",
+      "name": "29 Rix",
+      "category": "Free Tier",
+      "file_size_kb": 204.44,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "30-titho",
+      "name": "30 Dox",
+      "category": "Free Tier",
+      "file_size_kb": 7.07,
+      "vertices": 48,
+      "edges": 120
+    },
+    {
+      "id": "31-tissidtixhi",
+      "name": "31 Thox",
+      "category": "Free Tier",
+      "file_size_kb": 391.95,
+      "vertices": 2400,
+      "edges": 8400
+    },
+    {
+      "id": "32-tidtidohi",
+      "name": "32 Sirp",
+      "category": "Free Tier",
+      "file_size_kb": 379.88,
+      "vertices": 2400,
+      "edges": 8400
+    },
+    {
+      "id": "33-tiggidtixhi",
+      "name": "33 Rirp",
+      "category": "Free Tier",
+      "file_size_kb": 391.95,
+      "vertices": 2400,
+      "edges": 8400
+    },
+    {
+      "id": "34-quitit",
+      "name": "34 Grip",
+      "category": "Free Tier",
+      "file_size_kb": 4.83,
+      "vertices": 64,
+      "edges": 128
+    },
+    {
+      "id": "35-quit sishi",
+      "name": "35 Pex",
+      "category": "Free Tier",
+      "file_size_kb": 266.72,
+      "vertices": 2400,
+      "edges": 4800
+    },
+    {
+      "id": "36-quit gishi",
+      "name": "36 Dattady",
+      "category": "Free Tier",
+      "file_size_kb": 196.97,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "37-quit gashi",
+      "name": "37 Pahi",
+      "category": "Free Tier",
+      "file_size_kb": 185.72,
+      "vertices": 1440,
+      "edges": 4320
+    },
+    {
+      "id": "38-quit gogishi",
+      "name": "38 Xhi",
+      "category": "Free Tier",
+      "file_size_kb": 298,
+      "vertices": 2400,
+      "edges": 4800
+    },
+    {
+      "id": "39-rap",
+      "name": "39 Toxhi",
+      "category": "Free Tier",
+      "file_size_kb": 1.26,
+      "vertices": 10,
+      "edges": 30
+    },
+    {
+      "id": "40-firp",
+      "name": "40 Pox",
+      "category": "Free Tier",
+      "file_size_kb": 1.36,
+      "vertices": 10,
+      "edges": 30
+    },
+    {
+      "id": "41-pinnip",
+      "name": "41 Sadi",
+      "category": "Free Tier",
+      "file_size_kb": 1.5,
+      "vertices": 10,
+      "edges": 30
     }
   ]
 }

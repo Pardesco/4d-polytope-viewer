@@ -388,6 +388,18 @@ export class PolytopeSelector {
 
     // Update statistics from loaded data
     if (data && data.metadata) {
+      // Update System panel (top-left)
+      const vertexCountElement = document.getElementById('vertex-count');
+      if (vertexCountElement) {
+        vertexCountElement.textContent = data.metadata.vertexCount;
+      }
+
+      const edgeCountElement = document.getElementById('edge-count');
+      if (edgeCountElement) {
+        edgeCountElement.textContent = data.metadata.edgeCount;
+      }
+
+      // Also update info panel elements (if they exist)
       const verticesElement = document.getElementById('polytope-vertices');
       if (verticesElement) {
         verticesElement.textContent = data.metadata.vertexCount;

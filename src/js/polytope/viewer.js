@@ -25,6 +25,8 @@ import { IridescentMaterial } from '../materials/IridescentMaterial.js';
 import { Screenshot } from '../utils/Screenshot.js';
 import { ManualRotationController } from '../controls/ManualRotationController.js';
 import { PerformanceWarningBanner } from '../ui/PerformanceWarningBanner.js';
+import { MatrixDisplay } from '../ui/MatrixDisplay.js'; // NEW: For displaying 4D rotation matrix
+import { GlitchEffect } from '../effects/GlitchEffect.js'; // NEW: For visual feedback on polytope changes
 
 export class PolytopeViewer {
   constructor(canvasContainer, options = {}) {
@@ -122,6 +124,13 @@ export class PolytopeViewer {
 
     // Performance warning banner
     this.performanceBanner = new PerformanceWarningBanner();
+
+    // Matrix display for 4D rotation (desktop only)
+    if (window.innerWidth >= 1024) {
+      this.matrixDisplay = new MatrixDisplay('matrix-display');
+    } else {
+      this.matrixDisplay = null;
+    }
   }
 
   /**
@@ -144,14 +153,21 @@ export class PolytopeViewer {
     this.camera.position.z = 5;
 
     // Create renderer with alpha support for transparent screenshots
+    // If container is a canvas element, use it directly; otherwise append new canvas
+    const canvas = this.container.tagName === 'CANVAS' ? this.container : null;
     this.renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
       antialias: true,
       alpha: true,
       preserveDrawingBuffer: true // Required for screenshots
     });
     this.renderer.setSize(this.options.width, this.options.height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.container.appendChild(this.renderer.domElement);
+
+    // Only append if we created a new canvas (i.e., container wasn't a canvas)
+    if (!canvas) {
+      this.container.appendChild(this.renderer.domElement);
+    }
 
     // Create bloom effect (desktop only, enabled by default)
     this.bloomEffect = new BloomEffect(this.renderer, this.scene, this.camera);
@@ -203,6 +219,11 @@ export class PolytopeViewer {
     console.log(`[PolytopeViewer] Loading polytope from ${url}`);
 
     try {
+      // Trigger glitch effect on desktop before loading new polytope
+      if (window.innerWidth >= 1024) {
+        GlitchEffect.trigger(this.container);
+      }
+
       // Load and parse .off file
       this.polytopeData = await loadOffFile(url);
       this.polytopeName = name || url.split('/').pop().replace('.off', '');
@@ -1097,6 +1118,10 @@ export class PolytopeViewer {
     }
 
     // 4D rotation (auto or manual mode)
+    if (this.matrixDisplay) { // Update matrix display on desktop
+      this.matrixDisplay.update(this.rotation4D.getCurrentRotationMatrix());
+    }
+
     if (this.rotationMode === 'manual' && this.manualRotationController) {
       // Manual mode: update from manual controller
       // Note: 3D rotation is disabled in manual mode for precise 4D control

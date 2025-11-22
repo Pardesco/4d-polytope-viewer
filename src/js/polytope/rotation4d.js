@@ -183,6 +183,9 @@ export class Rotation4D {
       yz: 0, yw: 0, zw: 0
     };
     this.manualMode = false; // When true, use manualAngles instead of currentAngle
+
+    // Store the last applied rotation matrix for display
+    this.currentRotationMatrix = identity4D();
   }
 
   /**
@@ -244,7 +247,9 @@ export class Rotation4D {
    * Apply rotation to vertices
    */
   applyTo(vertices) {
-    return rotateVertices4D(vertices, this.activePlanes, this.currentAngle);
+    const rotationMatrix = create4DRotationMatrix(this.activePlanes, this.currentAngle);
+    this.currentRotationMatrix = rotationMatrix; // Store the matrix
+    return vertices.map(vertex => applyMatrix4D(rotationMatrix, vertex));
   }
 
   /**
@@ -311,7 +316,16 @@ export class Rotation4D {
       }
     }
 
+    this.currentRotationMatrix = combined; // Store the matrix
     // Apply combined matrix to all vertices
     return vertices.map(vertex => applyMatrix4D(combined, vertex));
+  }
+
+  /**
+   * Get the currently applied 4x4 rotation matrix
+   * @returns {Array<Array<number>>} - Current 4x4 rotation matrix
+   */
+  getCurrentRotationMatrix() {
+    return this.currentRotationMatrix;
   }
 }

@@ -5,12 +5,17 @@
  * Shows upgrade prompts for free tier users
  */
 
+import * as THREE from 'three';
+import { VideoRecorder } from '../export/VideoRecorder.js';
+
 export class ExportMenu {
     constructor(container, licenseManager, viewer) {
         this.container = container;
         this.licenseManager = licenseManager;
         this.viewer = viewer;
         this.exportPanel = null;
+        this.videoRecorder = null;
+        this.recordingInterval = null;
 
         this.init();
     }
@@ -49,6 +54,21 @@ export class ExportMenu {
             </div>
 
             <div class="export-buttons">
+                <!-- Video Recording (Creator/Pro only) -->
+                <button
+                    class="export-btn ${isFree ? 'locked' : ''}"
+                    id="video-record-btn"
+                    data-export-type="video"
+                    ${isFree ? 'disabled' : ''}
+                >
+                    ${isFree ? '🔒' : '🎬'} <span id="video-btn-text">Record Video</span>
+                    ${isFree ? '<span class="upgrade-hint">Creator</span>' : ''}
+                </button>
+                <div id="recording-timer" class="recording-timer" style="display: none;">
+                    <span class="recording-dot"></span>
+                    <span id="timer-text">00:00</span>
+                </div>
+
                 <!-- Mesh Export -->
                 <button
                     class="export-btn ${isFree ? 'locked' : ''}"
@@ -97,6 +117,7 @@ export class ExportMenu {
                 <p>🌟 <strong>Unlock Export Features</strong></p>
                 <p>Upgrade to Creator tier for:</p>
                 <ul style="text-align: left; font-size: 12px; margin: 8px 0; padding-left: 20px;">
+                    <li>🎬 Video recording (30 FPS, .webm)</li>
                     <li>🎨 Transparent background screenshots</li>
                     <li>📐 Mesh & linework .obj exports</li>
                     <li>✨ No watermarks</li>
@@ -144,18 +165,28 @@ export class ExportMenu {
 
     /**
      * Handle export button click
-     * @param {string} exportType - 'mesh', 'linework', or 'screenshot'
+     * @param {string} exportType - 'mesh', 'linework', 'screenshot', or 'video'
      */
     async handleExport(exportType) {
         const tier = this.licenseManager.getTier();
         const isFree = tier === 'free';
 
-        // Check permissions
-        if (exportType === 'mesh' || exportType === 'linework') {
+        // Check permissions for Creator/Pro features
+        if (exportType === 'mesh' || exportType === 'linework' || exportType === 'video') {
             if (isFree) {
                 this.showUpgradeModal(exportType);
                 return;
             }
+        }
+
+        // Handle video recording toggle
+        if (exportType === 'video') {
+            if (this.videoRecorder && this.videoRecorder.isRecording) {
+                await this.stopVideoRecording();
+            } else {
+                await this.startVideoRecording();
+            }
+            return;
         }
 
         this.setStatus('Preparing export...', 'info');
@@ -283,9 +314,161 @@ export class ExportMenu {
     }
 
     /**
+     * Start video recording
+     */
+    async startVideoRecording() {
+        try {
+            // Check browser support
+            if (!VideoRecorder.isSupported()) {
+                this.setStatus('Video recording is not supported in this browser', 'error');
+                alert('Video recording requires a modern browser (Chrome, Edge, Firefox, or Safari 14.1+)');
+                return;
+            }
+
+            // Get canvas from viewer
+            const canvas = this.viewer.renderer.domElement;
+
+            // Create recorder if needed
+            if (!this.videoRecorder) {
+                this.videoRecorder = new VideoRecorder(canvas, 30);
+            }
+
+            // Ensure solid background during recording (transparent background doesn't work well in video)
+            const originalBackground = this.viewer.scene.background;
+            this.viewer.scene.background = new THREE.Color(0x0a0a1a); // Solid dark background
+
+            // Store original background to restore later
+            this._originalBackground = originalBackground;
+
+            // Start recording (60 second max)
+            await this.videoRecorder.start(60000);
+
+            // Update UI
+            this.updateRecordingUI(true);
+            this.setStatus('🔴 Recording... (max 60 seconds)', 'info');
+
+            // Start timer update
+            this.recordingInterval = setInterval(() => {
+                this.updateRecordingTimer();
+            }, 100); // Update every 100ms for smooth timer
+
+        } catch (error) {
+            console.error('[ExportMenu] Failed to start recording:', error);
+            this.setStatus(`Failed to start recording: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * Stop video recording
+     */
+    async stopVideoRecording() {
+        try {
+            if (!this.videoRecorder || !this.videoRecorder.isRecording) {
+                return;
+            }
+
+            // Update UI to show processing
+            this.setStatus('Processing video...', 'info');
+            const videoBtn = document.getElementById('video-record-btn');
+            if (videoBtn) {
+                videoBtn.disabled = true;
+            }
+
+            // Generate filename
+            const polytopeData = this.viewer.getCurrentPolytopeData();
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+            const filename = `${polytopeData.name}-${timestamp}`;
+
+            // Stop recording and download
+            await this.videoRecorder.stop(filename);
+
+            // Restore original background
+            if (this._originalBackground !== undefined) {
+                this.viewer.scene.background = this._originalBackground;
+            }
+
+            // Clear timer interval
+            if (this.recordingInterval) {
+                clearInterval(this.recordingInterval);
+                this.recordingInterval = null;
+            }
+
+            // Update UI
+            this.updateRecordingUI(false);
+            this.setStatus('✓ Video saved successfully!', 'success');
+
+            // Re-enable button
+            if (videoBtn) {
+                videoBtn.disabled = false;
+            }
+
+        } catch (error) {
+            console.error('[ExportMenu] Failed to stop recording:', error);
+            this.setStatus(`Failed to save video: ${error.message}`, 'error');
+
+            // Clean up on error
+            if (this.recordingInterval) {
+                clearInterval(this.recordingInterval);
+                this.recordingInterval = null;
+            }
+            this.updateRecordingUI(false);
+        }
+    }
+
+    /**
+     * Update recording UI state
+     * @param {boolean} isRecording - True if recording is active
+     */
+    updateRecordingUI(isRecording) {
+        const videoBtn = document.getElementById('video-record-btn');
+        const videoBtnText = document.getElementById('video-btn-text');
+        const recordingTimer = document.getElementById('recording-timer');
+
+        if (!videoBtn || !videoBtnText || !recordingTimer) return;
+
+        if (isRecording) {
+            videoBtn.classList.add('recording');
+            videoBtnText.textContent = 'Stop Recording';
+            recordingTimer.style.display = 'flex';
+        } else {
+            videoBtn.classList.remove('recording');
+            videoBtnText.textContent = 'Record Video';
+            recordingTimer.style.display = 'none';
+        }
+    }
+
+    /**
+     * Update recording timer display
+     */
+    updateRecordingTimer() {
+        if (!this.videoRecorder || !this.videoRecorder.isRecording) return;
+
+        const duration = this.videoRecorder.getDuration();
+        const minutes = Math.floor(duration / 60);
+        const seconds = Math.floor(duration % 60);
+        const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        const timerText = document.getElementById('timer-text');
+        if (timerText) {
+            timerText.textContent = timeString;
+        }
+    }
+
+    /**
      * Update UI when license tier changes
      */
     refresh() {
+        // Stop any active recording
+        if (this.videoRecorder && this.videoRecorder.isRecording) {
+            this.videoRecorder.cancel();
+        }
+
+        // Clear recording interval
+        if (this.recordingInterval) {
+            clearInterval(this.recordingInterval);
+            this.recordingInterval = null;
+        }
+
         const tier = this.licenseManager.getTier();
         this.exportPanel.innerHTML = this.generateHTML(tier);
         this.attachEventListeners();

@@ -289,6 +289,14 @@ export class ViewerControls {
         }
       });
     }
+
+    // Audio toggle button
+    const soundToggle = document.getElementById('sound-toggle');
+    if (soundToggle) {
+      soundToggle.addEventListener('click', () => {
+        this.toggleAudio();
+      });
+    }
   }
 
   /**
@@ -583,6 +591,21 @@ export class ViewerControls {
   }
 
   /**
+   * Toggle audio on/off
+   */
+  toggleAudio() {
+    // Check if HUDSounds is available (desktop only)
+    if (window.hudSounds) {
+      const isEnabled = window.hudSounds.enabled;
+      window.hudSounds.setEnabled(!isEnabled);
+      this.updateAudioButton();
+      console.log('[ViewerControls] Audio toggled:', !isEnabled);
+    } else {
+      console.warn('[ViewerControls] HUDSounds not available');
+    }
+  }
+
+  /**
    * Reset view to initial state
    */
   resetView() {
@@ -694,6 +717,22 @@ export class ViewerControls {
       } else {
         stereoBtn.classList.remove('active');
         perspBtn.classList.add('active');
+      }
+    }
+  }
+
+  /**
+   * Update audio toggle button
+   */
+  updateAudioButton() {
+    const button = document.getElementById('sound-toggle');
+    if (button && window.hudSounds) {
+      if (window.hudSounds.enabled) {
+        button.classList.add('active');
+        button.textContent = 'Audio: ON';
+      } else {
+        button.classList.remove('active');
+        button.textContent = 'Audio: OFF';
       }
     }
   }

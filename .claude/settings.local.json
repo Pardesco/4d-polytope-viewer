@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(python scripts/find_duplicates.py:*)",
+      "Bash(\"C:\\Users\\Randall\\Documents\\polytope-web-app\\public\\data\\duplicates.json\")",
+      "Bash(\"C:\\Users\\Randall\\Documents\\polytope-web-app\\PHASE_1_OPTIMIZATIONS_COMPLETE.md\")",
+      "Bash(node -e:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

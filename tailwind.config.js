@@ -9,15 +9,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#8B5CF6',      // Purple
-        'primary-dark': '#7C3AED',
-        secondary: '#EC4899',    // Pink
-        'secondary-dark': '#DB2777',
-        dark: '#0F172A',         // Dark blue-gray
-        'dark-lighter': '#1E293B',
-        'dark-accent': '#334155',
-        accent: '#00D9FF',       // Cyan accent
-        'accent-dark': '#00B4D8',
+        // Primary neon colors
+        'neon-cyan': '#00ffff',
+        'neon-magenta': '#ff00ff',
+        'neon-blue': '#0080ff',
+        
+        // Background layers
+        'hud-bg': '#050810',
+        'hud-panel': '#0a0e1a',
+        'hud-panel-light': '#151b2e',
+        
+        // Accents
+        'accent-green': '#00ff00',
+        'accent-amber': '#ffaa00',
+        'accent-red': '#ff0040',
+      },
+      boxShadow: {
+        'neon-cyan': '0 0 20px rgba(0, 255, 255, 0.5)',
+        'neon-magenta': '0 0 20px rgba(255, 0, 255, 0.5)',
+        'neon-multi': '0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.2)',
+      },
+      dropShadow: {
+        'neon': '0 0 10px currentColor',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

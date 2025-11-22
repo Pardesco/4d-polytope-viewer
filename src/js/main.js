@@ -1,15 +1,11 @@
-/**
- * Main entry point for Polytope Viewer
- *
- * Initializes viewer and controls
- */
-
 import { PolytopeViewer } from './polytope/viewer.js';
-import { ViewerControls, showPerformanceWarning } from './ui/controls.js';
+import { ViewerControls } from './ui/controls.js';
 import { PolytopeSelector } from './ui/polytope-selector.js';
 import { MobileUI } from './ui/mobile/MobileUI.js';
 import { SimpleWatermark } from './ui/SimpleWatermark.js';
 import { licenseManager } from './license/LicenseManager.js';
+import { ParticleField } from './effects/ParticleField.js';
+import { HUDSounds } from './audio/HUDSounds.js';
 import '../styles/main.css';
 import '../styles/mobile.css';
 
@@ -17,6 +13,7 @@ import '../styles/mobile.css';
 let viewer = null;
 let controls = null;
 let mobileUI = null;
+let hudSounds = null; // NEW: Global instance for audio feedback
 
 /**
  * Initialize application
@@ -111,12 +108,37 @@ async function init() {
     showError(`Failed to load polytope: ${error.message}`);
   }
 
+  // Initialize desktop-only effects
+  if (window.innerWidth >= 1024) {
+    // Particle background
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    `;
+    document.body.insertBefore(bgCanvas, document.body.firstChild);
+    new ParticleField(bgCanvas);
+
+    // Audio feedback for UI interactions
+    hudSounds = new HUDSounds();
+    document.querySelectorAll('.hud-button, .btn-secondary, .btn-primary').forEach(btn => {
+      btn.addEventListener('mouseenter', () => hudSounds.playTick());
+      btn.addEventListener('click', () => hudSounds.playChirp());
+    });
+  }
+
   // Make viewer globally accessible for debugging
   window.viewer = viewer;
   window.controls = controls;
   window.mobileUI = mobileUI;
   window.licenseManager = licenseManager;
   window.selector = selector;
+  window.hudSounds = hudSounds; // Make sounds globally accessible for toggle
 }
 
 /**

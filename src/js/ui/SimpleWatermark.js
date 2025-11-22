@@ -1,9 +1,9 @@
 /**
- * SimpleWatermark - Persistent canvas watermark
+ * SimpleWatermark - Terminal-style persistent watermark
  *
- * Always-visible brand watermark in corners
+ * Prominent brand watermark with flashing cursor
  * Appears in ALL screenshots/recordings (OS-level capture)
- * Non-intrusive, subtle opacity
+ * Terminal/HUD aesthetic matching the UI theme
  */
 
 export class SimpleWatermark {
@@ -13,17 +13,19 @@ export class SimpleWatermark {
   }
 
   /**
-   * Create watermark overlay
+   * Create terminal-style watermark overlay
    */
   create() {
     const overlay = document.createElement('div');
     overlay.className = 'simple-watermark';
     overlay.innerHTML = `
-      <div class="watermark-corner top-left">4d.pardesco.com</div>
-      <div class="watermark-corner bottom-right">pardesco.com</div>
+      <div class="watermark watermark-top-center">
+        <span class="watermark-text">4D.PARDESCO.COM</span>
+        <span class="watermark-cursor">█</span>
+      </div>
     `;
     document.body.appendChild(overlay);
-    console.log('[SimpleWatermark] Persistent watermark created');
+    console.log('[SimpleWatermark] Terminal-style watermark created');
   }
 
   /**
