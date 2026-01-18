@@ -289,17 +289,109 @@
 
 /* Show mobile UI and hide desktop panels on mobile/tablet */
 @media (max-width: 1023px) {
-  /* Hide desktop control panels */
+  /* Hide desktop control panels (legacy) */
   .info-panel,
   .control-panel {
     display: none !important;
   }
 
-  /* Ensure mobile components are visible */
+  /* Hide most HUD panels, keep only selector and quick controls */
+  .hud-top-left,
+  .hud-bottom-left,
+  .hud-bottom-right {
+    display: none !important;
+  }
+
+  /* Keep polytope selector visible at top - REDUCED SIZE */
+  .hud-top-right {
+    display: block !important;
+    position: fixed !important;
+    top: 10px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    max-width: calc(100% - 40px) !important;
+    width: auto !important;
+    min-width: 280px !important;
+    z-index: 100 !important;
+  }
+
+  /* Reduce polytope selector height by ~50% */
+  .hud-top-right .hud-content {
+    padding: 0.5rem !important;
+  }
+
+  .hud-top-right .hud-title {
+    font-size: 0.7rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .hud-top-right h4 {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .hud-top-right #polytope-selector select {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    min-height: 32px !important;
+  }
+
+  .hud-top-right #tier-indicator {
+    font-size: 0.7rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .hud-top-right .hud-divider {
+    margin: 0.5rem 0 !important;
+  }
+
+  /* Keep Quick Controls visible at bottom - REDUCED SIZE */
+  .hud-bottom-center {
+    display: block !important;
+    position: fixed !important;
+    bottom: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    min-width: calc(100% - 40px) !important;
+    max-width: calc(100% - 40px) !important;
+    z-index: 100 !important;
+  }
+
+  /* Reduce quick controls size by ~50% */
+  .hud-bottom-center .hud-content {
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  .hud-bottom-center .hud-title {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .hud-bottom-center .hud-divider {
+    margin: 0.3rem 0 !important;
+  }
+
+  .hud-bottom-center .rotation-controls {
+    gap: 0.4rem !important;
+  }
+
+  .hud-bottom-center .rotation-controls button {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.65rem !important;
+    min-width: auto !important;
+  }
+
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Hide the complex mobile UI components (we're using simplified approach) */
   .mobile-overlay,
   .mobile-fab,
   .mobile-sheet {
-    display: flex;
+    display: none !important;
   }
 
   /* Let canvas fill viewport naturally - overlay sits on top */
@@ -309,6 +401,11 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+  }
+
+  /* Adjust watermark position for mobile */
+  .watermark-top-center {
+    top: 60px !important; /* Below polytope selector */
   }
 }
 

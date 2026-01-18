@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:all": "node scripts/build-all.js",
+    "build:kb": "cd knowledge-base && npm run build",
     "preview": "vite preview"
   },
   "keywords": [
@@ -24,6 +26,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
+    "puppeteer": "^24.31.0",
     "tailwindcss": "^3.4.15",
     "terser": "^5.44.1",
     "vite": "^5.4.11"

@@ -10,6 +10,7 @@ export class PerformanceWarningBanner {
     this.currentEdgeCount = 0;
     this.isVisible = false;
     this.WARNING_THRESHOLD = 1200; // Show warning for polytopes with >1200 edges
+    this.autoDismissTimer = null;
   }
 
   /**
@@ -23,12 +24,11 @@ export class PerformanceWarningBanner {
     this.banner.className = 'performance-warning-banner hidden';
     this.banner.innerHTML = `
       <div class="banner-content">
-        <div class="banner-icon">⚠️</div>
         <div class="banner-text">
-          <div class="banner-title">Performance Notice</div>
+          <div class="banner-title">PERFORMANCE NOTICE</div>
           <div class="banner-message">
-            This polytope has <span id="banner-edge-count">0</span> edges.
-            4D rotation may impact performance on some devices.
+            THIS POLYTOPE HAS <span id="banner-edge-count">0</span> EDGES.
+            4D ROTATION MAY IMPACT PERFORMANCE ON SOME DEVICES.
           </div>
         </div>
         <button class="banner-close" id="close-warning-banner" title="Dismiss">✕</button>
@@ -84,7 +84,8 @@ export class PerformanceWarningBanner {
     this.banner.classList.add('visible');
     this.isVisible = true;
 
-    console.log(`[PerformanceWarning] Banner shown for ${edgeCount} edges`);
+    // NO auto-dismiss - user must manually close while rotating high-edge polytope
+    console.log(`[PerformanceWarning] Banner shown for ${edgeCount} edges (manual close required)`);
   }
 
   /**
@@ -92,6 +93,12 @@ export class PerformanceWarningBanner {
    */
   hide() {
     if (!this.banner) return;
+
+    // Clear auto-dismiss timer
+    if (this.autoDismissTimer) {
+      clearTimeout(this.autoDismissTimer);
+      this.autoDismissTimer = null;
+    }
 
     this.banner.classList.remove('visible');
     this.banner.classList.add('hidden');

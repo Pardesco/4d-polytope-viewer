@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>4D Polytope Viewer - Pardesco</title>
   <meta name="description" content="Interactive 4D polytope viewer with stereographic projection and true 4D rotation">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/styles/emergency-fix.css">
 </head>
 <body class="overflow-hidden">
   <div class="viewer-container">
@@ -65,10 +65,10 @@
           <h3 class="hud-title">Quick Controls</h3>
           <div class="hud-divider"></div>
           <div class="rotation-controls">
-            <button id="rotate-3d-btn" class="btn-secondary py-1 px-3 text-xs">3D Rotate: OFF</button>
-            <button id="rotate-4d-btn" class="btn-secondary py-1 px-3 text-xs">4D Rotate: OFF</button>
-            <button id="toggle-vertices-btn" class="btn-secondary py-1 px-3 text-xs active">Vertices: ON</button>
-            <button id="reset-view-btn" class="btn-secondary py-1 px-3 text-xs">Reset View</button>
+            <button id="rotate-3d-btn" class="btn-secondary py-1 px-3 text-xs" title="Toggle 3D Rotation">3D Rotate: OFF</button>
+            <button id="rotate-4d-btn" class="btn-secondary py-1 px-3 text-xs" title="Toggle 4D Rotation">4D Rotate: OFF</button>
+            <button id="toggle-vertices-btn" class="btn-secondary py-1 px-3 text-xs active" title="Toggle Vertices">Vertices: ON</button>
+            <button id="reset-view-btn" class="btn-secondary py-1 px-3 text-xs" title="Reset View">Reset View</button>
           </div>
         </div>
       </div>
@@ -81,72 +81,70 @@
           
           <div class="controls-scroll-container" style="max-height: 50vh; overflow-y: auto; padding-right: 5px; scrollbar-width: thin;">
             
-            <!-- Manual Rotation Control (Desktop Only) -->
-            <div id="manual-rotation-section" class="desktop-only mb-4" style="display: none;">
-              <details class="bg-dark-lighter rounded-lg">
-                <summary class="text-sm font-bold text-secondary p-2 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
+            <!-- 4D Rotation (Combined Auto Planes + Manual Controls) - HIGHLIGHTED -->
+            <div id="rotation-section" class="mb-4">
+              <details open class="details-highlighted details-orange">
+                <summary class="text-sm font-bold p-2 cursor-pointer rounded-lg transition-colors flex items-center justify-between summary-highlighted">
                   <span>4D Rotation</span>
-                  <span class="text-xs text-gray-500">▼</span>
+                  <span class="text-xs">▼</span>
                 </summary>
                 <div class="p-2 pt-0">
-                  <div class="mb-2 mt-2 flex gap-2">
-                    <label class="flex items-center cursor-pointer text-xs">
-                      <input type="radio" name="rotation-mode" id="rotation-mode-auto" value="auto" checked class="mr-1"> Auto
-                    </label>
-                    <label class="flex items-center cursor-pointer text-xs">
-                      <input type="radio" name="rotation-mode" id="rotation-mode-manual" value="manual" class="mr-1"> Manual
-                    </label>
-                  </div>
-                  <div id="manual-instructions" class="mb-2 hidden text-xs text-gray-400 bg-dark-lighter p-2 rounded">
-                    <div>🖱️ Mouse: XY + ZW</div>
-                    <div>⇧ Shift: XZ + YW</div>
-                    <div>⌃ Ctrl: XW + YZ</div>
-                    <button id="show-keyboard-help" class="text-secondary hover:text-primary mt-1 underline">[?] Shortcuts</button>
-                  </div>
-                  <div id="angle-display" class="mb-2 hidden">
-                    <div class="grid grid-cols-3 gap-1 text-[10px]">
-                      <div>XY: <span id="angle-xy" class="text-accent font-mono">0°</span></div>
-                      <div>XZ: <span id="angle-xz" class="text-accent font-mono">0°</span></div>
-                      <div>XW: <span id="angle-xw" class="text-accent font-mono">0°</span></div>
-                      <div>YZ: <span id="angle-yz" class="text-accent font-mono">0°</span></div>
-                      <div>YW: <span id="angle-yw" class="text-accent font-mono">0°</span></div>
-                      <div>ZW: <span id="angle-zw" class="text-accent font-mono">0°</span></div>
+                  <!-- Auto Rotation Planes -->
+                  <div class="mb-3 mt-2">
+                    <label class="text-xs text-gray-400 mb-1 block">Auto Planes:</label>
+                    <div class="grid grid-cols-3 gap-1">
+                      <button id="plane-xy" class="btn-secondary py-1 px-1 text-xs">XY</button>
+                      <button id="plane-xz" class="btn-secondary py-1 px-1 text-xs">XZ</button>
+                      <button id="plane-xw" class="btn-secondary py-1 px-1 text-xs">XW</button>
+                      <button id="plane-yz" class="btn-secondary py-1 px-1 text-xs">YZ</button>
+                      <button id="plane-yw" class="btn-secondary py-1 px-1 text-xs">YW</button>
+                      <button id="plane-zw" class="btn-secondary py-1 px-1 text-xs">ZW</button>
                     </div>
                   </div>
-                  <div id="rotation-presets" class="mb-2 hidden grid grid-cols-2 gap-1">
-                    <button data-preset="clifford45" class="btn-secondary py-1 px-1 text-[10px]">Clifford</button>
-                    <button data-preset="hopf" class="btn-secondary py-1 px-1 text-[10px]">Hopf</button>
-                    <button data-preset="doubleRotation" class="btn-secondary py-1 px-1 text-[10px]">Double</button>
-                    <button data-preset="isoclinic" class="btn-secondary py-1 px-1 text-[10px]">Isoclinic</button>
-                  </div>
-                  <div id="sensitivity-control" class="mb-2 hidden">
-                    <div class="flex justify-between text-[10px] text-gray-400">
-                      <label>Sensitivity</label> <span id="sensitivity-value">0.5</span>
-                    </div>
-                    <input type="range" id="rotation-sensitivity" min="0.1" max="2.0" step="0.1" value="0.5" class="slider w-full h-1">
-                  </div>
-                  <div id="reset-rotation-container" class="hidden">
-                    <button id="rotation-reset" class="btn-secondary w-full py-1 text-xs">Reset</button>
-                  </div>
-                </div>
-              </details>
-            </div>
 
-            <!-- 4D Rotation Planes -->
-            <div class="mb-4">
-              <details class="bg-dark-lighter rounded-lg">
-                <summary class="text-sm font-bold text-secondary p-2 cursor-pointer hover:bg-dark-accent rounded-lg transition-colors flex items-center justify-between">
-                  <span>Auto Planes</span>
-                  <span class="text-xs text-gray-500">▼</span>
-                </summary>
-                <div class="p-2 pt-0">
-                  <div class="grid grid-cols-3 gap-1 mt-2">
-                    <button id="plane-xy" class="btn-secondary py-1 px-1 text-xs">XY</button>
-                    <button id="plane-xz" class="btn-secondary py-1 px-1 text-xs">XZ</button>
-                    <button id="plane-xw" class="btn-secondary py-1 px-1 text-xs">XW</button>
-                    <button id="plane-yz" class="btn-secondary py-1 px-1 text-xs">YZ</button>
-                    <button id="plane-yw" class="btn-secondary py-1 px-1 text-xs">YW</button>
-                    <button id="plane-zw" class="btn-secondary py-1 px-1 text-xs">ZW</button>
+                  <!-- Manual Rotation Controls (Desktop Only) -->
+                  <div id="manual-rotation-controls" class="desktop-only" style="display: none;">
+                    <div class="border-t border-gray-700 pt-2 mt-2">
+                      <div class="mb-2 flex gap-2">
+                        <label class="flex items-center cursor-pointer text-xs">
+                          <input type="radio" name="rotation-mode" id="rotation-mode-auto" value="auto" checked class="mr-1"> Auto
+                        </label>
+                        <label class="flex items-center cursor-pointer text-xs">
+                          <input type="radio" name="rotation-mode" id="rotation-mode-manual" value="manual" class="mr-1"> Manual
+                        </label>
+                      </div>
+                      <div id="manual-instructions" class="mb-2 hidden text-xs text-gray-400 bg-dark-lighter p-2 rounded">
+                        <div>Mouse: XY + ZW</div>
+                        <div>Shift: XZ + YW</div>
+                        <div>Ctrl: XW + YZ</div>
+                        <button id="show-keyboard-help" class="text-secondary hover:text-primary mt-1 underline">[?] Shortcuts</button>
+                      </div>
+                      <div id="angle-display" class="mb-2 hidden">
+                        <div class="grid grid-cols-3 gap-1 text-[10px]">
+                          <div>XY: <span id="angle-xy" class="text-accent font-mono">0°</span></div>
+                          <div>XZ: <span id="angle-xz" class="text-accent font-mono">0°</span></div>
+                          <div>XW: <span id="angle-xw" class="text-accent font-mono">0°</span></div>
+                          <div>YZ: <span id="angle-yz" class="text-accent font-mono">0°</span></div>
+                          <div>YW: <span id="angle-yw" class="text-accent font-mono">0°</span></div>
+                          <div>ZW: <span id="angle-zw" class="text-accent font-mono">0°</span></div>
+                        </div>
+                      </div>
+                      <div id="rotation-presets" class="mb-2 hidden grid grid-cols-2 gap-1">
+                        <button data-preset="clifford45" class="btn-secondary py-1 px-1 text-[10px]">Clifford</button>
+                        <button data-preset="hopf" class="btn-secondary py-1 px-1 text-[10px]">Hopf</button>
+                        <button data-preset="doubleRotation" class="btn-secondary py-1 px-1 text-[10px]">Double</button>
+                        <button data-preset="isoclinic" class="btn-secondary py-1 px-1 text-[10px]">Isoclinic</button>
+                      </div>
+                      <div id="sensitivity-control" class="mb-2 hidden">
+                        <div class="flex justify-between text-[10px] text-gray-400">
+                          <label>Sensitivity</label> <span id="sensitivity-value">0.5</span>
+                        </div>
+                        <input type="range" id="rotation-sensitivity" min="0.1" max="2.0" step="0.1" value="0.5" class="slider w-full h-1">
+                      </div>
+                      <div id="reset-rotation-container" class="hidden">
+                        <button id="rotation-reset" class="btn-secondary w-full py-1 text-xs">Reset</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </details>
@@ -171,7 +169,15 @@
                       </button>
                     </div>
                   </div>
-                  <button id="toggle-mesh-btn" class="btn-secondary w-full py-1 text-xs">Mesh: OFF</button>
+                  <button id="toggle-mesh-btn" class="btn-highlighted btn-purple w-full py-1 text-xs">Mesh: OFF</button>
+                  <!-- Material Selection (Desktop only, shown when mesh is enabled) -->
+                  <div id="material-selector" class="desktop-only hidden">
+                    <label class="text-xs text-gray-400 mb-1 block">Material:</label>
+                    <div class="grid grid-cols-2 gap-1">
+                      <button id="material-iridescent" class="btn-secondary py-1 px-1 text-[10px] active" data-material="iridescent">Iridescent</button>
+                      <button id="material-basic" class="btn-secondary py-1 px-1 text-[10px]" data-material="basic">Basic</button>
+                    </div>
+                  </div>
                 </div>
               </details>
             </div>
@@ -185,14 +191,10 @@
                 </summary>
                 <div class="p-2 pt-0 space-y-2 mt-2">
                   <button id="toggle-bloom-btn" class="btn-secondary w-full py-1 text-xs active">Bloom: ON</button>
+                  <button id="toggle-grain-btn" class="btn-secondary w-full py-1 text-xs active">Film Grain: ON</button>
                 </div>
               </details>
             </div>
-
-            <!-- Audio Toggle -->
-            <button id="sound-toggle" class="hud-button btn-secondary w-full py-2 text-sm mt-2 mb-4">
-              Audio: ON
-            </button>
 
             <!-- Export -->
             <div id="export-container"></div>
@@ -262,20 +264,24 @@
   <script type="module" src="/src/js/main.js"></script>
 
   <style>
+    /* CRT Terminal Inline Styles */
     kbd {
-      background-color: #252538;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      font-size: 0.75rem;
-      font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-color: rgba(0, 30, 40, 0.8);
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      font-size: 0.7rem;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      color: #00ffff;
+      text-shadow: 0 0 4px rgba(0, 255, 255, 0.5);
     }
 
-    /* Active button state */
+    /* Active button state - CRT cyan glow */
     button.active {
-      background: linear-gradient(to right, #8b5cf6, #d946ef);
-      border-color: transparent;
-      box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+      background: rgba(0, 255, 255, 0.15);
+      border-color: #00ffff;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+      color: #00ffff;
     }
 
     /* Details summary styling */
@@ -284,8 +290,9 @@
     }
 
     details[open] summary {
-      color: #d1d5db;
+      color: #00ffff;
     }
+
   </style>
 </body>
 </html>

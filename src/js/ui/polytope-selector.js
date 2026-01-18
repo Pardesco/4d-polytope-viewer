@@ -64,14 +64,16 @@ export class PolytopeSelector {
   }
 
   /**
-   * Load polytope list from tier-specific JSON file
+   * Load polytope list - all polytopes available to all users
+   * Tier only affects export features, not viewing
    * Loads only metadata (names, IDs, categories, sizes) - no geometry
    */
   async loadPolytopeList() {
     this.isLoading = true;
 
     try {
-      const listPath = `/data/polytope-lists/${this.tier}-tier.json`;
+      // All users get access to full polytope library - tier only affects exports
+      const listPath = `/data/polytope-lists/creator-tier.json`;
       console.log(`[PolytopeSelector] Fetching: ${listPath}`);
 
       const response = await fetch(listPath);
@@ -133,14 +135,16 @@ export class PolytopeSelector {
             ${categories.map(cat => `<option value="${cat}">${cat === 'all' ? 'All Categories' : cat}</option>`).join('')}
           </select>
         </div>
-        <div class="flex gap-2 items-center text-xs">
+        <div class="flex gap-2 items-center text-xs px-1">
           <span class="text-gray-400">Edges:</span>
           <input type="number" id="edge-min" placeholder="Min" value="${this.filters.edgeMin}"
-                 class="w-20 bg-dark-lighter text-white border border-primary/30 rounded px-2 py-1 text-xs">
+                 style="background-color: rgba(10, 20, 40, 0.9) !important; color: #00ffff !important;"
+                 class="w-20 text-cyan-300 border border-cyan-500/30 rounded px-2 py-1 text-xs focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all">
           <span class="text-gray-400">-</span>
           <input type="number" id="edge-max" placeholder="Max" value="${this.filters.edgeMax === Infinity ? '' : this.filters.edgeMax}"
-                 class="w-20 bg-dark-lighter text-white border border-primary/30 rounded px-2 py-1 text-xs">
-          <button id="reset-filters" class="text-gray-400 hover:text-white text-xs">Reset</button>
+                 style="background-color: rgba(10, 20, 40, 0.9) !important; color: #00ffff !important;"
+                 class="w-20 text-cyan-300 border border-cyan-500/30 rounded px-2 py-1 text-xs focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all mr-2">
+          <button id="reset-filters" class="text-gray-400 hover:text-cyan-400 text-xs transition-colors">Reset</button>
         </div>
         <div id="filter-count" class="text-xs text-gray-400 text-center"></div>
       `;
@@ -298,23 +302,25 @@ export class PolytopeSelector {
     const badge = document.createElement('div');
     badge.className = 'mt-2 text-xs text-center';
 
-    const tierLabels = {
-      free: { text: 'Free Tier', color: 'text-gray-400' },
-      creator: { text: 'Creator Tier', color: 'text-purple-400' },
-      professional: { text: 'Professional Tier', color: 'text-pink-400' }
-    };
-
-    const tierInfo = tierLabels[this.tier] || tierLabels.free;
-
-    badge.innerHTML = `
-      <span class="${tierInfo.color}">
-        ${tierInfo.text} - ${this.polytopes.length} polytopes available
-      </span>
-    `;
-
-    // Add upgrade link for free tier
+    // All users see all polytopes - tier only affects exports
     if (this.tier === 'free') {
-      badge.innerHTML += `<br><a href="https://pardesco.com/products/4d-viewer-creator" class="text-primary hover:underline text-xs">Upgrade for ${1717 - this.polytopes.length}+ more</a>`;
+      badge.innerHTML = `
+        <span class="text-gray-400">
+          ${this.polytopes.length} polytopes available
+        </span>
+        <br><a href="https://pardesco.com/products/4d-viewer-creator" class="text-primary hover:underline text-xs">Upgrade for export features</a>
+      `;
+    } else {
+      const tierLabels = {
+        creator: { text: 'Creator Tier', color: 'text-purple-400' },
+        professional: { text: 'Professional Tier', color: 'text-pink-400' }
+      };
+      const tierInfo = tierLabels[this.tier] || tierLabels.creator;
+      badge.innerHTML = `
+        <span class="${tierInfo.color}">
+          ${tierInfo.text} - exports enabled
+        </span>
+      `;
     }
 
     this.container.appendChild(badge);

@@ -1,0 +1,17 @@
+# Robots.txt for 4d.pardesco.com
+# https://4d.pardesco.com
+
+User-agent: *
+Allow: /
+Allow: /ebook/
+Allow: /ebook/The-Geometry-of-Consciousness.pdf
+Allow: /gallery.html
+Allow: /viewer.html
+
+# Disallow development/utility pages
+Disallow: /preview-generator.html
+Disallow: /activate.html
+Disallow: /CLEAR_LICENSE.html
+
+# Sitemap
+Sitemap: https://4d.pardesco.com/sitemap.xml

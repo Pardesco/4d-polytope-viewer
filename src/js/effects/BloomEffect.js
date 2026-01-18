@@ -155,4 +155,11 @@ export class BloomEffect {
   isAvailable() {
     return this.composer !== null;
   }
+
+  /**
+   * Get the effect composer (for adding additional passes)
+   */
+  getComposer() {
+    return this.composer;
+  }
 }

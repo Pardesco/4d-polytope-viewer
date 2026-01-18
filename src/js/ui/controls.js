@@ -33,6 +33,7 @@ export class ViewerControls {
     this.setupRotationControls();
     this.setupViewControls();
     this.setupBloomControls();
+    this.setupMaterialControls();
     this.setupManualRotationControls();
     this.setupKeyboardShortcuts();
     this.setupExportMenu();
@@ -290,13 +291,6 @@ export class ViewerControls {
       });
     }
 
-    // Audio toggle button
-    const soundToggle = document.getElementById('sound-toggle');
-    if (soundToggle) {
-      soundToggle.addEventListener('click', () => {
-        this.toggleAudio();
-      });
-    }
   }
 
   /**
@@ -332,6 +326,25 @@ export class ViewerControls {
 
       console.log('[ViewerControls] Bloom controls initialized (desktop)');
       console.log('[ViewerControls] Iridescent material always used for mesh view on desktop');
+
+      // Film grain toggle
+      const grainToggle = document.getElementById('toggle-grain-btn');
+      if (grainToggle && this.viewer.filmGrainEffect) {
+        grainToggle.addEventListener('click', () => {
+          const isEnabled = this.viewer.filmGrainEffect.enabled;
+          this.viewer.filmGrainEffect.setEnabled(!isEnabled);
+
+          // Update button text and state
+          if (!isEnabled) {
+            grainToggle.textContent = 'Film Grain: ON';
+            grainToggle.classList.add('active');
+          } else {
+            grainToggle.textContent = 'Film Grain: OFF';
+            grainToggle.classList.remove('active');
+          }
+        });
+        console.log('[ViewerControls] Film grain control initialized');
+      }
     } else {
       console.log('[ViewerControls] Bloom not available (mobile or disabled)');
     }
@@ -347,10 +360,10 @@ export class ViewerControls {
       return;
     }
 
-    // Show manual rotation section
-    const manualSection = document.getElementById('manual-rotation-section');
-    if (manualSection) {
-      manualSection.style.display = 'block';
+    // Show manual rotation controls (now inside combined 4D Rotation section)
+    const manualControls = document.getElementById('manual-rotation-controls');
+    if (manualControls) {
+      manualControls.style.display = 'block';
     }
 
     // Mode toggle (auto/manual radio buttons)
@@ -591,21 +604,6 @@ export class ViewerControls {
   }
 
   /**
-   * Toggle audio on/off
-   */
-  toggleAudio() {
-    // Check if HUDSounds is available (desktop only)
-    if (window.hudSounds) {
-      const isEnabled = window.hudSounds.enabled;
-      window.hudSounds.setEnabled(!isEnabled);
-      this.updateAudioButton();
-      console.log('[ViewerControls] Audio toggled:', !isEnabled);
-    } else {
-      console.warn('[ViewerControls] HUDSounds not available');
-    }
-  }
-
-  /**
    * Reset view to initial state
    */
   resetView() {
@@ -688,19 +686,61 @@ export class ViewerControls {
   }
 
   /**
-   * Update mesh view button
+   * Update mesh view button and material selector visibility
    */
   updateMeshButton() {
     const button = document.getElementById('toggle-mesh-btn');
+    const materialSelector = document.getElementById('material-selector');
+
     if (button) {
       if (this.viewer.showMeshView) {
         button.classList.add('active');
         button.textContent = 'Mesh View: ON';
+        // Show material selector when mesh view is enabled (desktop only)
+        if (materialSelector && window.innerWidth >= 1024) {
+          materialSelector.classList.remove('hidden');
+        }
       } else {
         button.classList.remove('active');
         button.textContent = 'Mesh View: OFF';
+        // Hide material selector when mesh view is disabled
+        if (materialSelector) {
+          materialSelector.classList.add('hidden');
+        }
       }
     }
+  }
+
+  /**
+   * Setup material selection controls (desktop only)
+   */
+  setupMaterialControls() {
+    if (window.innerWidth < 1024) return;
+
+    const materialBtns = document.querySelectorAll('[data-material]');
+    materialBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const materialType = btn.dataset.material;
+        this.viewer.setMaterialType(materialType);
+        this.updateMaterialButtons();
+      });
+    });
+
+    console.log('[ViewerControls] Material controls initialized');
+  }
+
+  /**
+   * Update material selection buttons
+   */
+  updateMaterialButtons() {
+    const materialBtns = document.querySelectorAll('[data-material]');
+    materialBtns.forEach(btn => {
+      if (btn.dataset.material === this.viewer.currentMaterialType) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
   }
 
   /**
@@ -717,22 +757,6 @@ export class ViewerControls {
       } else {
         stereoBtn.classList.remove('active');
         perspBtn.classList.add('active');
-      }
-    }
-  }
-
-  /**
-   * Update audio toggle button
-   */
-  updateAudioButton() {
-    const button = document.getElementById('sound-toggle');
-    if (button && window.hudSounds) {
-      if (window.hudSounds.enabled) {
-        button.classList.add('active');
-        button.textContent = 'Audio: ON';
-      } else {
-        button.classList.remove('active');
-        button.textContent = 'Audio: OFF';
       }
     }
   }

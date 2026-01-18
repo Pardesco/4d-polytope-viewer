@@ -27,6 +27,8 @@ import { ManualRotationController } from '../controls/ManualRotationController.j
 import { PerformanceWarningBanner } from '../ui/PerformanceWarningBanner.js';
 import { MatrixDisplay } from '../ui/MatrixDisplay.js'; // NEW: For displaying 4D rotation matrix
 import { GlitchEffect } from '../effects/GlitchEffect.js'; // NEW: For visual feedback on polytope changes
+import { licenseManager } from '../license/LicenseManager.js'; // Security: For feature gating
+import { FilmGrainEffect } from '../effects/FilmGrainEffect.js'; // Film grain post-processing
 
 export class PolytopeViewer {
   constructor(canvasContainer, options = {}) {
@@ -113,6 +115,9 @@ export class PolytopeViewer {
     this.TUBE_UPDATE_INTERVAL = 4; // Update tubes every N frames (Frenet frames are expensive)
     this._tubeUpdateCounter = 0;  // Frame counter for tube updates
 
+    // Mesh quality settings ('standard' for real-time, 'high' for export quality)
+    this.meshQuality = 'standard';
+
     // Animation
     this.animationFrameId = null;
     this.isRendering = false;
@@ -173,13 +178,28 @@ export class PolytopeViewer {
     this.bloomEffect = new BloomEffect(this.renderer, this.scene, this.camera);
     this.bloomEffect.setEnabled(true); // ON by default with optimized settings
 
-    // Create iridescent material (desktop only, off by default)
+    // Create film grain effect (desktop only, enabled by default for CRT aesthetic)
+    if (window.innerWidth >= 1024 && this.bloomEffect.getComposer()) {
+      this.filmGrainEffect = new FilmGrainEffect();
+      this.filmGrainEffect.addToComposer(this.bloomEffect.getComposer());
+      this.filmGrainEffect.setEnabled(true); // ON by default for retro CRT look
+      this.filmGrainEffect.setGrainAmount(0.12); // Subtle but visible
+      this.filmGrainEffect.setChromaticAberration(0.0015); // Subtle RGB split
+      this.filmGrainEffect.setVignette(0.35); // Noticeable vignette
+      console.log('[PolytopeViewer] Film grain effect enabled (desktop)');
+    } else {
+      this.filmGrainEffect = null;
+    }
+
+    // Create materials (desktop only)
     if (window.innerWidth >= 1024) {
       this.iridescentMaterial = new IridescentMaterial();
-      console.log('[PolytopeViewer] Iridescent material available (desktop)');
+      this.currentMaterialType = 'iridescent'; // 'iridescent' or 'basic'
+      console.log('[PolytopeViewer] Materials available (desktop): iridescent');
     } else {
       this.iridescentMaterial = null;
-      console.log('[PolytopeViewer] Iridescent material disabled (mobile)');
+      this.currentMaterialType = 'basic';
+      console.log('[PolytopeViewer] Advanced materials disabled (mobile)');
     }
 
     // Create group for 3D rotation
@@ -497,6 +517,9 @@ export class PolytopeViewer {
 
       // Create tube geometry if in mesh view (using custom BufferGeometry)
       if (this.showMeshView) {
+        // Get quality settings (respects current meshQuality setting)
+        const settings = this.getMeshSettings();
+
         const avgPosition = threePoints.reduce(
           (acc, p) => acc.add(p.clone()),
           new THREE.Vector3()
@@ -510,29 +533,28 @@ export class PolytopeViewer {
           (this.maxThickness - this.minThickness) *
           Math.pow(normalizedDist, this.thicknessCurve);
 
-        const radialSegments = this.getTubeRadialSegments(distance);
+        // Use quality-based segments (or LOD-based for standard quality)
+        const radialSegments = settings.radialSegments || this.getTubeRadialSegments(distance);
+        const tubularSegments = settings.tubularSegments;
 
         // Create custom tube geometry (export-ready, updateable)
         const tubeGeometry = this.createCustomTubeGeometry(
           curve,
-          this.TUBE_SEGMENTS,
+          tubularSegments,
           thickness,
           radialSegments
         );
 
-        const tubeMaterial = new THREE.MeshPhongMaterial({
-          color: 0x667eea,
-          shininess: 100,
-          specular: 0x444444
-        });
+        // Get material based on current selection
+        const tubeMaterial = this.getCurrentTubeMaterial();
 
         const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
         this.group.add(tubeMesh);
         this.tubeMeshes.push(tubeMesh);
 
-        // Store metadata for this tube
+        // Store metadata for this tube (use actual values used)
         this.tubeMetadata.push({
-          tubularSegments: this.TUBE_SEGMENTS,
+          tubularSegments: tubularSegments,
           radialSegments: radialSegments
         });
 
@@ -587,19 +609,222 @@ export class PolytopeViewer {
   }
 
   /**
-   * Create custom tube BufferGeometry with updateable attributes
+   * Get mesh quality settings based on current quality mode
+   *
+   * Standard: Optimized for real-time performance (current defaults)
+   * High: High-resolution for exports and close-up renders
+   *
+   * @returns {{ tubularSegments: number, radialSegments: number, curvePoints: number }}
+   */
+  getMeshSettings() {
+    if (this.meshQuality === 'high') {
+      // High quality for exports
+      // Stereographic projection creates curved lines, needs more segments
+      if (this.projectionType === 'stereographic') {
+        return { tubularSegments: 64, radialSegments: 16, curvePoints: 50 };
+      } else {
+        // Perspective projection: straighter lines, fewer segments needed
+        return { tubularSegments: 32, radialSegments: 12, curvePoints: 30 };
+      }
+    } else {
+      // Standard quality for real-time
+      return {
+        tubularSegments: this.TUBE_SEGMENTS, // 6
+        radialSegments: null, // Use LOD-based calculation
+        curvePoints: this.NUM_CURVE_POINTS   // 20
+      };
+    }
+  }
+
+  /**
+   * Get current triangle count for mesh view
+   * @returns {{ trianglesPerTube: number, totalTriangles: number, edgeCount: number }}
+   */
+  getTriangleCount() {
+    const settings = this.getMeshSettings();
+    const edgeCount = this.edgeIndices?.length || 0;
+
+    // For standard mode with LOD, estimate average radial segments
+    const radialSegments = settings.radialSegments || 5; // Average LOD value
+    const tubularSegments = settings.tubularSegments;
+
+    // Triangle count per tube: 2 * tubularSegments * radialSegments
+    // (2 triangles per quad, tubularSegments quads along, radialSegments quads around)
+    const trianglesPerTube = 2 * tubularSegments * radialSegments;
+    const totalTriangles = trianglesPerTube * edgeCount;
+
+    return {
+      trianglesPerTube,
+      totalTriangles,
+      edgeCount,
+      tubularSegments,
+      radialSegments
+    };
+  }
+
+  /**
+   * Set mesh quality and rebuild geometry if needed
+   * @param {'standard' | 'high'} quality - Quality preset
+   */
+  setMeshQuality(quality) {
+    if (this.meshQuality === quality) return;
+
+    const oldQuality = this.meshQuality;
+    this.meshQuality = quality;
+
+    console.log(`[MeshQuality] Changed from ${oldQuality} to ${quality}`);
+
+    // If in mesh view, rebuild geometry with new quality settings
+    if (this.showMeshView && this.tubeMeshes.length > 0) {
+      console.log('[MeshQuality] Rebuilding mesh geometry...');
+      this.rebuildMeshGeometry();
+    }
+  }
+
+  /**
+   * Get the current tube material based on material type selection
+   * @returns {THREE.Material} The material to use for tubes
+   */
+  getCurrentTubeMaterial() {
+    if (this.currentMaterialType === 'iridescent' && this.iridescentMaterial) {
+      return this.iridescentMaterial.getMaterial();
+    }
+    // Fallback: basic Phong material
+    return new THREE.MeshPhongMaterial({
+      color: 0x667eea,
+      shininess: 100,
+      specular: 0x444444
+    });
+  }
+
+  /**
+   * Set the material type for mesh view
+   * @param {'iridescent' | 'basic'} type - Material type
+   */
+  setMaterialType(type) {
+    if (this.currentMaterialType === type) return;
+
+    const validTypes = ['iridescent', 'basic'];
+    if (!validTypes.includes(type)) {
+      console.warn(`[PolytopeViewer] Invalid material type: ${type}`);
+      return;
+    }
+
+    const oldType = this.currentMaterialType;
+    this.currentMaterialType = type;
+    console.log(`[PolytopeViewer] Material changed from ${oldType} to ${type}`);
+
+    // Update all existing tube meshes with new material
+    if (this.showMeshView && this.tubeMeshes.length > 0) {
+      const newMaterial = this.getCurrentTubeMaterial();
+      this.tubeMeshes.forEach(mesh => {
+        if (mesh) {
+          mesh.material = newMaterial;
+        }
+      });
+    }
+  }
+
+  /**
+   * Rebuild all tube mesh geometry with current quality settings
+   * Used when mesh quality changes or for export preparation
+   */
+  rebuildMeshGeometry() {
+    if (!this.showMeshView || this.tubeMeshes.length === 0) return;
+
+    const settings = this.getMeshSettings();
+    const startTime = performance.now();
+
+    // Clear metadata and Frenet cache
+    this.tubeMetadata = [];
+    this.frenetFrameCache = [];
+    this.frenetCacheValid = [];
+
+    const numCurvePoints = settings.curvePoints || this.NUM_CURVE_POINTS;
+
+    // Rebuild each tube with new settings
+    for (let i = 0; i < this.edgeIndices.length; i++) {
+      const [idx1, idx2] = this.edgeIndices[i];
+      const tubeMesh = this.tubeMeshes[i];
+
+      if (!tubeMesh) continue;
+
+      // Get 4D vertices for curve generation
+      const v1_4d = this.vertices4DCurrent[idx1];
+      const v2_4d = this.vertices4DCurrent[idx2];
+      if (!v1_4d || !v2_4d) continue;
+
+      // Generate curve points (same signature as createAllTubeMeshes)
+      const curvePoints = generateCurvePoints(
+        v1_4d,
+        v2_4d,
+        this.projectionType,
+        numCurvePoints,
+        this.perspectiveDistance
+      );
+
+      if (curvePoints.length < 2) continue;
+
+      // Convert to Three.js vectors
+      const threePoints = curvePoints.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+
+      // Calculate thickness based on average position
+      const avgPosition = threePoints.reduce(
+        (acc, p) => acc.add(p.clone()),
+        new THREE.Vector3()
+      ).divideScalar(threePoints.length);
+
+      const distance = avgPosition.length();
+      const maxDistance = 3.0;
+      const normalizedDist = Math.min(distance / maxDistance, 1.0);
+      const thickness = this.minThickness +
+        (this.maxThickness - this.minThickness) *
+        Math.pow(normalizedDist, this.thicknessCurve);
+
+      // Get quality-based segments
+      const radialSegments = settings.radialSegments || this.getTubeRadialSegments(distance);
+      const tubularSegments = settings.tubularSegments;
+
+      // Dispose old geometry
+      if (tubeMesh.geometry) {
+        tubeMesh.geometry.dispose();
+      }
+
+      // Create new geometry with quality settings
+      const curve = new THREE.CatmullRomCurve3(threePoints);
+      tubeMesh.geometry = this.createCustomTubeGeometry(
+        curve,
+        tubularSegments,
+        thickness,
+        radialSegments
+      );
+
+      // Store metadata
+      this.tubeMetadata[i] = { tubularSegments, radialSegments };
+      this.frenetCacheValid[i] = false;
+    }
+
+    const elapsed = performance.now() - startTime;
+    const triCount = this.getTriangleCount();
+    console.log(`[MeshQuality] Rebuilt ${this.tubeMeshes.length} tubes in ${elapsed.toFixed(1)}ms`);
+    console.log(`[MeshQuality] Total triangles: ${triCount.totalTriangles.toLocaleString()}`);
+  }
+
+  /**
+   * Create custom tube BufferGeometry with PER-POINT varying radius
    *
    * This creates a tube geometry from scratch with all attributes needed for:
    * - Real-time rendering (position, normal updates)
    * - OBJ/GLB/STL export (proper topology, normals, UVs)
+   * - Smooth thickness gradient (thin near center, thick far from center)
    *
    * @param {THREE.Curve} curve - The curve path to follow
    * @param {number} tubularSegments - Number of segments along the curve (more = smoother curve)
-   * @param {number} radius - Tube radius/thickness
+   * @param {number} baseRadius - Base radius (used as fallback, actual radius varies per-point)
    * @param {number} radialSegments - Number of segments around the tube (more = rounder)
    * @returns {THREE.BufferGeometry} Export-ready tube geometry
    */
-  createCustomTubeGeometry(curve, tubularSegments, radius, radialSegments) {
+  createCustomTubeGeometry(curve, tubularSegments, baseRadius, radialSegments) {
     // Calculate Frenet frames for proper tube orientation along curve
     // Frenet frames provide tangent, normal, and binormal vectors at each point
     const frames = curve.computeFrenetFrames(tubularSegments, false);
@@ -612,6 +837,9 @@ export class PolytopeViewer {
     const uvs = new Float32Array(vertexCount * 2);
     const indices = [];
 
+    // Thickness gradient parameters
+    const maxDistance = 3.0;
+
     let vertexIndex = 0;
 
     // Build vertices along the curve
@@ -619,6 +847,14 @@ export class PolytopeViewer {
       // Get position along curve (0.0 to 1.0)
       const t = i / tubularSegments;
       const p = curve.getPointAt(t);
+
+      // Calculate PER-POINT radius based on distance from origin
+      // This creates smooth thickness variation along the tube
+      const distance = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+      const normalizedDist = Math.min(distance / maxDistance, 1.0);
+      const radius = this.minThickness +
+        (this.maxThickness - this.minThickness) *
+        Math.pow(normalizedDist, this.thicknessCurve);
 
       // Get orientation at this point (from Frenet frames)
       const T = frames.tangents[i];   // Direction along curve
@@ -710,15 +946,16 @@ export class PolytopeViewer {
    *
    * This updates an existing tube geometry without recreating it.
    * Uses cached Frenet frames to avoid expensive recalculation every frame.
+   * Calculates PER-POINT radius for smooth thickness gradient.
    *
    * @param {THREE.BufferGeometry} geometry - Existing tube geometry to update
    * @param {THREE.Curve} curve - New curve path
-   * @param {number} radius - New tube radius
+   * @param {number} baseRadius - Base radius (fallback, actual radius varies per-point)
    * @param {number} tubularSegments - Must match geometry's segment count
    * @param {number} radialSegments - Must match geometry's segment count
    * @param {number} tubeIndex - Index for Frenet frame cache lookup
    */
-  updateCustomTubePositions(geometry, curve, radius, tubularSegments, radialSegments, tubeIndex) {
+  updateCustomTubePositions(geometry, curve, baseRadius, tubularSegments, radialSegments, tubeIndex) {
     // Get references to existing attribute arrays
     const positions = geometry.attributes.position;
     const normals = geometry.attributes.normal;
@@ -734,12 +971,22 @@ export class PolytopeViewer {
       this.frenetCacheValid[tubeIndex] = true;
     }
 
+    // Thickness gradient parameters
+    const maxDistance = 3.0;
+
     let vertexIndex = 0;
 
     // Update all vertices
     for (let i = 0; i <= tubularSegments; i++) {
       const t = i / tubularSegments;
       const p = curve.getPointAt(t);
+
+      // Calculate PER-POINT radius based on distance from origin
+      const distance = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+      const normalizedDist = Math.min(distance / maxDistance, 1.0);
+      const radius = this.minThickness +
+        (this.maxThickness - this.minThickness) *
+        Math.pow(normalizedDist, this.thicknessCurve);
 
       const T = frames.tangents[i];
       const N = frames.normals[i];
@@ -750,7 +997,7 @@ export class PolytopeViewer {
         const sin = Math.sin(v);
         const cos = Math.cos(v);
 
-        // Calculate new vertex position
+        // Calculate new vertex position with per-point radius
         const x = p.x + radius * (cos * N.x + sin * B.x);
         const y = p.y + radius * (cos * N.y + sin * B.y);
         const z = p.z + radius * (cos * N.z + sin * B.z);
@@ -905,14 +1152,20 @@ export class PolytopeViewer {
       (this.maxThickness - this.minThickness) *
       Math.pow(normalizedDist, this.thicknessCurve);
 
-    // Get LOD settings
-    const radialSegments = this.getTubeRadialSegments(distance);
+    // Get metadata for this tube (contains quality settings used when created)
     const metadata = this.tubeMetadata[edgeIndex];
 
+    // Use stored segments from metadata if available, otherwise use defaults
+    const tubularSegments = metadata?.tubularSegments || this.TUBE_SEGMENTS;
+    const storedRadialSegments = metadata?.radialSegments;
+
+    // Get LOD-based radial segments
+    const radialSegments = this.getTubeRadialSegments(distance);
+
     // Check if segment counts changed (rare - only happens with LOD transitions)
-    if (metadata && (metadata.radialSegments !== radialSegments)) {
+    if (storedRadialSegments && storedRadialSegments !== radialSegments) {
       // Segments changed - need to recreate geometry (fallback case)
-      console.log(`[Performance] Tube ${edgeIndex} LOD changed: ${metadata.radialSegments} → ${radialSegments}`);
+      console.log(`[Performance] Tube ${edgeIndex} LOD changed: ${storedRadialSegments} → ${radialSegments}`);
 
       if (tubeMesh.geometry) {
         tubeMesh.geometry.dispose();
@@ -920,21 +1173,23 @@ export class PolytopeViewer {
 
       tubeMesh.geometry = this.createCustomTubeGeometry(
         curve,
-        this.TUBE_SEGMENTS,
+        tubularSegments,
         thickness,
         radialSegments
       );
 
       // Update metadata
-      metadata.radialSegments = radialSegments;
+      if (metadata) {
+        metadata.radialSegments = radialSegments;
+      }
     } else {
       // Segments unchanged - update in-place (fast path - 99% of cases)
       this.updateCustomTubePositions(
         tubeMesh.geometry,
         curve,
         thickness,
-        this.TUBE_SEGMENTS,
-        radialSegments,
+        tubularSegments,
+        storedRadialSegments || radialSegments,
         edgeIndex  // Pass index for Frenet cache lookup
       );
     }
@@ -961,7 +1216,10 @@ export class PolytopeViewer {
   createAllTubeMeshes() {
     if (this.tubeMeshes.length > 0) return; // Already created
 
-    console.log('[PolytopeViewer] Creating tube meshes for mesh view');
+    const settings = this.getMeshSettings();
+    const numCurvePoints = settings.curvePoints || this.NUM_CURVE_POINTS;
+
+    console.log(`[PolytopeViewer] Creating tube meshes (quality: ${this.meshQuality}, segments: ${settings.tubularSegments}x${settings.radialSegments || 'LOD'})`);
 
     const edgesToRender = Math.min(this.edgeIndices.length, this.edgeLimit);
 
@@ -975,7 +1233,7 @@ export class PolytopeViewer {
         v1_4d,
         v2_4d,
         this.projectionType,
-        this.NUM_CURVE_POINTS,
+        numCurvePoints,
         this.perspectiveDistance
       );
 
@@ -998,30 +1256,22 @@ export class PolytopeViewer {
         (this.maxThickness - this.minThickness) *
         Math.pow(normalizedDist, this.thicknessCurve);
 
-      const radialSegments = this.getTubeRadialSegments(distance);
+      // Use quality settings for segments
+      const radialSegments = settings.radialSegments || this.getTubeRadialSegments(distance);
+      const tubularSegments = settings.tubularSegments;
 
       // Create custom tube geometry (export-ready, updateable)
       const curve = new THREE.CatmullRomCurve3(threePoints);
       const tubeGeometry = this.createCustomTubeGeometry(
         curve,
-        this.TUBE_SEGMENTS,
+        tubularSegments,
         thickness,
         radialSegments
       );
 
       // Use iridescent material on desktop, standard Phong on mobile
-      let tubeMaterial;
-      if (this.iridescentMaterial) {
-        // Desktop: always use iridescent for mesh view
-        tubeMaterial = this.iridescentMaterial.getMaterial();
-      } else {
-        // Mobile: use standard Phong material
-        tubeMaterial = new THREE.MeshPhongMaterial({
-          color: 0x667eea,
-          shininess: 100,
-          specular: 0x444444
-        });
-      }
+      // Get material based on current selection
+      const tubeMaterial = this.getCurrentTubeMaterial();
 
       const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
       this.group.add(tubeMesh);
@@ -1029,7 +1279,7 @@ export class PolytopeViewer {
 
       // Store metadata for this tube
       this.tubeMetadata.push({
-        tubularSegments: this.TUBE_SEGMENTS,
+        tubularSegments: tubularSegments,
         radialSegments: radialSegments
       });
 
@@ -1134,10 +1384,17 @@ export class PolytopeViewer {
       this.updateProjection();
     }
 
-    // Update iridescent material animation (desktop only, when mesh view is active)
-    if (this.iridescentMaterial && this.showMeshView) {
+    // Update material animation (desktop only, when mesh view is active)
+    if (this.showMeshView) {
       const deltaTime = delta / 1000; // Convert ms to seconds
-      this.iridescentMaterial.update(deltaTime);
+      if (this.iridescentMaterial && this.currentMaterialType === 'iridescent') {
+        this.iridescentMaterial.update(deltaTime);
+      }
+    }
+
+    // Update film grain effect (desktop only)
+    if (this.filmGrainEffect) {
+      this.filmGrainEffect.update();
     }
 
     // Render (with bloom if enabled)
@@ -1177,6 +1434,11 @@ export class PolytopeViewer {
     // Update bloom effect size
     if (this.bloomEffect) {
       this.bloomEffect.updateSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Update film grain resolution
+    if (this.filmGrainEffect) {
+      this.filmGrainEffect.updateResolution(window.innerWidth, window.innerHeight);
     }
   }
 
@@ -1235,22 +1497,31 @@ export class PolytopeViewer {
 
     // Create temporary notification
     const message = document.createElement('div');
-    message.className = 'rotation-4d-disabled-notice mesh-unavailable-notice';
+    message.className = 'rotation-4d-disabled-notice';
     message.innerHTML = `
-      <div class="notice-content">
-        <strong>4D Rotation Disabled</strong>
-        <p>This polytope has ${this.currentEdgeCount.toLocaleString()} edges.</p>
-        <p>4D rotation is disabled in mesh view for polytopes with >${this.MAX_EDGES_FOR_4D_ROTATION_WITH_MESH.toLocaleString()} edges.</p>
-        <p>Switch to line view to enable 4D rotation!</p>
+      <div class="notice-text">
+        <div class="notice-title">4D ROTATION DISABLED</div>
+        <div class="notice-message">
+          THIS POLYTOPE HAS ${this.currentEdgeCount.toLocaleString()} EDGES.
+          4D ROTATION IS DISABLED IN MESH VIEW FOR POLYTOPES WITH >${this.MAX_EDGES_FOR_4D_ROTATION_WITH_MESH.toLocaleString()} EDGES.
+          SWITCH TO LINE VIEW TO ENABLE 4D ROTATION!
+        </div>
       </div>
+      <button class="notice-close" onclick="this.parentElement.remove()">✕</button>
     `;
 
     document.body.appendChild(message);
 
     // Auto-remove after 5 seconds
     setTimeout(() => {
-      message.classList.add('fade-out');
-      setTimeout(() => message.remove(), 500);
+      if (message && message.parentElement) {
+        message.classList.add('fade-out');
+        setTimeout(() => {
+          if (message && message.parentElement) {
+            message.remove();
+          }
+        }, 500);
+      }
     }, 5000);
   }
 
@@ -1288,28 +1559,46 @@ export class PolytopeViewer {
   }
 
   /**
-   * Dispose viewer and clean up resources
-   */
-  /**
-   * Capture screenshot with optional watermark removal and transparent background
+   * Capture screenshot with optional watermark removal, transparent background, and resolution
    * @param {string} filename - Filename for download
    * @param {boolean} removeWatermark - True to remove watermark (Creator/Pro tier)
    * @param {boolean} transparentBackground - True for transparent background (Creator/Pro tier)
+   * @param {string} resolution - Resolution: 'current', '1080p', or '4k' (default: 'current' for free, '4k' for paid)
    */
-  captureScreenshot(filename, removeWatermark = false, transparentBackground = false) {
+  captureScreenshot(filename, removeWatermark = false, transparentBackground = false, resolution = 'current') {
+    // SECURITY: License check - Enforce free tier restrictions
+    const tier = licenseManager.getTier();
+    if (tier === 'free') {
+      // Free tier: force watermark, no transparency, current resolution only
+      if (removeWatermark || transparentBackground || resolution !== 'current') {
+        console.warn('[PolytopeViewer] Screenshot premium features blocked - requires Creator tier');
+        // Enforce free tier settings (don't throw - just downgrade to free tier behavior)
+        removeWatermark = false;
+        transparentBackground = false;
+        resolution = 'current';
+      }
+    }
+
     if (!this.screenshot) {
       this.screenshot = new Screenshot(this.renderer, this.camera, this.scene);
     }
 
     // Generate filename if not provided
     if (!filename) {
-      const polytopeName = this.currentPolytope?.name || 'polytope';
-      filename = this.screenshot.generateFilename(polytopeName);
+      const polytopeName = this.polytopeName || 'polytope';
+      const resSuffix = resolution !== 'current' ? `-${resolution}` : '';
+      filename = `${polytopeName}${resSuffix}-${new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')}.png`;
     }
 
-    // Capture with or without watermark and with/without transparent background based on license tier
-    this.screenshot.captureWithBloom(this.bloomEffect, filename, removeWatermark, transparentBackground);
-    console.log(`[PolytopeViewer] Screenshot captured: ${filename} (watermark: ${!removeWatermark}, transparent: ${transparentBackground})`);
+    // Use high-res capture for non-current resolutions (Creator/Pro)
+    if (resolution !== 'current' && removeWatermark) {
+      this.screenshot.captureHighRes(this.bloomEffect, filename, transparentBackground, resolution);
+      console.log(`[PolytopeViewer] High-res screenshot: ${filename} (${resolution}, transparent: ${transparentBackground})`);
+    } else {
+      // Standard capture for free tier or current resolution
+      this.screenshot.captureWithBloom(this.bloomEffect, filename, removeWatermark, transparentBackground);
+      console.log(`[PolytopeViewer] Screenshot captured: ${filename} (watermark: ${!removeWatermark}, transparent: ${transparentBackground})`);
+    }
   }
 
   /**
@@ -1343,6 +1632,13 @@ export class PolytopeViewer {
    * @returns {string} OBJ file content
    */
   exportOBJ(type = 'mesh') {
+    // SECURITY: License check - OBJ export requires Creator tier or higher
+    const tier = licenseManager.getTier();
+    if (tier === 'free') {
+      console.warn('[PolytopeViewer] OBJ export blocked - requires Creator tier');
+      throw new Error('OBJ export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+    }
+
     console.log('[PolytopeViewer] exportOBJ called with type:', type);
     console.log('[PolytopeViewer] Current projection mode:', this.projectionType);
     console.log('[PolytopeViewer] tubeMeshes:', this.tubeMeshes?.length);
@@ -1539,6 +1835,433 @@ export class PolytopeViewer {
 
     return obj;
   }
+
+  /**
+   * Get list of active rotation planes
+   * @returns {Array<string>} Active plane names (e.g., ['XY', 'ZW'])
+   */
+  getActiveRotationPlanes() {
+    if (!this.rotation4D) return ['XY']; // Default
+
+    const activePlanes = this.rotation4D.getActivePlanes();
+    // Convert to uppercase format expected by Python scripts
+    return activePlanes.map(p => p.toUpperCase());
+  }
+
+  /**
+   * Export animation JSON chunk for longer animations
+   *
+   * Generates animation data for a specific frame range, enabling chunked
+   * exports for longer animations (5s, 7s, 10s) that would be too memory-intensive
+   * to generate in a single pass.
+   *
+   * @param {number} startFrame - Starting frame number (0-indexed)
+   * @param {number} endFrame - Ending frame number (exclusive)
+   * @param {number} totalFrames - Total frames in full animation (for rotation calculation)
+   * @param {number} fps - Frames per second (default: 24)
+   * @param {Function} progressCallback - Optional callback(progress, status) for progress updates
+   * @returns {Promise<Object>} Animation JSON data for this chunk
+   */
+  async exportAnimationJSONChunk(startFrame, endFrame, totalFrames, fps = 24, progressCallback = null) {
+    // SECURITY: License check - Animation JSON export requires Creator tier or higher
+    const tier = licenseManager.getTier();
+    if (tier === 'free') {
+      console.warn('[PolytopeViewer] Animation JSON export blocked - requires Creator tier');
+      throw new Error('Animation JSON export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+    }
+
+    const chunkFrameCount = endFrame - startFrame;
+    console.log(`[PolytopeViewer] Exporting chunk: frames ${startFrame}-${endFrame - 1} of ${totalFrames} total`);
+
+    // Validate we have polytope data
+    if (!this.vertices4DOriginal || this.vertices4DOriginal.length === 0) {
+      throw new Error('No polytope loaded');
+    }
+
+    if (!this.edgeIndices || this.edgeIndices.length === 0) {
+      throw new Error('No edges to export');
+    }
+
+    // Check for active rotation planes
+    const activePlanes = this.getActiveRotationPlanes();
+    if (activePlanes.length === 0) {
+      throw new Error('No rotation planes active. Enable at least one rotation plane before exporting.');
+    }
+
+    // Calculate rotation parameters (based on total animation, not chunk)
+    const degreesPerFrame = 360.0 / totalFrames;
+    const durationSeconds = totalFrames / fps;
+
+    // Store current state to restore later
+    const originalAngle = this.rotation4D.currentAngle;
+    const wasRotating4D = this.rotating4D;
+    const wasRotating3D = this.rotating3D;
+
+    // Temporarily disable animation
+    this.rotating4D = false;
+    this.rotating3D = false;
+
+    // Number of sample points per curve (matching old viewer format)
+    const CURVE_SAMPLES = 51;
+
+    // Prepare frames array for this chunk
+    const frames = [];
+
+    try {
+      for (let frameIdx = 0; frameIdx < chunkFrameCount; frameIdx++) {
+        const frameNum = startFrame + frameIdx;
+
+        // Report progress within this chunk
+        if (progressCallback) {
+          const progress = (frameIdx + 1) / chunkFrameCount;
+          progressCallback(progress, `Generating frame ${frameIdx + 1} of ${chunkFrameCount}...`);
+        }
+
+        // Calculate rotation angle for this frame (based on position in full animation)
+        const angle = frameNum * degreesPerFrame;
+        this.rotation4D.currentAngle = angle;
+
+        // Apply rotation to get current 4D vertices
+        const rotatedVertices = this.rotation4D.applyTo(this.vertices4DOriginal);
+
+        // Generate curves for this frame
+        const frameCurves = [];
+
+        for (let edgeIdx = 0; edgeIdx < this.edgeIndices.length; edgeIdx++) {
+          const [v1Idx, v2Idx] = this.edgeIndices[edgeIdx];
+          const v1_4d = rotatedVertices[v1Idx];
+          const v2_4d = rotatedVertices[v2Idx];
+
+          // Generate curve points (sample along edge)
+          const controlPoints = [];
+          const thicknessValues = [];
+
+          for (let i = 0; i < CURVE_SAMPLES; i++) {
+            const t = i / (CURVE_SAMPLES - 1);
+
+            // Interpolate in 4D
+            const point4D = [
+              v1_4d[0] + t * (v2_4d[0] - v1_4d[0]),
+              v1_4d[1] + t * (v2_4d[1] - v1_4d[1]),
+              v1_4d[2] + t * (v2_4d[2] - v1_4d[2]),
+              v1_4d[3] + t * (v2_4d[3] - v1_4d[3])
+            ];
+
+            // Project to 3D
+            let point3D;
+            if (this.projectionType === 'stereographic') {
+              // Normalize to unit sphere for stereographic projection
+              const mag = Math.sqrt(
+                point4D[0] * point4D[0] +
+                point4D[1] * point4D[1] +
+                point4D[2] * point4D[2] +
+                point4D[3] * point4D[3]
+              );
+              const normalized = mag > 0 ? point4D.map(x => x / mag) : point4D;
+
+              // Stereographic projection
+              const denom = 1 - normalized[0];
+              if (Math.abs(denom) < 1e-6) {
+                // Near singularity, skip this point
+                continue;
+              }
+              point3D = [
+                normalized[1] / denom,
+                normalized[2] / denom,
+                normalized[3] / denom
+              ];
+            } else {
+              // Perspective projection
+              const d = this.perspectiveDistance;
+              const w = point4D[0];
+
+              if (w >= d * 0.99 || Math.abs(d - w) < 0.002) {
+                // Behind or at viewing plane, skip
+                continue;
+              }
+
+              const scale = d / (d - w);
+              point3D = [
+                point4D[1] * scale,
+                point4D[2] * scale,
+                point4D[3] * scale
+              ];
+            }
+
+            // Calculate thickness based on distance from origin (radial gradient)
+            const distance = Math.sqrt(
+              point3D[0] * point3D[0] +
+              point3D[1] * point3D[1] +
+              point3D[2] * point3D[2]
+            );
+            const maxDistance = 3.0;
+            const normalizedDist = Math.min(distance / maxDistance, 1.0);
+            const curvedDist = Math.pow(normalizedDist, this.thicknessCurve);
+            const thickness = this.minThickness +
+              (this.maxThickness - this.minThickness) * curvedDist;
+
+            controlPoints.push(point3D);
+            thicknessValues.push(thickness);
+          }
+
+          // Only include edges with valid points
+          if (controlPoints.length >= 2) {
+            frameCurves.push({
+              control_points: controlPoints,
+              thickness_values: thicknessValues
+            });
+          }
+        }
+
+        frames.push({
+          frame_number: frameNum,
+          rotation_angle: angle,
+          curves: frameCurves
+        });
+
+        // Allow UI to update every 5 frames
+        if (frameIdx % 5 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
+
+      // Build final JSON structure (matching old viewer format for Python compatibility)
+      const animationData = {
+        polytope_name: this.polytopeName || 'polytope',
+        frame_count: chunkFrameCount,
+        duration_seconds: durationSeconds,
+        fps: fps,
+        projection_type: this.projectionType,
+        perspective_distance: this.perspectiveDistance,
+        thickness_settings: {
+          min: this.minThickness,
+          max: this.maxThickness,
+          curve: this.thicknessCurve
+        },
+        rotation_planes: activePlanes,
+        degrees_per_frame: degreesPerFrame,
+        frames: frames
+      };
+
+      console.log(`[PolytopeViewer] Chunk export complete: ${frames.length} frames, ${frames[0]?.curves?.length || 0} curves per frame`);
+
+      return animationData;
+
+    } finally {
+      // Restore original state
+      this.rotation4D.currentAngle = originalAngle;
+      this.rotating4D = wasRotating4D;
+      this.rotating3D = wasRotating3D;
+
+      // Update projection to restore visual state
+      this.updateProjection();
+    }
+  }
+
+  /**
+   * Export animation JSON for Blender Alembic conversion
+   *
+   * Generates animation data matching the format expected by
+   * json_to_alembic_curves.py for professional Blender workflows.
+   *
+   * @param {number} frameCount - Number of frames (default: 48 for 2 second loop at 24fps)
+   * @param {number} fps - Frames per second (default: 24)
+   * @param {Function} progressCallback - Optional callback(progress, status) for progress updates
+   * @returns {Promise<Object>} Animation JSON data
+   */
+  async exportAnimationJSON(frameCount = 48, fps = 24, progressCallback = null) {
+    // SECURITY: License check - Animation JSON export requires Creator tier or higher
+    const tier = licenseManager.getTier();
+    if (tier === 'free') {
+      console.warn('[PolytopeViewer] Animation JSON export blocked - requires Creator tier');
+      throw new Error('Animation JSON export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+    }
+
+    console.log(`[PolytopeViewer] Starting animation export: ${frameCount} frames at ${fps} FPS`);
+
+    // Validate we have polytope data
+    if (!this.vertices4DOriginal || this.vertices4DOriginal.length === 0) {
+      throw new Error('No polytope loaded');
+    }
+
+    if (!this.edgeIndices || this.edgeIndices.length === 0) {
+      throw new Error('No edges to export');
+    }
+
+    // Check for active rotation planes
+    const activePlanes = this.getActiveRotationPlanes();
+    if (activePlanes.length === 0) {
+      throw new Error('No rotation planes active. Enable at least one rotation plane before exporting.');
+    }
+
+    // Calculate rotation parameters
+    const degreesPerFrame = 360.0 / frameCount;
+    const durationSeconds = frameCount / fps;
+
+    // Store current state to restore later
+    const originalAngle = this.rotation4D.currentAngle;
+    const wasRotating4D = this.rotating4D;
+    const wasRotating3D = this.rotating3D;
+
+    // Temporarily disable animation
+    this.rotating4D = false;
+    this.rotating3D = false;
+
+    // Number of sample points per curve (matching old viewer format)
+    const CURVE_SAMPLES = 51;
+
+    // Prepare frames array
+    const frames = [];
+
+    try {
+      for (let frameNum = 0; frameNum < frameCount; frameNum++) {
+        // Report progress
+        if (progressCallback) {
+          const progress = (frameNum + 1) / frameCount;
+          progressCallback(progress, `Generating frame ${frameNum + 1} of ${frameCount}...`);
+        }
+
+        // Calculate rotation angle for this frame
+        const angle = frameNum * degreesPerFrame;
+        this.rotation4D.currentAngle = angle;
+
+        // Apply rotation to get current 4D vertices
+        const rotatedVertices = this.rotation4D.applyTo(this.vertices4DOriginal);
+
+        // Generate curves for this frame
+        const frameCurves = [];
+
+        for (let edgeIdx = 0; edgeIdx < this.edgeIndices.length; edgeIdx++) {
+          const [v1Idx, v2Idx] = this.edgeIndices[edgeIdx];
+          const v1_4d = rotatedVertices[v1Idx];
+          const v2_4d = rotatedVertices[v2Idx];
+
+          // Generate curve points (sample along edge)
+          const controlPoints = [];
+          const thicknessValues = [];
+
+          for (let i = 0; i < CURVE_SAMPLES; i++) {
+            const t = i / (CURVE_SAMPLES - 1);
+
+            // Interpolate in 4D
+            const point4D = [
+              v1_4d[0] + t * (v2_4d[0] - v1_4d[0]),
+              v1_4d[1] + t * (v2_4d[1] - v1_4d[1]),
+              v1_4d[2] + t * (v2_4d[2] - v1_4d[2]),
+              v1_4d[3] + t * (v2_4d[3] - v1_4d[3])
+            ];
+
+            // Project to 3D
+            let point3D;
+            if (this.projectionType === 'stereographic') {
+              // Normalize to unit sphere for stereographic projection
+              const mag = Math.sqrt(
+                point4D[0] * point4D[0] +
+                point4D[1] * point4D[1] +
+                point4D[2] * point4D[2] +
+                point4D[3] * point4D[3]
+              );
+              const normalized = mag > 0 ? point4D.map(x => x / mag) : point4D;
+
+              // Stereographic projection
+              const denom = 1 - normalized[0];
+              if (Math.abs(denom) < 1e-6) {
+                // Near singularity, skip this point
+                continue;
+              }
+              point3D = [
+                normalized[1] / denom,
+                normalized[2] / denom,
+                normalized[3] / denom
+              ];
+            } else {
+              // Perspective projection
+              const d = this.perspectiveDistance;
+              const w = point4D[0];
+
+              if (w >= d * 0.99 || Math.abs(d - w) < 0.002) {
+                // Behind or at viewing plane, skip
+                continue;
+              }
+
+              const scale = d / (d - w);
+              point3D = [
+                point4D[1] * scale,
+                point4D[2] * scale,
+                point4D[3] * scale
+              ];
+            }
+
+            // Calculate thickness based on distance from origin (radial gradient)
+            const distance = Math.sqrt(
+              point3D[0] * point3D[0] +
+              point3D[1] * point3D[1] +
+              point3D[2] * point3D[2]
+            );
+            const maxDistance = 3.0;
+            const normalizedDist = Math.min(distance / maxDistance, 1.0);
+            const curvedDist = Math.pow(normalizedDist, this.thicknessCurve);
+            const thickness = this.minThickness +
+              (this.maxThickness - this.minThickness) * curvedDist;
+
+            controlPoints.push(point3D);
+            thicknessValues.push(thickness);
+          }
+
+          // Only include edges with valid points
+          if (controlPoints.length >= 2) {
+            frameCurves.push({
+              control_points: controlPoints,
+              thickness_values: thicknessValues
+            });
+          }
+        }
+
+        frames.push({
+          frame_number: frameNum,
+          rotation_angle: angle,
+          curves: frameCurves
+        });
+
+        // Allow UI to update every 5 frames
+        if (frameNum % 5 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
+
+      // Build final JSON structure (matching old viewer format for Python compatibility)
+      const animationData = {
+        polytope_name: this.polytopeName || 'polytope',
+        frame_count: frameCount,
+        duration_seconds: durationSeconds,
+        fps: fps,
+        projection_type: this.projectionType,
+        perspective_distance: this.perspectiveDistance,
+        thickness_settings: {
+          min: this.minThickness,
+          max: this.maxThickness,
+          curve: this.thicknessCurve
+        },
+        rotation_planes: activePlanes,
+        degrees_per_frame: degreesPerFrame,
+        frames: frames
+      };
+
+      console.log(`[PolytopeViewer] Animation export complete: ${frames.length} frames, ${frames[0]?.curves?.length || 0} curves per frame`);
+
+      return animationData;
+
+    } finally {
+      // Restore original state
+      this.rotation4D.currentAngle = originalAngle;
+      this.rotating4D = wasRotating4D;
+      this.rotating3D = wasRotating3D;
+
+      // Update projection to restore visual state
+      this.updateProjection();
+    }
+  }
+
   dispose() {
     this.stopRendering();
     this.clearGeometry();

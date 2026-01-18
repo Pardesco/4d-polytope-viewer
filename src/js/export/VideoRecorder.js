@@ -5,6 +5,8 @@
  * Zero-cost solution using native browser APIs
  */
 
+import { licenseManager } from '../license/LicenseManager.js'; // Security: For feature gating
+
 export class VideoRecorder {
     constructor(canvas, fps = 30) {
         this.canvas = canvas;
@@ -67,6 +69,13 @@ export class VideoRecorder {
      * @returns {Promise<boolean>} True if recording started successfully
      */
     async start(maxDuration = 60000) {
+        // SECURITY: License check - Video recording requires Creator tier or higher
+        const tier = licenseManager.getTier();
+        if (tier === 'free') {
+            console.warn('[VideoRecorder] Video recording blocked - requires Creator tier');
+            throw new Error('Video recording requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+        }
+
         if (this.isRecording) {
             console.warn('[VideoRecorder] Already recording');
             return false;

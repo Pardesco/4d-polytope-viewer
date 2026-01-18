@@ -70,9 +70,22 @@ export class MobileUI {
    * Hide desktop control panels on mobile
    */
   hideDesktopPanels() {
-    const desktopPanels = document.querySelectorAll('.info-panel, .control-panel');
-    desktopPanels.forEach(panel => {
+    // Hide legacy panels
+    const legacyPanels = document.querySelectorAll('.info-panel, .control-panel');
+    legacyPanels.forEach(panel => {
       panel.style.display = 'none';
+    });
+
+    // Hide new HUD panels
+    const hudPanels = document.querySelectorAll('.hud-panel');
+    hudPanels.forEach(panel => {
+      panel.style.display = 'none';
+    });
+
+    // Hide desktop-only elements
+    const desktopOnly = document.querySelectorAll('.desktop-only');
+    desktopOnly.forEach(element => {
+      element.style.display = 'none';
     });
   }
 
@@ -266,32 +279,55 @@ export class MobileUI {
    * Get controls HTML by reusing desktop controls
    */
   getControlsHTML() {
-    // Try to clone existing desktop controls
-    const infoPanel = document.querySelector('.info-panel');
-    const controlPanel = document.querySelector('.control-panel');
-
     let html = '';
 
-    // Add info section
-    if (infoPanel) {
-      const infoClone = infoPanel.cloneNode(true);
-      infoClone.style.display = 'block';
-      html += `<div class="mobile-section">${infoClone.innerHTML}</div>`;
+    // Clone from new HUD structure
+    // 1. System Stats (top-left HUD panel)
+    const systemStats = document.querySelector('.hud-top-left .hud-content');
+    if (systemStats) {
+      const statsClone = systemStats.cloneNode(true);
+      html += `<div class="mobile-section">${statsClone.innerHTML}</div>`;
     }
 
-    // Add controls section
-    if (controlPanel) {
-      const controlClone = controlPanel.cloneNode(true);
-      controlClone.style.display = 'block';
-      html += `<div class="mobile-section">${controlClone.innerHTML}</div>`;
+    // 2. Quick Controls (bottom-center HUD panel)
+    const quickControls = document.querySelector('.hud-bottom-center .hud-content');
+    if (quickControls) {
+      const quickClone = quickControls.cloneNode(true);
+      html += `<div class="mobile-section">${quickClone.innerHTML}</div>`;
     }
 
-    // Fallback if panels not found
+    // 3. Main Controls (bottom-right HUD panel)
+    const mainControls = document.querySelector('.hud-bottom-right .hud-content');
+    if (mainControls) {
+      const controlsClone = mainControls.cloneNode(true);
+      html += `<div class="mobile-section">${controlsClone.innerHTML}</div>`;
+    }
+
+    // Fallback if HUD panels not found (legacy or error)
+    if (!html) {
+      // Try legacy structure as fallback
+      const infoPanel = document.querySelector('.info-panel');
+      const controlPanel = document.querySelector('.control-panel');
+
+      if (infoPanel) {
+        const infoClone = infoPanel.cloneNode(true);
+        infoClone.style.display = 'block';
+        html += `<div class="mobile-section">${infoClone.innerHTML}</div>`;
+      }
+
+      if (controlPanel) {
+        const controlClone = controlPanel.cloneNode(true);
+        controlClone.style.display = 'block';
+        html += `<div class="mobile-section">${controlClone.innerHTML}</div>`;
+      }
+    }
+
+    // Final fallback
     if (!html) {
       html = `
         <div class="mobile-section">
           <h3>Controls</h3>
-          <p>Desktop controls not found. Please reload.</p>
+          <p>Controls not found. Please reload.</p>
         </div>
       `;
     }

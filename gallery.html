@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>Polytope Gallery - Pardesco 4D</title>
+  <meta name="description" content="Browse 1,700+ uniform and scaliform 4D polytopes including the tesseract, 120-cell, 600-cell, and rare compounds.">
   <link rel="stylesheet" href="/src/styles/main.css">
 </head>
 <body>
@@ -12,26 +14,128 @@
       <h1 class="text-4xl font-display font-bold mb-2">
         <span class="text-gradient">Polytope Gallery</span>
       </h1>
-      <p class="text-gray-400 mb-8">Coming soon - Browse all 2,816 uniform polytopes</p>
+      <p class="text-gray-400 mb-4">Explore our library of <strong class="text-white">1,717 four-dimensional polytopes</strong></p>
+      <p class="text-gray-500 text-sm mb-8">
+        Full gallery browser coming soon. For now, use the viewer's dropdown to explore all polytopes.
+      </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Placeholder cards -->
+      <!-- Quick Launch -->
+      <div class="mb-12">
+        <a href="/viewer.html" class="btn-primary inline-block px-6 py-3">
+          Launch Viewer to Browse All Polytopes →
+        </a>
+      </div>
+
+      <h2 class="text-2xl font-display font-bold mb-6">
+        <span class="text-gradient">What's Included</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <!-- Regular Convex -->
         <div class="glass-morphism p-6 rounded-xl">
-          <h3 class="text-xl font-bold mb-2">Category 1</h3>
-          <p class="text-gray-400 text-sm">Regular polytopes</p>
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Regular Convex Polytopes</h3>
+          <p class="text-gray-400 text-sm mb-3">The 6 four-dimensional analogs of Platonic solids</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• 5-cell (Pentachoron)</li>
+            <li>• 8-cell (Tesseract / Hypercube)</li>
+            <li>• 16-cell (Hexadecachoron)</li>
+            <li>• 24-cell (Icositetrachoron)</li>
+            <li>• 120-cell (Hecatonicosachoron)</li>
+            <li>• 600-cell (Hexacosichoron)</li>
+          </ul>
         </div>
+
+        <!-- Uniform Polychora -->
         <div class="glass-morphism p-6 rounded-xl">
-          <h3 class="text-xl font-bold mb-2">Category 2</h3>
-          <p class="text-gray-400 text-sm">Semi-regular polytopes</p>
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Uniform Polychora</h3>
+          <p class="text-gray-400 text-sm mb-3">Vertex-transitive polytopes with regular polygon faces</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• <strong class="text-gray-400">Cat 1-7:</strong> Pentachoric & Tesseractic families</li>
+            <li>• <strong class="text-gray-400">Cat 8-17:</strong> Icositetrachoric family</li>
+            <li>• <strong class="text-gray-400">Cat 18-26:</strong> Hecatonicosachoric families</li>
+            <li>• <strong class="text-gray-400">Cat 30:</strong> Snub 24-cell family</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">~1,000 polytopes across 30 categories</p>
         </div>
+
+        <!-- Scaliform Polychora -->
         <div class="glass-morphism p-6 rounded-xl">
-          <h3 class="text-xl font-bold mb-2">Category 3</h3>
-          <p class="text-gray-400 text-sm">Complex polytopes</p>
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Scaliform Polychora</h3>
+          <p class="text-gray-400 text-sm mb-3">Vertex-transitive with equal edge lengths but non-regular faces</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• <strong class="text-gray-400">CatS 1-6:</strong> Simple scaliforms & alterprisms</li>
+            <li>• <strong class="text-gray-400">CatS 10-13:</strong> Podary & duoprismatic blends</li>
+            <li>• <strong class="text-gray-400">CatS 18-19:</strong> Swirlprisms & exotic forms</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">~650 polytopes across 19 categories</p>
+        </div>
+
+        <!-- Prisms -->
+        <div class="glass-morphism p-6 rounded-xl">
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Prismatic Polychora</h3>
+          <p class="text-gray-400 text-sm mb-3">4D prisms built from 3D polyhedra</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• Duoprisms (polygon × polygon)</li>
+            <li>• Antiprism prisms</li>
+            <li>• Polygon-polyhedron hybrids</li>
+          </ul>
+        </div>
+
+        <!-- Compounds -->
+        <div class="glass-morphism p-6 rounded-xl">
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Compound Polytopes</h3>
+          <p class="text-gray-400 text-sm mb-3">Multiple polytopes occupying the same space</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• Compound of 5 tesseracts</li>
+            <li>• Compound of 120 pentachora</li>
+            <li>• Stellated compounds</li>
+          </ul>
+          <p class="text-xs text-gray-600 mt-2">29 compound polytopes</p>
+        </div>
+
+        <!-- Star Polytopes -->
+        <div class="glass-morphism p-6 rounded-xl">
+          <h3 class="text-xl font-bold mb-2 text-purple-300">Star Polychora</h3>
+          <p class="text-gray-400 text-sm mb-3">Non-convex polytopes with intersecting faces</p>
+          <ul class="text-gray-500 text-sm space-y-1">
+            <li>• Great grand stellated 120-cell</li>
+            <li>• Grand 600-cell</li>
+            <li>• Stellated icositetrachora</li>
+          </ul>
         </div>
       </div>
 
-      <div class="mt-8">
+      <!-- Data Source -->
+      <div class="glass-morphism-light p-6 rounded-xl mb-8">
+        <h3 class="text-lg font-bold mb-2 text-white">Data Sources</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Our polytope library is compiled from mathematical research and community contributions.
+          Category structure follows the
+          <a href="https://polytope.miraheze.org/wiki/List_of_uniform_polychora" target="_blank" rel="noopener" class="text-purple-400 hover:text-purple-300 underline">Polytope Wiki</a>
+          classification system. Special thanks to the
+          <a href="https://discord.gg/C4WNFcX6" target="_blank" rel="noopener" class="text-purple-400 hover:text-purple-300 underline">Polytope Discord</a>
+          community for vertex coordinate data.
+        </p>
+      </div>
+
+      <!-- Access Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="glass-morphism p-6 rounded-xl border border-cyan-500/30">
+          <h3 class="text-lg font-bold mb-2 text-white">Free Access</h3>
+          <p class="text-3xl font-bold text-gradient mb-2">1,717 polytopes</p>
+          <p class="text-gray-400 text-sm">Explore the entire library with full 4D rotation and visualization</p>
+        </div>
+        <div class="glass-morphism p-6 rounded-xl border border-purple-500/30">
+          <h3 class="text-lg font-bold mb-2 text-white">Creator Tier</h3>
+          <p class="text-3xl font-bold text-gradient mb-2">Export Features</p>
+          <p class="text-gray-400 text-sm">OBJ mesh export, 4K screenshots, no watermarks, video recording</p>
+          <a href="https://pardesco.com/products/4d-viewer-creator" target="_blank" rel="noopener" class="text-purple-400 hover:text-purple-300 text-sm mt-2 inline-block">Upgrade →</a>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
         <a href="/" class="btn-secondary inline-block px-6 py-3">← Back to Home</a>
+        <a href="/viewer.html" class="btn-primary inline-block px-6 py-3">Launch Viewer</a>
       </div>
     </div>
   </div>

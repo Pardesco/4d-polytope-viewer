@@ -1,3 +1,5 @@
+console.log('[Main] Module parsing started...');
+
 import { PolytopeViewer } from './polytope/viewer.js';
 import { ViewerControls } from './ui/controls.js';
 import { PolytopeSelector } from './ui/polytope-selector.js';
@@ -5,7 +7,6 @@ import { MobileUI } from './ui/mobile/MobileUI.js';
 import { SimpleWatermark } from './ui/SimpleWatermark.js';
 import { licenseManager } from './license/LicenseManager.js';
 import { ParticleField } from './effects/ParticleField.js';
-import { HUDSounds } from './audio/HUDSounds.js';
 import '../styles/main.css';
 import '../styles/mobile.css';
 
@@ -13,12 +14,27 @@ import '../styles/mobile.css';
 let viewer = null;
 let controls = null;
 let mobileUI = null;
-let hudSounds = null; // NEW: Global instance for audio feedback
 
 /**
  * Initialize application
  */
 async function init() {
+  console.warn('[Main] init() called');
+  console.warn('[Main] URL search:', window.location.search);
+
+  // Check for embed mode (used in knowledge base article iframes)
+  const urlParams = new URLSearchParams(window.location.search);
+  const isEmbedMode = urlParams.get('embed') === 'true';
+  console.warn('[Main] isEmbedMode:', isEmbedMode);
+
+  if (isEmbedMode) {
+    document.body.classList.add('embed-mode');
+    console.warn('[Main] Added embed-mode class to body');
+    console.warn('[Main] Body classes:', document.body.className);
+  } else {
+    console.warn('[Main] Running in standard mode');
+  }
+
   console.log('[Main] Initializing Polytope Viewer...');
 
   // Initialize license manager
@@ -52,7 +68,8 @@ async function init() {
   await viewer.init();
 
   // Create mobile UI (automatically detects mobile/tablet)
-  mobileUI = new MobileUI(viewer);
+  // DISABLED: Using pure CSS responsive approach instead
+  // mobileUI = new MobileUI(viewer);
 
   // Create controls
   controls = new ViewerControls(viewer);
@@ -70,9 +87,10 @@ async function init() {
     console.log('[Main] Polytope selector initialized');
 
     // Connect selector to mobile UI (if mobile)
-    if (mobileUI && mobileUI.isMobile) {
-      mobileUI.setSelector(selector);
-    }
+    // DISABLED: Using pure CSS responsive approach
+    // if (mobileUI && mobileUI.isMobile) {
+    //   mobileUI.setSelector(selector);
+    // }
   } catch (error) {
     console.error('[Main] Failed to initialize selector:', error);
     showError('Failed to load polytope library. Using fallback list.');
@@ -82,7 +100,6 @@ async function init() {
   // Only mesh view is limited (>1200 edges) - handled in viewer.js
 
   // Get polytope from URL parameter or default to tesseract
-  const urlParams = new URLSearchParams(window.location.search);
   const polytopeId = urlParams.get('id') || '2-tes';
 
   // ALL polytopes load from /data/polytopes/{id}.off
@@ -97,6 +114,17 @@ async function init() {
 
     hideLoading();
     updateInfoPanel(polytopeId, viewer.polytopeData);
+
+    // Enable mesh view by default in embed mode
+    if (isEmbedMode) {
+      viewer.toggleMeshView(true);
+      // Update button state if it exists
+      const meshBtn = document.getElementById('toggle-mesh-btn');
+      if (meshBtn) {
+        meshBtn.classList.add('active');
+        meshBtn.textContent = 'Mesh: ON';
+      }
+    }
 
     // Start rendering
     viewer.startRendering();
@@ -123,13 +151,6 @@ async function init() {
     `;
     document.body.insertBefore(bgCanvas, document.body.firstChild);
     new ParticleField(bgCanvas);
-
-    // Audio feedback for UI interactions
-    hudSounds = new HUDSounds();
-    document.querySelectorAll('.hud-button, .btn-secondary, .btn-primary').forEach(btn => {
-      btn.addEventListener('mouseenter', () => hudSounds.playTick());
-      btn.addEventListener('click', () => hudSounds.playChirp());
-    });
   }
 
   // Make viewer globally accessible for debugging
@@ -138,7 +159,6 @@ async function init() {
   window.mobileUI = mobileUI;
   window.licenseManager = licenseManager;
   window.selector = selector;
-  window.hudSounds = hudSounds; // Make sounds globally accessible for toggle
 }
 
 /**
@@ -210,11 +230,12 @@ function updateInfoPanel(name, data) {
   }
 
   // Also update mobile sheet if it exists
-  if (mobileUI && mobileUI.isMobile && mobileUI.sheet) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const polytopeId = urlParams.get('id') || '2-tes';
-    mobileUI.updateMobileInfoPanel(polytopeId, data);
-  }
+  // DISABLED: Using pure CSS responsive approach
+  // if (mobileUI && mobileUI.isMobile && mobileUI.sheet) {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const polytopeId = urlParams.get('id') || '2-tes';
+  //   mobileUI.updateMobileInfoPanel(polytopeId, data);
+  // }
 }
 
 // Initialize when DOM is ready
