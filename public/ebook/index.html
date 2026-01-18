@@ -9,7 +9,7 @@
     <meta name="title" content="The Geometry of Consciousness | Free 4D Visualization Guide">
     <meta name="description" content="A comprehensive guide to visualizing four-dimensional polytopes (polychora), exploring the 120-cell, 600-cell, tesseract, and the intersection of higher-dimensional geometry with consciousness studies. Free PDF download.">
     <meta name="keywords" content="4D geometry, polychora, tesseract, 120-cell, 600-cell, fourth dimension, higher dimensions, consciousness, visualization, Penrose, sacred geometry, polytopes">
-    <meta name="author" content="Randall, Pardesco">
+    <meta name="author" content="Aria, Pardesco">
     <meta name="robots" content="index, follow">
 
     <!-- Canonical URL -->
@@ -249,6 +249,48 @@
         .download-icon {
             width: 24px;
             height: 24px;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            text-decoration: none;
+            color: var(--orange);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+            color: var(--orange-bright);
+            transform: translateY(3px);
+        }
+
+        .scroll-text {
+            font-family: var(--font-data);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+        }
+
+        .scroll-arrow {
+            width: 28px;
+            height: 28px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(8px);
+            }
+            60% {
+                transform: translateY(4px);
+            }
         }
 
         /* Book Preview */
@@ -650,6 +692,14 @@
                         </svg>
                         Download Free PDF
                     </a>
+
+                    <!-- Scroll indicator -->
+                    <a href="#support" class="scroll-indicator">
+                        <span class="scroll-text">♥ Support Our Work</span>
+                        <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </a>
                 </div>
                 <div class="book-preview">
                     <div class="book-cover">
@@ -660,7 +710,7 @@
         </section>
 
         <!-- Support Section - PROMINENT -->
-        <section class="support-section">
+        <section id="support" class="support-section">
             <div class="support-content">
                 <h2 class="support-title">Support This Project</h2>
                 <p class="support-subtitle">
@@ -674,7 +724,7 @@
                     <div class="creator-message">
                         <p>Thanks for exploring the fourth dimension with me! Building this viewer has been a labor of love.</p>
                         <p>Your support helps keep the servers running and funds future features.</p>
-                        <span class="signature">- Randall, Pardesco</span>
+                        <span class="signature">- Aria, Pardesco</span>
                     </div>
                 </div>
 
