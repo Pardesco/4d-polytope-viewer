@@ -7,6 +7,7 @@ import { MobileUI } from './ui/mobile/MobileUI.js';
 import { SimpleWatermark } from './ui/SimpleWatermark.js';
 import { licenseManager } from './license/LicenseManager.js';
 import { ParticleField } from './effects/ParticleField.js';
+import { DonationAvatar } from './ui/DonationAvatar.js';
 import '../styles/main.css';
 import '../styles/mobile.css';
 
@@ -151,6 +152,17 @@ async function init() {
     `;
     document.body.insertBefore(bgCanvas, document.body.firstChild);
     new ParticleField(bgCanvas);
+
+    // Donation avatar (appears after 3 minutes)
+    // Skip in embed mode
+    if (!isEmbedMode) {
+      const donationAvatar = new DonationAvatar({
+        // Hybrid timing: 2.5 min first visit, 1 min return visits
+        donationUrl: 'https://4d.pardesco.com/ebook/',
+        videoUrl: '/videos/donation-request.mp4'
+      });
+      donationAvatar.init();
+    }
   }
 
   // Make viewer globally accessible for debugging

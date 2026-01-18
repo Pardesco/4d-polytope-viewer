@@ -63,19 +63,6 @@ export class ExportMenu {
                     </summary>
                     <div class="p-2 pt-0 space-y-2 mt-2">
 
-            <!-- Mesh Quality Settings (for mesh exports) -->
-            <div class="mesh-quality-section">
-                <span class="quality-label">Mesh Quality</span>
-                <div class="quality-toggle">
-                    <button id="quality-low-btn" class="quality-btn active" data-quality="low">
-                        Low
-                    </button>
-                    <button id="quality-high-btn" class="quality-btn" data-quality="high">
-                        High
-                    </button>
-                </div>
-            </div>
-
             <div class="export-buttons">
                 <!-- Video Recording (Creator/Pro only) -->
                 <button
@@ -223,15 +210,6 @@ export class ExportMenu {
             });
         });
 
-        // Mesh quality toggle buttons
-        const qualityBtns = this.exportPanel.querySelectorAll('.quality-btn');
-        qualityBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const quality = e.currentTarget.dataset.quality;
-                this.handleQualityChange(quality);
-            });
-        });
-
         // Screenshot resolution toggle buttons
         const resolutionBtns = this.exportPanel.querySelectorAll('.resolution-btn');
         resolutionBtns.forEach(btn => {
@@ -268,34 +246,6 @@ export class ExportMenu {
                     }, 1000);
                 }
             });
-        }
-    }
-
-    /**
-     * Handle mesh quality toggle change
-     * @param {'low' | 'high'} quality - Selected quality
-     */
-    handleQualityChange(quality) {
-        // Update button states
-        const lowBtn = document.getElementById('quality-low-btn');
-        const highBtn = document.getElementById('quality-high-btn');
-
-        if (lowBtn && highBtn) {
-            lowBtn.classList.toggle('active', quality === 'low');
-            highBtn.classList.toggle('active', quality === 'high');
-        }
-
-        // Update viewer mesh quality (map 'low' to 'standard' for viewer)
-        if (this.viewer) {
-            const viewerQuality = quality === 'low' ? 'standard' : 'high';
-            this.viewer.setMeshQuality(viewerQuality);
-        }
-
-        // Show warning for high quality
-        if (quality === 'high') {
-            this.setStatus('High quality - may reduce performance', 'info');
-        } else {
-            this.setStatus('', 'info');
         }
     }
 
