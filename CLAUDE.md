@@ -238,14 +238,22 @@ getMeshSettings() {
 # Development
 npm run dev
 
-# Production build
-npm run build
+# Production build (IMPORTANT: use build:all, not build)
+npm run build:all
 
 # Deploy to Cloudflare Pages (PRODUCTION)
-npx wrangler pages deployment create --project-name=polytope-4d --branch=main dist
+npx wrangler pages deployment create dist --project-name=polytope-4d --branch=main
 ```
 
-**Important**: Use `deployment create` with `--branch=main` for production. Plain `pages deploy` creates preview only.
+**IMPORTANT - Use `build:all` not `build`**:
+- `npm run build` - Only builds the main Vite app (viewer, landing page, gallery)
+- `npm run build:all` - Builds main app AND the Astro knowledge base, then merges them
+
+The knowledge base (`/shapes/*`, `/learn/*`, `/guide/*`) is a separate Astro project in `knowledge-base/`. The `build:all` script runs both builds and merges the output into `dist/`.
+
+If you only run `npm run build`, the knowledge base routes will 404 or redirect to the landing page.
+
+**Also important**: Use `deployment create` with `--branch=main` for production. Plain `pages deploy` creates preview only.
 
 ### Verify Deployment
 
