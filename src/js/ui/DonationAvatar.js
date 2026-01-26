@@ -1,13 +1,16 @@
 /**
  * DonationAvatar - Shows a donation prompt after user engages with viewer
  * Desktop only, with hybrid timing:
- * - First visit: 2.5 minutes delay
+ * - First visit: 3 minutes delay
  * - Return visits: 1 minute delay
+ * - Skipped for Creator tier users (they already supported!)
  */
+
+import { licenseManager } from '../license/LicenseManager.js';
 
 export class DonationAvatar {
   constructor(options = {}) {
-    this.firstVisitDelayMs = options.firstVisitDelayMs || 2.5 * 60 * 1000; // 2.5 minutes
+    this.firstVisitDelayMs = options.firstVisitDelayMs || 3 * 60 * 1000; // 3 minutes
     this.returnVisitDelayMs = options.returnVisitDelayMs || 60 * 1000; // 1 minute
     this.donationUrl = options.donationUrl || 'https://4d.pardesco.com/ebook/';
     this.videoUrl = options.videoUrl || '/videos/donation-request.mp4';
@@ -19,9 +22,16 @@ export class DonationAvatar {
   }
 
   /**
-   * Initialize the donation avatar (desktop only)
+   * Initialize the donation avatar (desktop only, free tier only)
    */
   init() {
+    // Skip for Creator/Professional tier users - they already supported!
+    const tier = licenseManager.getTier();
+    if (tier === 'creator' || tier === 'professional') {
+      console.log(`[DonationAvatar] Skipping - ${tier} tier user`);
+      return;
+    }
+
     // Only show on desktop
     if (this.isMobile()) {
       console.log('[DonationAvatar] Skipping - mobile device detected');
