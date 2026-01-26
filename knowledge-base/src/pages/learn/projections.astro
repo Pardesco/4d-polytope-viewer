@@ -1,0 +1,289 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+---
+
+<ArticleLayout
+  title="Projection Methods: Visualizing the Fourth Dimension"
+  description="How we render 4D objects in 3D space—stereographic, perspective, and cross-sectioning techniques explained."
+>
+  <p class="lead text-xl text-gray-300 mb-8">
+    Since 4D objects cannot be viewed directly, their structure must be inferred through projection—the same way we understand 3D objects through 2D images. This guide explains the techniques used to visualize polychora.
+  </p>
+
+  <h2>The Fundamental Challenge</h2>
+
+  <p>Our eyes are 2D sensors that reconstruct 3D scenes. We cannot add another dimension to this process. Instead, we use mathematical projections to reduce 4D objects to 3D representations, which we can then view normally.</p>
+
+  <p>This is analogous to how 3D objects cast 2D shadows. A 4D object casts a 3D "shadow" that we can examine from all angles.</p>
+
+  <h2>Perspective Projection</h2>
+
+  <h3>The Concept</h3>
+
+  <p>Perspective projection mimics how our eyes see: objects farther away appear smaller. For 4D→3D projection:</p>
+
+  <ol>
+    <li>Place a 4D object in 4-space</li>
+    <li>Choose a projection point (like your eye, but in 4D)</li>
+    <li>Draw lines from each vertex to the projection point</li>
+    <li>Where these lines cross a 3D hyperplane, plot the projected points</li>
+  </ol>
+
+  <h3>The Result</h3>
+
+  <p>The projected 3D object shows:</p>
+  <ul>
+    <li>Parts of the 4D object closer to the projection point appear <strong>larger</strong></li>
+    <li>Parts farther away appear <strong>smaller</strong></li>
+    <li>The 3D object seems to have one cell "containing" another</li>
+  </ul>
+
+  <h3>Example: Tesseract</h3>
+
+  <p>A tesseract projected this way shows a small cube inside a large cube, with edges connecting corresponding vertices. This is misleading—both cubes are the same size in 4D! The "inner" cube is simply farther away in the w-direction.</p>
+
+  <h2>Schlegel Diagrams</h2>
+
+  <h3>What They Are</h3>
+
+  <p>A <strong>Schlegel diagram</strong> is a specific type of perspective projection used in polytope theory. The projection point is placed just outside one face (or cell), looking inward.</p>
+
+  <h3>For Polychora (4D→3D)</h3>
+
+  <p>A Schlegel diagram of a tesseract:</p>
+  <ul>
+    <li>One cubic cell becomes the outer boundary (a cube)</li>
+    <li>The opposite cubic cell appears as a smaller cube inside</li>
+    <li>The remaining 6 cubic cells appear as truncated pyramids connecting them</li>
+  </ul>
+
+  <h3>Why Schlegel Diagrams Are Useful</h3>
+
+  <ul>
+    <li>All cells are visible (none hidden behind others)</li>
+    <li>The combinatorial structure (what connects to what) is preserved</li>
+    <li>Easy to understand face/cell adjacency</li>
+  </ul>
+
+  <h3>The Distortion</h3>
+
+  <p>Schlegel diagrams severely distort size and shape. In the tesseract Schlegel diagram, all 8 cubic cells are congruent in 4D, but they appear as wildly different sizes in the diagram. Angles and proportions are not preserved.</p>
+
+  <h2>Stereographic Projection</h2>
+
+  <h3>The Concept</h3>
+
+  <p>Stereographic projection maps a sphere onto a plane. For 4D visualization, we use the 4D analogue:</p>
+
+  <ol>
+    <li>Place the polytope on the surface of a 4D hypersphere</li>
+    <li>Choose a projection point (typically the "north pole")</li>
+    <li>Project each point onto a 3D hyperplane</li>
+  </ol>
+
+  <h3>Key Properties</h3>
+
+  <ul>
+    <li><strong>Conformality</strong>: Angles are preserved locally</li>
+    <li><strong>Circles become circles</strong>: Great circles on the hypersphere project to circles in 3D</li>
+    <li><strong>Smooth curves</strong>: Edges that are straight in 4D become graceful curves in 3D</li>
+  </ul>
+
+  <h3>Why This Viewer Uses Stereographic Projection</h3>
+
+  <p>This 4D polytope viewer primarily uses stereographic projection because:</p>
+
+  <ol>
+    <li><strong>Visual elegance</strong>: The curved edges create beautiful, organic forms</li>
+    <li><strong>Equal treatment</strong>: No single cell dominates visually</li>
+    <li><strong>Rotation clarity</strong>: As the polytope rotates in 4D, the flowing curves make the motion intuitive</li>
+    <li><strong>Mathematical significance</strong>: Preserves the conformal structure</li>
+  </ol>
+
+  <h3>The Characteristic Look</h3>
+
+  <p>In stereographic projection:</p>
+  <ul>
+    <li>Edges curve gracefully rather than going straight</li>
+    <li>The overall shape appears spherical</li>
+    <li>4D rotation creates mesmerizing transformations</li>
+  </ul>
+
+  <h2>Orthographic Projection</h2>
+
+  <h3>The Concept</h3>
+
+  <p>Orthographic (or parallel) projection uses parallel projection lines rather than converging ones. Choose a viewing direction in 4D, then project every point perpendicularly onto a 3D hyperplane.</p>
+
+  <p>This is like viewing from infinitely far away—no perspective distortion.</p>
+
+  <h3>Properties</h3>
+
+  <ul>
+    <li><strong>No size distortion by depth</strong>: Objects don't shrink with distance</li>
+    <li><strong>Parallel lines stay parallel</strong>: Good for technical analysis</li>
+    <li><strong>Overlapping elements</strong>: Parts of the polytope may overlap confusingly</li>
+  </ul>
+
+  <h2>Cross-Sectioning (Slicing)</h2>
+
+  <h3>The Concept</h3>
+
+  <p>Instead of projecting the entire 4D object, we can slice it with a 3D hyperplane—like passing an object through a plane and observing the intersection.</p>
+
+  <h3>Dynamic Cross-Sections</h3>
+
+  <p>As a 4D object passes through 3D space, the cross-section changes:</p>
+
+  <p><strong>Tesseract passing vertex-first:</strong></p>
+  <ol>
+    <li>Point (first vertex touches)</li>
+    <li>Growing tetrahedron</li>
+    <li>Octahedron (at the middle)</li>
+    <li>Shrinking tetrahedron</li>
+    <li>Point (last vertex exits)</li>
+  </ol>
+
+  <p><strong>Tesseract passing face-first:</strong></p>
+  <ol>
+    <li>Square (first face touches)</li>
+    <li>Growing cube</li>
+    <li>Cube (entire face inside)</li>
+    <li>Shrinking cube</li>
+    <li>Square (last face exits)</li>
+  </ol>
+
+  <h3>Hinton's Colored Cubes</h3>
+
+  <p>Charles Howard Hinton developed a system of colored cubes to help visualize cross-sections. By memorizing the sequence of colors as different parts of a tesseract pass through 3D space, practitioners could develop 4D intuition.</p>
+
+  <h2>Rotation vs. Projection</h2>
+
+  <h3>4D Rotation</h3>
+
+  <p>True 4D rotation happens before projection. A 4D object can rotate in 6 independent planes:</p>
+  <ul>
+    <li>XY, XZ, XW (rotations involving X)</li>
+    <li>YZ, YW (rotations involving Y)</li>
+    <li>ZW (rotation purely in the "extra" dimensions)</li>
+  </ul>
+
+  <h3>What You See</h3>
+
+  <p>When a 4D object rotates in a plane involving W (like XW, YW, or ZW), the 3D projection transforms dramatically:</p>
+  <ul>
+    <li>Cells appear to turn inside-out</li>
+    <li>Parts that were "inside" move "outside"</li>
+    <li>The object seems to flow through itself</li>
+  </ul>
+
+  <p>This is not the projection changing—it's genuine 4D rotation revealing different aspects of the object.</p>
+
+  <h3>3D Rotation (of the Projection)</h3>
+
+  <p>You can also rotate the 3D projection itself, like turning a sculpture. This helps you understand the 3D shape of the projection but doesn't reveal new 4D information.</p>
+
+  <h2>Choosing the Right Method</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Best For</th>
+        <th>Limitation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Perspective</td><td>Understanding depth</td><td>Severe size distortion</td></tr>
+      <tr><td>Schlegel</td><td>Seeing all cells</td><td>Shape/angle distortion</td></tr>
+      <tr><td>Stereographic</td><td>Aesthetic visualization</td><td>Curved edges can confuse</td></tr>
+      <tr><td>Orthographic</td><td>Technical analysis</td><td>Overlapping elements</td></tr>
+      <tr><td>Cross-section</td><td>Step-by-step understanding</td><td>Only partial view at once</td></tr>
+    </tbody>
+  </table>
+
+  <h2>This Viewer's Approach</h2>
+
+  <p>This interactive viewer combines several techniques:</p>
+
+  <ol>
+    <li><strong>Stereographic projection</strong> for the primary visualization</li>
+    <li><strong>Real-time 4D rotation</strong> to reveal the object's structure</li>
+    <li><strong>3D rotation</strong> (via mouse drag) to examine the projection</li>
+    <li><strong>Adjustable projection parameters</strong> to customize the view</li>
+  </ol>
+
+  <p>By rotating a polytope through all 6 4D rotation planes, you can observe how its 3D projection transforms—the closest we can come to "seeing" a 4D object.</p>
+
+  <h2>Matrix-5: 5D Embedding (Experimental)</h2>
+
+  <p class="text-sm text-orange-400 mb-4">⚠️ This is an experimental feature available in the viewer.</p>
+
+  <h3>The Concept</h3>
+
+  <p>What if we went one dimension further? <strong>Matrix-5</strong> embeds 4D polytopes into 5D space, then rotates them through the fifth dimension. This creates a visualization effect similar to an MRI scanner—parts of the polytope phase in and out of existence as they move through the fifth dimension.</p>
+
+  <p>Think of it this way: just as a 3D object passing through a 2D plane creates changing cross-sections, a 4D object "passing through" our 4D viewing space from 5D creates dynamic, evolving forms.</p>
+
+  <h3>How It Works</h3>
+
+  <ol>
+    <li>Each 4D vertex <code>[x, y, z, w]</code> is embedded into 5D as <code>[x, y, z, w, 0]</code></li>
+    <li>The polytope is rotated in a 5D plane involving the new V dimension</li>
+    <li>The result is projected: 5D → 4D → 3D</li>
+    <li>As vertices move through V-space, they fade or transform based on their V coordinate</li>
+  </ol>
+
+  <h3>The Four New Rotation Planes</h3>
+
+  <p>In addition to the 6 standard 4D rotation planes, Matrix-5 adds 4 planes involving the fifth dimension (V):</p>
+
+  <ul>
+    <li><strong>XV</strong> - Rotation between X and V axes</li>
+    <li><strong>YV</strong> - Rotation between Y and V axes</li>
+    <li><strong>ZV</strong> - Rotation between Z and V axes</li>
+    <li><strong>WV</strong> - Rotation between W and V axes (the most dramatic effect)</li>
+  </ul>
+
+  <p>The <strong>WV plane</strong> is particularly interesting—it rotates between the fourth and fifth spatial dimensions, creating a "breathing" effect where the entire polytope seems to pulse and transform.</p>
+
+  <h3>Matrix-4 vs Matrix-5</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Aspect</th>
+        <th>Matrix-4 (Standard)</th>
+        <th>Matrix-5 (5D Embedding)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Dimensions</td><td>4D → 3D</td><td>5D → 4D → 3D</td></tr>
+      <tr><td>Rotation Planes</td><td>6 planes</td><td>10 planes (6 + 4 new)</td></tr>
+      <tr><td>Rotation Matrix</td><td>4×4</td><td>5×5</td></tr>
+      <tr><td>Visual Effect</td><td>Cells turn inside-out</td><td>Parts phase in/out of existence</td></tr>
+      <tr><td>Best For</td><td>Understanding 4D structure</td><td>Artistic/meditative visualization</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Using Matrix-5 in the Viewer</h3>
+
+  <p>In the viewer's Quick Controls panel, you can toggle between Matrix-4 and Matrix-5 modes. When Matrix-5 is active:</p>
+
+  <ul>
+    <li>The interface adopts an orange/gold color scheme</li>
+    <li>The rotation matrix display expands to 5×5</li>
+    <li>New 5D rotation plane controls appear (XV, YV, ZV, WV)</li>
+    <li>The polytope gains an ethereal, phasing quality</li>
+  </ul>
+
+  <p>Try the <strong>WV rotation plane</strong> with stereographic projection for the most mesmerizing effect—the polytope appears to breathe and pulse as it rotates through the fifth dimension.</p>
+
+  <h2>Further Reading</h2>
+
+  <ul>
+    <li><a href="/learn/what-is-4d">What is the Fourth Dimension?</a> - Basic concepts</li>
+    <li><a href="/learn/schlafli-symbols">Schläfli Symbols</a> - The notation for regular polytopes</li>
+    <li><a href="/shapes/24-cell">The 24-Cell</a> - A shape best understood through rotation</li>
+  </ul>
+</ArticleLayout>
