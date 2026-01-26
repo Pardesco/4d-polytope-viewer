@@ -29,6 +29,8 @@ import { MatrixDisplay } from '../ui/MatrixDisplay.js'; // NEW: For displaying 4
 import { GlitchEffect } from '../effects/GlitchEffect.js'; // NEW: For visual feedback on polytope changes
 import { licenseManager } from '../license/LicenseManager.js'; // Security: For feature gating
 import { FilmGrainEffect } from '../effects/FilmGrainEffect.js'; // Film grain post-processing
+import { createMatrix5LineMaterial, createMatrix5PointMaterial, Matrix5Controller } from '../shaders/Matrix5Shader.js'; // Matrix-5 (5D) projection
+import { Rotation5D, embedAllIn5D, generateCurvePoints5D, rotateVertex5D, getRotationMatrix5D } from './projection5d.js'; // 5D math utilities
 
 export class PolytopeViewer {
   constructor(canvasContainer, options = {}) {
@@ -117,6 +119,21 @@ export class PolytopeViewer {
 
     // Mesh quality settings ('standard' for real-time, 'high' for export quality)
     this.meshQuality = 'standard';
+
+    // Matrix-5 (5D projection) mode - experimental
+    this.projectionMode = 'matrix4'; // 'matrix4' (standard) or 'matrix5' (5D scanner effect)
+    this.matrix5Enabled = false;     // Feature flag (enabled via URL param ?mode=matrix5)
+    this.matrix5Material = null;     // Shader material for Matrix-5
+    this.matrix5Lines = null;        // Line segments for Matrix-5 rendering
+    this.matrix5Points = null;       // Point cloud for vertices in Matrix-5
+    this.matrix5Controller = null;   // Controller for shader uniforms
+    this.rotation5D = null;          // 5D rotation state (for CPU path)
+    this.vertices5D = [];            // 4D vertices embedded in 5D (original)
+    this.vertices5DRotated = [];     // 5D vertices after rotation (for CPU path)
+    this.matrix5ProjectionType = null; // Will inherit from projectionType when Matrix-5 activates
+    this.matrix5Time = 0;            // Animation time for CPU-based 5D rotation
+    this.matrix5RotationPlane = 'wv'; // Active 5D rotation plane
+    this.matrix5RotationSpeed = 0.5; // 5D rotation speed
 
     // Animation
     this.animationFrameId = null;
@@ -229,6 +246,12 @@ export class PolytopeViewer {
       console.log('[PolytopeViewer] Manual rotation disabled (mobile)');
     }
 
+    // Check for Matrix-5 mode URL parameter
+    if (PolytopeViewer.isMatrix5Enabled()) {
+      this.matrix5Enabled = true;
+      console.log('[PolytopeViewer] Matrix-5 mode ENABLED via URL parameter (?mode=matrix5)');
+    }
+
     console.log('[PolytopeViewer] Initialized successfully');
   }
 
@@ -296,6 +319,16 @@ export class PolytopeViewer {
 
       // Update performance warning banner
       this.performanceBanner.update(this.currentEdgeCount, this.rotating4D, this.showMeshView);
+
+      // Reinitialize Matrix-5 rendering if active
+      if (this.projectionMode === 'matrix5') {
+        this.disableMatrix5Rendering();
+        this.initMatrix5Rendering();
+        // Hide standard geometry
+        this.edgeLines.forEach(line => { line.visible = false; });
+        this.tubeMeshes.forEach(mesh => { mesh.visible = false; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
+      }
 
       return this.polytopeData;
     } catch (error) {
@@ -1093,17 +1126,35 @@ export class PolytopeViewer {
     if (edgeIndex >= this.edgeLines.length) return;
 
     const [v1Idx, v2Idx] = this.edgeIndices[edgeIndex];
-    const v1_4d = this.vertices4DCurrent[v1Idx];
-    const v2_4d = this.vertices4DCurrent[v2Idx];
+    let curvePoints;
 
-    // Generate updated curve points
-    const curvePoints = generateCurvePoints(
-      v1_4d,
-      v2_4d,
-      this.projectionType,
-      this.NUM_CURVE_POINTS,
-      this.perspectiveDistance
-    );
+    // Check if we're in Matrix-5 mode with mesh view (CPU path)
+    if (this.projectionMode === 'matrix5' && this.vertices5DRotated) {
+      // Use 5D curve generation
+      const v1_5d = this.vertices5DRotated[v1Idx];
+      const v2_5d = this.vertices5DRotated[v2Idx];
+
+      curvePoints = generateCurvePoints5D(
+        v1_5d,
+        v2_5d,
+        this.matrix5ProjectionType,
+        this.NUM_CURVE_POINTS,
+        2.5,  // scale5D
+        this.perspectiveDistance  // scale4D
+      );
+    } else {
+      // Standard 4D curve generation
+      const v1_4d = this.vertices4DCurrent[v1Idx];
+      const v2_4d = this.vertices4DCurrent[v2Idx];
+
+      curvePoints = generateCurvePoints(
+        v1_4d,
+        v2_4d,
+        this.projectionType,
+        this.NUM_CURVE_POINTS,
+        this.perspectiveDistance
+      );
+    }
 
     if (curvePoints.length < 2) return;
 
@@ -1367,9 +1418,21 @@ export class PolytopeViewer {
       this.group.rotation.x += 0.002;
     }
 
-    // 4D rotation (auto or manual mode)
-    if (this.matrixDisplay) { // Update matrix display on desktop
-      this.matrixDisplay.update(this.rotation4D.getCurrentRotationMatrix());
+    // Matrix-5 mode: GPU-based 5D projection
+    if (this.projectionMode === 'matrix5') {
+      this.updateMatrix5(delta);
+    }
+
+    // Update matrix display on desktop (4D or 5D based on projection mode)
+    if (this.matrixDisplay) {
+      if (this.projectionMode === 'matrix5') {
+        // Show 5x5 rotation matrix in Matrix-5 mode
+        const matrix5D = this.get5DRotationMatrix();
+        this.matrixDisplay.update(matrix5D);
+      } else {
+        // Show 4x4 rotation matrix in Matrix-4 mode
+        this.matrixDisplay.update(this.rotation4D.getCurrentRotationMatrix());
+      }
     }
 
     if (this.rotationMode === 'manual' && this.manualRotationController) {
@@ -1377,15 +1440,19 @@ export class PolytopeViewer {
       // Note: 3D rotation is disabled in manual mode for precise 4D control
       const deltaTime = delta / 1000; // Convert ms to seconds
       this.manualRotationController.update(deltaTime);
-      this.updateProjection();
+      if (this.projectionMode !== 'matrix5') {
+        this.updateProjection();
+      }
     } else if (this.rotating4D && this.rotationEnabled) {
       // Auto mode: continuous rotation
       this.rotation4D.update();
-      this.updateProjection();
+      if (this.projectionMode !== 'matrix5') {
+        this.updateProjection();
+      }
     }
 
     // Update material animation (desktop only, when mesh view is active)
-    if (this.showMeshView) {
+    if (this.showMeshView && this.projectionMode !== 'matrix5') {
       const deltaTime = delta / 1000; // Convert ms to seconds
       if (this.iridescentMaterial && this.currentMaterialType === 'iridescent') {
         this.iridescentMaterial.update(deltaTime);
@@ -1547,6 +1614,41 @@ export class PolytopeViewer {
     this.showMeshView = enabled;
     console.log(`[PolytopeViewer] Mesh view: ${enabled ? 'enabled' : 'disabled'}`);
 
+    // Handle Matrix-5 mode transitions between GPU and CPU paths
+    if (this.projectionMode === 'matrix5') {
+      if (enabled) {
+        // Switching to mesh view: use CPU path
+        console.log('[Matrix5] Switching to CPU path for mesh view');
+        // Hide GPU shader objects
+        if (this.matrix5Lines) this.matrix5Lines.visible = false;
+        if (this.matrix5Points) this.matrix5Points.visible = false;
+        // Show tube meshes
+        this.edgeLines.forEach(line => { line.visible = false; });
+        this.tubeMeshes.forEach(mesh => { mesh.visible = true; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = this.showVertices; });
+        // Ensure 5D vertices are embedded
+        if (!this.vertices5D || this.vertices5D.length === 0) {
+          this.vertices5D = embedAllIn5D(this.vertices4DOriginal);
+        }
+        // Force geometry rebuild
+        this.geometryInitialized = false;
+      } else {
+        // Switching to line view: use GPU shader
+        console.log('[Matrix5] Switching to GPU shader for line view');
+        // Hide tube meshes and line objects
+        this.edgeLines.forEach(line => { line.visible = false; });
+        this.tubeMeshes.forEach(mesh => { mesh.visible = false; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
+        // Show GPU shader objects (re-initialize if needed)
+        if (!this.matrix5Lines) {
+          this.initMatrix5Rendering();
+        } else {
+          this.matrix5Lines.visible = true;
+          if (this.matrix5Points) this.matrix5Points.visible = this.showVertices;
+        }
+      }
+    }
+
     // Update geometry
     if (this.geometryInitialized) {
       this.updateAllGeometry();
@@ -1556,6 +1658,372 @@ export class PolytopeViewer {
     if (this.performanceBanner) {
       this.performanceBanner.update(this.currentEdgeCount, this.rotating4D, this.showMeshView);
     }
+  }
+
+  // ============================================================================
+  // MATRIX-5 (5D PROJECTION) MODE - EXPERIMENTAL
+  // ============================================================================
+
+  /**
+   * Check if Matrix-5 mode is enabled via URL parameter
+   * @returns {boolean} True if ?mode=matrix5 is present in URL
+   */
+  static isMatrix5Enabled() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('mode') === 'matrix5';
+  }
+
+  /**
+   * Set projection mode (Matrix-4 standard or Matrix-5 experimental)
+   * @param {'matrix4' | 'matrix5'} mode - Projection mode
+   */
+  setProjectionMode(mode) {
+    if (mode !== 'matrix4' && mode !== 'matrix5') {
+      console.warn(`[Matrix5] Invalid projection mode: ${mode}`);
+      return;
+    }
+
+    if (this.projectionMode === mode) return;
+
+    const previousMode = this.projectionMode;
+    this.projectionMode = mode;
+
+    // Enable matrix5Enabled flag when switching to matrix5 mode
+    if (mode === 'matrix5') {
+      this.matrix5Enabled = true;
+    }
+
+    console.log(`[Matrix5] Switching projection mode: ${previousMode} → ${mode}`);
+
+    if (mode === 'matrix5') {
+      // Inherit projection type from current 4D setting if not already set
+      if (!this.matrix5ProjectionType) {
+        this.matrix5ProjectionType = this.projectionType; // 'stereographic' or 'perspective'
+        console.log(`[Matrix5] Inheriting projection type: ${this.matrix5ProjectionType}`);
+      }
+
+      // Embed 4D vertices into 5D
+      this.vertices5D = embedAllIn5D(this.vertices4DOriginal);
+      this.matrix5Time = 0;
+
+      // Initialize 5D rotation state
+      if (!this.rotation5D) {
+        this.rotation5D = new Rotation5D();
+        this.rotation5D.setPlaneActive('wv', true);
+      }
+
+      if (this.showMeshView) {
+        // Mesh view: use CPU-based 5D projection with existing tube geometry
+        console.log('[Matrix5] Using CPU path for mesh view');
+        // Hide GPU shader objects if they exist
+        if (this.matrix5Lines) this.matrix5Lines.visible = false;
+        if (this.matrix5Points) this.matrix5Points.visible = false;
+        // Show tube meshes - they'll be updated with 5D projection
+        this.edgeLines.forEach(line => { line.visible = false; });
+        this.tubeMeshes.forEach(mesh => { mesh.visible = true; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = this.showVertices; });
+        // Force geometry rebuild with 5D projection
+        this.geometryInitialized = false;
+        this.updateProjection();
+      } else {
+        // Line view: use GPU shader (fast path)
+        console.log('[Matrix5] Using GPU shader for line view');
+        this.initMatrix5Rendering();
+        // Hide standard geometry
+        this.edgeLines.forEach(line => { line.visible = false; });
+        this.tubeMeshes.forEach(mesh => { mesh.visible = false; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
+      }
+    } else {
+      // Disable Matrix-5 rendering
+      this.disableMatrix5Rendering();
+      // Show standard geometry
+      this.edgeLines.forEach(line => { line.visible = !this.showMeshView; });
+      this.tubeMeshes.forEach(mesh => { mesh.visible = this.showMeshView; });
+      this.vertexMeshes.forEach(mesh => { mesh.visible = this.showVertices; });
+      // Rebuild geometry with standard 4D projection
+      this.geometryInitialized = false;
+      this.updateProjection();
+    }
+  }
+
+  /**
+   * Initialize Matrix-5 rendering objects
+   * Creates GPU-accelerated shader materials and geometry for 5D projection
+   */
+  initMatrix5Rendering() {
+    if (!this.vertices4DOriginal || this.vertices4DOriginal.length === 0) {
+      console.warn('[Matrix5] No polytope loaded, cannot initialize');
+      return;
+    }
+
+    console.log('[Matrix5] Initializing 5D projection rendering...');
+
+    // Embed 4D vertices into 5D (v = 0)
+    this.vertices5D = embedAllIn5D(this.vertices4DOriginal);
+
+    // Create line material for edges
+    this.matrix5Material = createMatrix5LineMaterial({
+      uScale4D: this.perspectiveDistance,
+      uScale5D: 2.5,
+      uAutoRotate: true,
+      uAutoRotateSpeed: 0.5,
+      uAutoRotatePlane: 3 // WV plane
+    });
+
+    // Create Matrix-5 controller for uniform management
+    this.matrix5Controller = new Matrix5Controller(this.matrix5Material);
+
+    // Apply current projection type to Matrix-5 controller
+    if (this.matrix5ProjectionType) {
+      this.matrix5Controller.setProjectionType(this.matrix5ProjectionType);
+    }
+
+    // Create geometry for all edges
+    const positions = [];
+    const positions4D = [];
+
+    // Build line segments for each edge
+    for (let i = 0; i < this.edgeIndices.length; i++) {
+      const [v1Idx, v2Idx] = this.edgeIndices[i];
+      const v1 = this.vertices4DOriginal[v1Idx];
+      const v2 = this.vertices4DOriginal[v2Idx];
+
+      // Generate interpolated points along edge for smoother curves
+      const NUM_SEGMENTS = 20;
+      for (let j = 0; j < NUM_SEGMENTS; j++) {
+        const t1 = j / NUM_SEGMENTS;
+        const t2 = (j + 1) / NUM_SEGMENTS;
+
+        // Interpolate in 4D
+        const p1 = [
+          v1[0] + t1 * (v2[0] - v1[0]),
+          v1[1] + t1 * (v2[1] - v1[1]),
+          v1[2] + t1 * (v2[2] - v1[2]),
+          v1[3] + t1 * (v2[3] - v1[3])
+        ];
+        const p2 = [
+          v1[0] + t2 * (v2[0] - v1[0]),
+          v1[1] + t2 * (v2[1] - v1[1]),
+          v1[2] + t2 * (v2[2] - v1[2]),
+          v1[3] + t2 * (v2[3] - v1[3])
+        ];
+
+        // Add line segment (position is placeholder, shader will project)
+        positions.push(0, 0, 0); // Vertex 1 (3D placeholder)
+        positions.push(0, 0, 0); // Vertex 2 (3D placeholder)
+
+        // Store 4D coordinates as custom attribute
+        positions4D.push(p1[0], p1[1], p1[2], p1[3]);
+        positions4D.push(p2[0], p2[1], p2[2], p2[3]);
+      }
+    }
+
+    // Create BufferGeometry for line segments
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('aPosition4D', new THREE.Float32BufferAttribute(positions4D, 4));
+
+    // Create line segments object
+    this.matrix5Lines = new THREE.LineSegments(geometry, this.matrix5Material);
+    this.group.add(this.matrix5Lines);
+
+    // Create point material for vertices (optional)
+    const pointMaterial = createMatrix5PointMaterial({
+      uScale4D: this.perspectiveDistance,
+      uScale5D: 2.5,
+      pointSize: 4.0
+    });
+
+    // Create vertex points
+    const vertexPositions = [];
+    const vertex4DPositions = [];
+
+    for (let i = 0; i < this.vertices4DOriginal.length; i++) {
+      const v = this.vertices4DOriginal[i];
+      vertexPositions.push(0, 0, 0); // Placeholder
+      vertex4DPositions.push(v[0], v[1], v[2], v[3]);
+    }
+
+    const pointGeometry = new THREE.BufferGeometry();
+    pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertexPositions, 3));
+    pointGeometry.setAttribute('aPosition4D', new THREE.Float32BufferAttribute(vertex4DPositions, 4));
+
+    this.matrix5Points = new THREE.Points(pointGeometry, pointMaterial);
+    this.matrix5Points.visible = this.showVertices;
+    this.group.add(this.matrix5Points);
+
+    // Initialize 5D rotation state (for CPU-side calculations if needed)
+    this.rotation5D = new Rotation5D();
+    this.rotation5D.setPlaneActive('wv', true); // Default: rotate in WV plane
+
+    console.log(`[Matrix5] Initialized: ${this.edgeIndices.length} edges, ${this.vertices4DOriginal.length} vertices`);
+  }
+
+  /**
+   * Update Matrix-5 shader uniforms (called each frame)
+   * @param {number} deltaTime - Time since last frame in milliseconds
+   */
+  updateMatrix5(deltaTime) {
+    // Update animation time
+    this.matrix5Time += deltaTime * 0.001;
+
+    // GPU shader path (line view)
+    if (this.matrix5Controller) {
+      // Update time for auto-rotation
+      this.matrix5Controller.update(deltaTime);
+
+      // Sync 4D rotation angles from standard rotation controller
+      if (this.rotation4D && this.rotating4D) {
+        const angles = this.rotation4D.getCurrentAngles?.() || {};
+        if (angles.xy !== undefined) this.matrix5Controller.set4DAngle('xy', angles.xy * Math.PI / 180);
+        if (angles.xz !== undefined) this.matrix5Controller.set4DAngle('xz', angles.xz * Math.PI / 180);
+        if (angles.xw !== undefined) this.matrix5Controller.set4DAngle('xw', angles.xw * Math.PI / 180);
+        if (angles.yz !== undefined) this.matrix5Controller.set4DAngle('yz', angles.yz * Math.PI / 180);
+        if (angles.yw !== undefined) this.matrix5Controller.set4DAngle('yw', angles.yw * Math.PI / 180);
+        if (angles.zw !== undefined) this.matrix5Controller.set4DAngle('zw', angles.zw * Math.PI / 180);
+      }
+
+      // Update point visibility to match vertex setting
+      if (this.matrix5Points) {
+        this.matrix5Points.visible = this.showVertices;
+      }
+    }
+
+    // CPU path (mesh view) - compute rotated 5D vertices
+    if (this.showMeshView && this.vertices5D && this.vertices5D.length > 0) {
+      // Get 5D rotation matrix for current animation time
+      const angle5D = this.matrix5Time * this.matrix5RotationSpeed;
+      const rotationMatrix5D = getRotationMatrix5D(this.matrix5RotationPlane, angle5D);
+
+      // Rotate all 5D vertices
+      this.vertices5DRotated = this.vertices5D.map(v => rotateVertex5D(v, rotationMatrix5D));
+
+      // Update geometry with 5D-projected curves
+      this.updateAllGeometry();
+    }
+  }
+
+  /**
+   * Disable Matrix-5 rendering and clean up resources
+   */
+  disableMatrix5Rendering() {
+    console.log('[Matrix5] Disabling 5D projection rendering...');
+
+    // Remove and dispose line segments
+    if (this.matrix5Lines) {
+      this.group.remove(this.matrix5Lines);
+      if (this.matrix5Lines.geometry) this.matrix5Lines.geometry.dispose();
+      if (this.matrix5Lines.material) this.matrix5Lines.material.dispose();
+      this.matrix5Lines = null;
+    }
+
+    // Remove and dispose points
+    if (this.matrix5Points) {
+      this.group.remove(this.matrix5Points);
+      if (this.matrix5Points.geometry) this.matrix5Points.geometry.dispose();
+      if (this.matrix5Points.material) this.matrix5Points.material.dispose();
+      this.matrix5Points = null;
+    }
+
+    // Clear controller and material references
+    this.matrix5Controller = null;
+    this.matrix5Material = null;
+    this.rotation5D = null;
+    this.vertices5D = [];
+
+    console.log('[Matrix5] Cleanup complete');
+  }
+
+  /**
+   * Set Matrix-5 auto-rotation plane
+   * @param {'xv' | 'yv' | 'zv' | 'wv'} plane - 5D rotation plane
+   */
+  setMatrix5RotationPlane(plane) {
+    // Update CPU-side state (for mesh view)
+    this.matrix5RotationPlane = plane;
+
+    // Update GPU shader (for line view)
+    if (this.matrix5Controller) {
+      this.matrix5Controller.setAutoRotatePlane(plane);
+    }
+    console.log(`[Matrix5] Rotation plane set to: ${plane.toUpperCase()}`);
+  }
+
+  /**
+   * Set Matrix-5 auto-rotation speed
+   * @param {number} speed - Rotation speed in radians per second
+   */
+  setMatrix5RotationSpeed(speed) {
+    // Update CPU-side state (for mesh view)
+    this.matrix5RotationSpeed = speed;
+
+    // Update GPU shader (for line view)
+    if (this.matrix5Controller) {
+      this.matrix5Controller.setAutoRotateSpeed(speed);
+    }
+  }
+
+  /**
+   * Set Matrix-5 color scheme
+   * @param {number} nearColor - Color when v ≈ 0 (hex)
+   * @param {number} farColor - Color when |v| is large (hex)
+   */
+  setMatrix5Colors(nearColor, farColor) {
+    if (!this.matrix5Controller) return;
+    this.matrix5Controller.setColors(nearColor, farColor);
+  }
+
+  /**
+   * Toggle Matrix-5 auto-rotation
+   * @param {boolean} enabled - Whether auto-rotation is enabled
+   */
+  setMatrix5AutoRotate(enabled) {
+    if (!this.matrix5Controller) return;
+    this.matrix5Controller.setAutoRotate(enabled);
+  }
+
+  /**
+   * Set Matrix-5 projection type
+   * @param {'perspective' | 'stereographic'} type - Projection type
+   */
+  setMatrix5ProjectionType(type) {
+    // Update CPU-side state (for mesh view)
+    this.matrix5ProjectionType = type;
+
+    // Update GPU shader (for line view)
+    if (this.matrix5Controller) {
+      this.matrix5Controller.setProjectionType(type);
+    }
+    console.log(`[Matrix5] Projection type set to: ${type}`);
+  }
+
+  /**
+   * Get the current 5D rotation matrix for display
+   * @returns {Array} 5x5 2D array representing the rotation matrix
+   */
+  get5DRotationMatrix() {
+    // Calculate current 5D rotation angle based on time and speed
+    const angle = this.matrix5Time * this.matrix5RotationSpeed;
+    const matrix = getRotationMatrix5D(this.matrix5RotationPlane, angle);
+    return this.float32To5x5Array(matrix);
+  }
+
+  /**
+   * Convert Float32Array (column-major 5x5) to 2D array (row-major) for display
+   * @param {Float32Array} float32 - Column-major 5x5 matrix
+   * @returns {Array} 5x5 2D array in row-major order
+   */
+  float32To5x5Array(float32) {
+    const result = [];
+    for (let row = 0; row < 5; row++) {
+      result.push([]);
+      for (let col = 0; col < 5; col++) {
+        // Column-major: m[col * 5 + row]
+        result[row].push(float32[col * 5 + row]);
+      }
+    }
+    return result;
   }
 
   /**

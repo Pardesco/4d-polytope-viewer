@@ -1263,6 +1263,154 @@ span {
     }
   }
 
+/* ============================================
+   MATRIX MODE TOGGLE
+   Segmented control for 4D/5D mode switching
+   ============================================ */
+
+/* Title row - flex container for inline title + toggle */
+.hud-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hud-title-row .hud-title {
+  margin-bottom: 0;
+}
+
+/* Matrix mode toggle container */
+.matrix-mode-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.matrix-mode-toggle.hidden {
+  display: none;
+}
+
+/* Individual toggle buttons */
+.matrix-mode-btn {
+  font-family: var(--font-terminal);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.matrix-mode-btn:hover {
+  color: var(--crt-cyan);
+  background: rgba(0, 255, 255, 0.08);
+}
+
+.matrix-mode-btn.active {
+  background: rgba(0, 255, 255, 0.15);
+  border-color: var(--crt-cyan);
+  color: var(--crt-cyan);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+/* Matrix-5 active state - orange/gold styling */
+.matrix-mode-btn[data-mode="matrix5"].active {
+  background: rgba(255, 140, 0, 0.2);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange-bright, #ffa500);
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+  text-shadow: 0 0 4px rgba(255, 140, 0, 0.5);
+}
+
+/* ============================================
+   MATRIX-5 THEME MODE (Orange/Gold)
+   Applied to body when Matrix-5 is active
+   ============================================ */
+
+body.matrix5-theme .hud-panel {
+  border-color: var(--accent-orange);
+  box-shadow:
+    0 0 8px rgba(255, 140, 0, 0.3),
+    0 0 16px rgba(255, 140, 0, 0.15),
+    inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+body.matrix5-theme .hud-panel::before {
+  border-color: rgba(255, 140, 0, 0.4);
+}
+
+body.matrix5-theme .hud-title {
+  color: var(--accent-orange);
+  text-shadow:
+    0 0 4px var(--accent-orange),
+    0 0 8px rgba(255, 140, 0, 0.3);
+}
+
+body.matrix5-theme .hud-divider {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 140, 0, 0.4) 20%,
+    var(--accent-orange) 50%,
+    rgba(255, 140, 0, 0.4) 80%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 4px rgba(255, 140, 0, 0.6),
+    0 0 8px rgba(255, 140, 0, 0.3);
+}
+
+body.matrix5-theme .data-value {
+  color: var(--accent-orange-bright, #ffa500);
+  text-shadow: 0 0 4px rgba(255, 140, 0, 0.5);
+}
+
+body.matrix5-theme .btn-secondary {
+  border-color: rgba(255, 140, 0, 0.4);
+  color: var(--accent-orange);
+}
+
+body.matrix5-theme .btn-secondary:hover {
+  border-color: var(--accent-orange);
+  background: rgba(255, 140, 0, 0.1);
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+  text-shadow: 0 0 4px rgba(255, 140, 0, 0.5);
+}
+
+body.matrix5-theme .btn-secondary.active {
+  background: rgba(255, 140, 0, 0.15);
+  border-color: var(--accent-orange);
+  box-shadow:
+    0 0 12px rgba(255, 140, 0, 0.5),
+    inset 0 0 10px rgba(255, 140, 0, 0.15);
+  text-shadow: 0 0 6px var(--accent-orange);
+  color: var(--accent-orange-bright, #ffa500);
+}
+
+/* Matrix display cells in Matrix-5 theme */
+body.matrix5-theme .matrix-cell {
+  background: rgba(255, 140, 0, 0.05) !important;
+  border-color: rgba(255, 140, 0, 0.2) !important;
+  color: var(--accent-orange) !important;
+}
+
+/* Keep Matrix-4 button cyan even in Matrix-5 theme */
+body.matrix5-theme .matrix-mode-btn[data-mode="matrix4"] {
+  color: var(--text-dim);
+}
+
+body.matrix5-theme .matrix-mode-btn[data-mode="matrix4"]:hover {
+  color: var(--crt-cyan);
+}
+
   /* Holographic Scanline Effect */
   .hud-content {
     position: relative;

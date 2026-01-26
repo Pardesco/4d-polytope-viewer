@@ -60,9 +60,16 @@
       </div>
       
       <!-- Bottom-Center: Quick Controls -->
-      <div class="hud-panel hud-bottom-center">
+      <div class="hud-panel hud-bottom-center" id="quick-controls-panel">
         <div class="hud-content">
-          <h3 class="hud-title">Quick Controls</h3>
+          <!-- Inline title with Matrix mode toggle -->
+          <div class="hud-title-row">
+            <h3 class="hud-title">Quick Controls</h3>
+            <div id="matrix-mode-toggle" class="matrix-mode-toggle hidden">
+              <button id="matrix-4-btn" class="matrix-mode-btn active" data-mode="matrix4">MATRIX-4</button>
+              <button id="matrix-5-btn" class="matrix-mode-btn" data-mode="matrix5">MATRIX-5</button>
+            </div>
+          </div>
           <div class="hud-divider"></div>
           <div class="rotation-controls">
             <button id="rotate-3d-btn" class="btn-secondary py-1 px-3 text-xs" title="Toggle 3D Rotation">3D Rotate: OFF</button>
@@ -146,6 +153,35 @@
                       </div>
                     </div>
                   </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- 5D Rotation (Matrix-5 mode only) - Hidden by default -->
+            <div id="rotation-5d-section" class="mb-4 hidden">
+              <details open class="details-highlighted details-orange">
+                <summary class="text-sm font-bold p-2 cursor-pointer rounded-lg transition-colors flex items-center justify-between summary-highlighted">
+                  <span>5D Rotation</span>
+                  <span class="text-xs">▼</span>
+                </summary>
+                <div class="p-2 pt-0">
+                  <div class="mb-3 mt-2">
+                    <label class="text-xs text-gray-400 mb-1 block">5D Rotation Plane:</label>
+                    <div class="grid grid-cols-4 gap-1">
+                      <button id="plane5d-xv" class="matrix5-plane-btn btn-secondary py-1 px-1 text-xs" data-plane="xv">XV</button>
+                      <button id="plane5d-yv" class="matrix5-plane-btn btn-secondary py-1 px-1 text-xs" data-plane="yv">YV</button>
+                      <button id="plane5d-zv" class="matrix5-plane-btn btn-secondary py-1 px-1 text-xs" data-plane="zv">ZV</button>
+                      <button id="plane5d-wv" class="matrix5-plane-btn btn-secondary py-1 px-1 text-xs active" data-plane="wv">WV</button>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                      <label>5D Rotation Speed</label>
+                      <span id="speed5d-value">0.5</span>
+                    </div>
+                    <input type="range" id="rotation5d-speed" min="0.1" max="2.0" step="0.1" value="0.5" class="slider w-full h-1">
+                  </div>
+                  <button id="toggle-5d-autorotate" class="btn-secondary w-full py-1 text-xs active">5D Auto-Rotate: ON</button>
                 </div>
               </details>
             </div>

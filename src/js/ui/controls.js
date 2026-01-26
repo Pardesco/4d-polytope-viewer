@@ -37,6 +37,7 @@ export class ViewerControls {
     this.setupManualRotationControls();
     this.setupKeyboardShortcuts();
     this.setupExportMenu();
+    this.setupMatrix5Controls();
     console.log('[ViewerControls] Initialized');
   }
 
@@ -533,6 +534,352 @@ export class ViewerControls {
         case '3': // 3 - toggle 3D rotation
           this.toggle3DRotation();
           break;
+        case '5': // 5 - toggle Matrix-5 mode (if enabled via URL)
+          if (this.viewer.matrix5Enabled) {
+            this.toggleMatrix5Mode();
+          }
+          break;
+      }
+    });
+  }
+
+  /**
+   * Setup Matrix-5 (5D projection) controls
+   * Only visible when enabled via ?mode=matrix5 URL parameter
+   */
+  setupMatrix5Controls() {
+    console.log('[ViewerControls] Setting up Matrix-5 controls...');
+
+    // Always show the matrix mode toggle in Quick Controls header (experimental branch)
+    const matrixModeToggle = document.getElementById('matrix-mode-toggle');
+    if (matrixModeToggle) {
+      matrixModeToggle.classList.remove('hidden');
+      console.log('[ViewerControls] Matrix mode toggle revealed');
+    } else {
+      console.warn('[ViewerControls] Matrix mode toggle element NOT FOUND');
+    }
+
+    // Matrix mode toggle buttons (4D/5D) in Quick Controls
+    const matrix4Btn = document.getElementById('matrix-4-btn');
+    const matrix5Btn = document.getElementById('matrix-5-btn');
+
+    if (matrix4Btn) {
+      matrix4Btn.addEventListener('click', () => this.setMatrixMode('matrix4'));
+    }
+    if (matrix5Btn) {
+      matrix5Btn.addEventListener('click', () => this.setMatrixMode('matrix5'));
+    }
+
+    // Setup inline 5D rotation controls (always available with toggle)
+    // 5D rotation speed slider (inline section)
+    const speed5DSlider = document.getElementById('rotation5d-speed');
+    if (speed5DSlider) {
+      speed5DSlider.addEventListener('input', () => {
+        const speed = parseFloat(speed5DSlider.value);
+        this.viewer.setMatrix5RotationSpeed(speed);
+        const speedValue = document.getElementById('speed5d-value');
+        if (speedValue) speedValue.textContent = speed.toFixed(1);
+      });
+    }
+
+    // 5D auto-rotate toggle (inline section)
+    const autoRotate5DBtn = document.getElementById('toggle-5d-autorotate');
+    if (autoRotate5DBtn) {
+      autoRotate5DBtn.addEventListener('click', () => {
+        const isEnabled = autoRotate5DBtn.classList.contains('active');
+        this.viewer.setMatrix5AutoRotate(!isEnabled);
+        autoRotate5DBtn.classList.toggle('active');
+        autoRotate5DBtn.textContent = isEnabled ? '5D Auto-Rotate: OFF' : '5D Auto-Rotate: ON';
+      });
+    }
+
+    // Only setup advanced Matrix-5 controls if enabled via URL parameter
+    if (!this.viewer.matrix5Enabled) {
+      console.log('[ViewerControls] Advanced Matrix-5 controls not enabled (add ?mode=matrix5 for full controls)');
+      return;
+    }
+
+    // Show the Matrix-5 panel if it exists in HTML
+    const matrix5Panel = document.getElementById('matrix5-panel');
+    if (matrix5Panel) {
+      matrix5Panel.classList.remove('hidden');
+    }
+
+    // Create Matrix-5 control panel if it doesn't exist
+    this.createMatrix5Panel();
+
+    // Toggle Matrix-5 mode button
+    const toggleMatrix5Btn = document.getElementById('toggle-matrix5-btn');
+    if (toggleMatrix5Btn) {
+      toggleMatrix5Btn.addEventListener('click', () => this.toggleMatrix5Mode());
+    }
+
+    // 5D rotation plane selector
+    const plane5DButtons = document.querySelectorAll('.matrix5-plane-btn');
+    plane5DButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plane = btn.dataset.plane;
+        this.viewer.setMatrix5RotationPlane(plane);
+        this.updateMatrix5PlaneButtons(plane);
+      });
+    });
+
+    // 5D rotation speed slider
+    const speedSlider = document.getElementById('matrix5-speed');
+    if (speedSlider) {
+      speedSlider.addEventListener('input', () => {
+        const speed = parseFloat(speedSlider.value);
+        this.viewer.setMatrix5RotationSpeed(speed);
+        const speedValue = document.getElementById('matrix5-speed-value');
+        if (speedValue) speedValue.textContent = speed.toFixed(1);
+      });
+    }
+
+    // Auto-rotation toggle
+    const autoRotateBtn = document.getElementById('matrix5-auto-rotate');
+    if (autoRotateBtn) {
+      autoRotateBtn.addEventListener('click', () => {
+        const isEnabled = autoRotateBtn.classList.contains('active');
+        this.viewer.setMatrix5AutoRotate(!isEnabled);
+        autoRotateBtn.classList.toggle('active');
+        autoRotateBtn.textContent = isEnabled ? '5D Auto-Rotate: OFF' : '5D Auto-Rotate: ON';
+      });
+    }
+
+    // Color preset buttons
+    const colorPresets = document.querySelectorAll('.matrix5-color-preset');
+    colorPresets.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const nearColor = parseInt(btn.dataset.near, 16);
+        const farColor = parseInt(btn.dataset.far, 16);
+        this.viewer.setMatrix5Colors(nearColor, farColor);
+        this.updateMatrix5ColorButtons(btn);
+      });
+    });
+
+    // Projection type toggle (perspective vs stereographic)
+    const projectionBtns = document.querySelectorAll('.matrix5-projection-btn');
+    projectionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const projType = btn.dataset.projection;
+        this.viewer.setMatrix5ProjectionType(projType);
+        this.updateMatrix5ProjectionButtons(projType);
+      });
+    });
+
+    console.log('[ViewerControls] Matrix-5 controls initialized');
+  }
+
+  /**
+   * Create Matrix-5 control panel dynamically if not in HTML
+   */
+  createMatrix5Panel() {
+    // Check if panel already exists
+    if (document.getElementById('matrix5-panel')) return;
+
+    const controlsContainer = document.querySelector('.controls-container') || document.querySelector('.hud-panel');
+    if (!controlsContainer) return;
+
+    const panel = document.createElement('div');
+    panel.id = 'matrix5-panel';
+    panel.className = 'hud-panel glass-morphism p-4 mt-4';
+    panel.innerHTML = `
+      <h3 class="text-lg font-bold mb-3 text-cyan-400">
+        <span class="text-purple-400">MATRIX-5</span> | 5D PROJECTION
+      </h3>
+      <p class="text-xs text-gray-400 mb-3">EXPERIMENTAL: Visualize 4D polytopes embedded in 5D space</p>
+
+      <div class="mb-4">
+        <button id="toggle-matrix5-btn" class="btn-primary w-full py-2">
+          Enable Matrix-5 Mode
+        </button>
+      </div>
+
+      <div id="matrix5-options" class="hidden">
+        <div class="mb-3">
+          <label class="text-xs text-gray-400 block mb-1">PROJECTION TYPE</label>
+          <div class="grid grid-cols-2 gap-1">
+            <button class="matrix5-projection-btn btn-secondary text-xs py-1 active" data-projection="perspective">
+              Perspective
+            </button>
+            <button class="matrix5-projection-btn btn-secondary text-xs py-1" data-projection="stereographic">
+              Stereographic
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Perspective = breathing | Stereographic = bubble wrap</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="text-xs text-gray-400 block mb-1">5D ROTATION PLANE</label>
+          <div class="grid grid-cols-4 gap-1">
+            <button class="matrix5-plane-btn btn-secondary text-xs py-1" data-plane="xv">XV</button>
+            <button class="matrix5-plane-btn btn-secondary text-xs py-1" data-plane="yv">YV</button>
+            <button class="matrix5-plane-btn btn-secondary text-xs py-1" data-plane="zv">ZV</button>
+            <button class="matrix5-plane-btn btn-secondary text-xs py-1 active" data-plane="wv">WV</button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="text-xs text-gray-400 block mb-1">
+            5D ROTATION SPEED: <span id="matrix5-speed-value">0.5</span>
+          </label>
+          <input type="range" id="matrix5-speed" min="0.1" max="2.0" step="0.1" value="0.5"
+                 class="w-full accent-cyan-500">
+        </div>
+
+        <div class="mb-3">
+          <button id="matrix5-auto-rotate" class="btn-secondary w-full py-1 text-xs active">
+            5D Auto-Rotate: ON
+          </button>
+        </div>
+
+        <div class="mb-3">
+          <label class="text-xs text-gray-400 block mb-1">COLOR SCHEME</label>
+          <div class="grid grid-cols-3 gap-1">
+            <button class="matrix5-color-preset btn-secondary text-xs py-1 active"
+                    data-near="00ffff" data-far="ff00ff" title="Cyan → Magenta">
+              <span style="color:#00ffff">●</span><span style="color:#ff00ff">●</span>
+            </button>
+            <button class="matrix5-color-preset btn-secondary text-xs py-1"
+                    data-near="00ff00" data-far="ff0000" title="Green → Red">
+              <span style="color:#00ff00">●</span><span style="color:#ff0000">●</span>
+            </button>
+            <button class="matrix5-color-preset btn-secondary text-xs py-1"
+                    data-near="ffff00" data-far="0000ff" title="Yellow → Blue">
+              <span style="color:#ffff00">●</span><span style="color:#0000ff">●</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-500 mt-2">
+        Press <kbd class="bg-dark-accent px-1 rounded">5</kbd> to toggle Matrix-5 mode
+      </p>
+    `;
+
+    controlsContainer.appendChild(panel);
+    console.log('[ViewerControls] Matrix-5 panel created');
+  }
+
+  /**
+   * Toggle Matrix-5 projection mode
+   */
+  toggleMatrix5Mode() {
+    const newMode = this.viewer.projectionMode === 'matrix5' ? 'matrix4' : 'matrix5';
+    this.setMatrixMode(newMode);
+  }
+
+  /**
+   * Set Matrix mode and update all related UI
+   * @param {'matrix4' | 'matrix5'} mode
+   */
+  setMatrixMode(mode) {
+    this.viewer.setProjectionMode(mode);
+    this.updateMatrixModeUI(mode);
+  }
+
+  /**
+   * Update all UI elements based on matrix mode
+   * @param {'matrix4' | 'matrix5'} mode
+   */
+  updateMatrixModeUI(mode) {
+    const isMatrix5 = mode === 'matrix5';
+
+    // Update Quick Controls toggle button states
+    const matrix4Btn = document.getElementById('matrix-4-btn');
+    const matrix5Btn = document.getElementById('matrix-5-btn');
+
+    if (matrix4Btn) matrix4Btn.classList.toggle('active', !isMatrix5);
+    if (matrix5Btn) matrix5Btn.classList.toggle('active', isMatrix5);
+
+    // Apply/remove orange theme to body
+    document.body.classList.toggle('matrix5-theme', isMatrix5);
+
+    // Update matrix display dimension (4x4 vs 5x5)
+    if (this.viewer.matrixDisplay) {
+      this.viewer.matrixDisplay.setDimension(isMatrix5 ? 5 : 4);
+    }
+
+    // Update existing Matrix-5 panel button
+    this.updateMatrix5Button();
+
+    // Toggle 4D/5D rotation sections in Controls panel
+    const rotation4DSection = document.getElementById('rotation-section');
+    const rotation5DSection = document.getElementById('rotation-5d-section');
+
+    if (rotation4DSection) {
+      rotation4DSection.classList.toggle('hidden', isMatrix5);
+    }
+    if (rotation5DSection) {
+      rotation5DSection.classList.toggle('hidden', !isMatrix5);
+    }
+
+    // Disable 4D rotation button in Quick Controls when Matrix-5 active
+    const rotate4DBtn = document.getElementById('rotate-4d-btn');
+    if (rotate4DBtn) {
+      rotate4DBtn.disabled = isMatrix5;
+      rotate4DBtn.style.opacity = isMatrix5 ? '0.4' : '1';
+      rotate4DBtn.style.pointerEvents = isMatrix5 ? 'none' : 'auto';
+    }
+
+    console.log(`[ViewerControls] Matrix mode switched to: ${mode}`);
+  }
+
+  /**
+   * Update Matrix-5 toggle button state
+   */
+  updateMatrix5Button() {
+    const btn = document.getElementById('toggle-matrix5-btn');
+    const options = document.getElementById('matrix5-options');
+
+    if (btn) {
+      if (this.viewer.projectionMode === 'matrix5') {
+        btn.textContent = 'Disable Matrix-5 Mode';
+        btn.classList.add('active');
+        if (options) options.classList.remove('hidden');
+      } else {
+        btn.textContent = 'Enable Matrix-5 Mode';
+        btn.classList.remove('active');
+        if (options) options.classList.add('hidden');
+      }
+    }
+  }
+
+  /**
+   * Update Matrix-5 plane selection buttons
+   */
+  updateMatrix5PlaneButtons(activePlane) {
+    const buttons = document.querySelectorAll('.matrix5-plane-btn');
+    buttons.forEach(btn => {
+      if (btn.dataset.plane === activePlane) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  /**
+   * Update Matrix-5 color preset buttons
+   */
+  updateMatrix5ColorButtons(activeBtn) {
+    const buttons = document.querySelectorAll('.matrix5-color-preset');
+    buttons.forEach(btn => {
+      btn.classList.remove('active');
+    });
+    activeBtn.classList.add('active');
+  }
+
+  /**
+   * Update Matrix-5 projection type buttons
+   */
+  updateMatrix5ProjectionButtons(activeType) {
+    const buttons = document.querySelectorAll('.matrix5-projection-btn');
+    buttons.forEach(btn => {
+      if (btn.dataset.projection === activeType) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
       }
     });
   }
