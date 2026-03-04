@@ -1,37 +1,48 @@
 /**
  * License API Client
  *
- * Handles communication with the backend license API
+ * Handles license validation via LemonSqueezy's license API
  */
 
-// Production API (now with CORS enabled for localhost development)
-const API_BASE_URL = 'https://4d-license-api.randall-7f7.workers.dev';
+// LemonSqueezy license validation endpoint
+const LEMONSQUEEZY_VALIDATE = 'https://api.lemonsqueezy.com/v1/licenses/validate';
 
 /**
- * Validate a license key with the backend
- * @param {string} licenseKey - License key (XXXX-XXXX-XXXX-XXXX)
- * @param {string} email - User email
+ * Validate a license key with LemonSqueezy
+ * @param {string} licenseKey - License key from LemonSqueezy
  * @returns {Promise<Object>} Validation response
  */
-export async function validateLicense(licenseKey, email) {
+export async function validateLicense(licenseKey) {
     try {
-        const response = await fetch(`${API_BASE_URL}/validate`, {
+        const response = await fetch(LEMONSQUEEZY_VALIDATE, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ licenseKey, email })
+            body: JSON.stringify({ license_key: licenseKey })
         });
 
         const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.error || 'Validation failed');
+        if (!data.valid) {
+            return {
+                success: false,
+                error: data.error || 'Invalid license key'
+            };
         }
 
         return {
             success: true,
-            data: data
+            data: {
+                valid: true,
+                key: licenseKey,
+                tier: 'creator', // All LemonSqueezy keys = creator tier
+                status: data.license_key.status,
+                expirationDate: data.license_key.expires_at,
+                purchaseDate: data.license_key.created_at,
+                customerName: data.meta?.customer_name || '',
+                productName: data.meta?.product_name || ''
+            }
         };
     } catch (error) {
         console.error('License validation error:', error);
@@ -39,101 +50,6 @@ export async function validateLicense(licenseKey, email) {
             success: false,
             error: error.message
         };
-    }
-}
-
-/**
- * Export mesh data (server-side validation)
- * @param {Object} polytopeData - Polytope export data
- * @param {string} licenseKey - License key
- * @returns {Promise<Blob>} .obj file blob
- */
-export async function exportMesh(polytopeData, licenseKey) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/export/mesh`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${licenseKey}`
-            },
-            body: JSON.stringify(polytopeData)
-        });
-
-        if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || 'Export failed');
-        }
-
-        const blob = await response.blob();
-        return blob;
-    } catch (error) {
-        console.error('Mesh export error:', error);
-        throw error;
-    }
-}
-
-/**
- * Export linework data (server-side validation)
- * @param {Object} polytopeData - Polytope export data
- * @param {string} licenseKey - License key
- * @returns {Promise<Blob>} .obj file blob
- */
-export async function exportLinework(polytopeData, licenseKey) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/export/linework`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${licenseKey}`
-            },
-            body: JSON.stringify(polytopeData)
-        });
-
-        if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || 'Export failed');
-        }
-
-        const blob = await response.blob();
-        return blob;
-    } catch (error) {
-        console.error('Linework export error:', error);
-        throw error;
-    }
-}
-
-/**
- * Export screenshot (server-side validation)
- * @param {string} imageData - Base64 image data URL
- * @param {string} polytopeName - Name of polytope
- * @param {string} licenseKey - License key
- * @returns {Promise<Blob>} PNG file blob
- */
-export async function exportScreenshot(imageData, polytopeName, licenseKey) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/export/screenshot`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${licenseKey}`
-            },
-            body: JSON.stringify({
-                imageData: imageData,
-                polytope: polytopeName,
-                format: 'png'
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error || 'Screenshot export failed');
-        }
-
-        const blob = await response.blob();
-        return blob;
-    } catch (error) {
-        console.error('Screenshot export error:', error);
-        throw error;
     }
 }
 

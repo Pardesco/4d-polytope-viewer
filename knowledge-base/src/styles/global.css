@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    @apply bg-cyber-darker text-gray-200;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  body {
+    @apply min-h-screen;
+    background:
+      linear-gradient(180deg, rgba(0, 20, 30, 0.95) 0%, rgba(5, 5, 8, 1) 100%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300d9ff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-darker;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-cyan/30 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-cyber-cyan/50;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-cyber-cyan/30 text-white;
+  }
+}
+
+@layer components {
+  /* Cyberpunk panel */
+  .cyber-panel {
+    @apply bg-cyber-panel backdrop-blur-md border border-cyber-border rounded-lg;
+    box-shadow:
+      0 0 20px rgba(0, 217, 255, 0.1),
+      inset 0 0 20px rgba(0, 217, 255, 0.02);
+  }
+
+  .cyber-panel-bright {
+    @apply cyber-panel border-cyber-border-bright;
+    box-shadow:
+      0 0 30px rgba(0, 217, 255, 0.2),
+      inset 0 0 30px rgba(0, 217, 255, 0.05);
+  }
+
+  /* Glowing text */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+  }
+
+  .text-glow-strong {
+    text-shadow:
+      0 0 10px rgba(0, 217, 255, 0.8),
+      0 0 20px rgba(0, 217, 255, 0.4),
+      0 0 30px rgba(0, 217, 255, 0.2);
+  }
+
+  /* Scanline effect */
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  }
+
+  /* Corner decorations */
+  .corner-decorations {
+    position: relative;
+  }
+
+  .corner-decorations::before,
+  .corner-decorations::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: rgba(0, 217, 255, 0.5);
+    border-style: solid;
+  }
+
+  .corner-decorations::before {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+
+  .corner-decorations::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+  }
+
+  /* Cyber button */
+  .cyber-button {
+    @apply px-6 py-2 bg-cyber-cyan/10 border border-cyber-cyan/50 text-cyber-cyan
+           font-medium tracking-wider uppercase text-sm
+           transition-all duration-200 hover:bg-cyber-cyan/20
+           hover:border-cyber-cyan hover:shadow-cyber;
+  }
+
+  .cyber-button-primary {
+    @apply cyber-button bg-cyber-cyan/20 border-cyber-cyan;
+  }
+
+  /* Cyber link */
+  .cyber-link {
+    @apply text-cyber-cyan hover:text-cyber-cyan-glow transition-colors
+           border-b border-cyber-cyan/30 hover:border-cyber-cyan;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply text-gray-400 hover:text-cyber-cyan transition-colors
+           relative px-4 py-2;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-cyber-cyan
+           transition-all duration-200 -translate-x-1/2;
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply w-full;
+  }
+
+  .nav-link.active {
+    @apply text-cyber-cyan;
+  }
+
+  /* Table of contents */
+  .toc-link {
+    @apply text-gray-400 hover:text-cyber-cyan transition-colors
+           border-l-2 border-transparent hover:border-cyber-cyan/50
+           pl-4 py-1 block text-sm;
+  }
+
+  .toc-link.active {
+    @apply text-cyber-cyan border-cyber-cyan;
+  }
+
+  /* Property grid */
+  .property-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+  }
+
+  .property-item {
+    @apply cyber-panel p-4 text-center;
+  }
+
+  .property-label {
+    @apply text-xs text-gray-500 uppercase tracking-wider mb-1;
+  }
+
+  .property-value {
+    @apply text-xl font-semibold text-cyber-cyan;
+  }
+}
+
+@layer utilities {
+  /* Gradient border */
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.5), transparent, rgba(0, 217, 255, 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Animated border */
+  .animated-border {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animated-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: conic-gradient(from 0deg, transparent, rgba(0, 217, 255, 0.5), transparent 30%);
+    animation: spin 4s linear infinite;
+  }
+
+  .animated-border::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    background: inherit;
+    border-radius: inherit;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}

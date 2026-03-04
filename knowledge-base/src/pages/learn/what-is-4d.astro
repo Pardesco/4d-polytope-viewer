@@ -1,0 +1,117 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+---
+
+<ArticleLayout
+  title="What is the Fourth Dimension?"
+  description="An introduction to four-dimensional space, polychora, and the element hierarchy."
+>
+  <p class="lead text-xl text-gray-300 mb-8">
+    The fourth dimension is a spatial direction perpendicular to the three dimensions we experience daily—length, width, and height. Just as a 2D creature living on a flat plane cannot perceive "up," we cannot directly perceive this fourth spatial direction.
+  </p>
+
+  <h2>Understanding Through Analogy</h2>
+
+  <p>The best way to understand four dimensions is through analogy with lower dimensions:</p>
+
+  <ul>
+    <li>A <strong>point</strong> (0D) has no extent</li>
+    <li>A <strong>line</strong> (1D) extends in one direction</li>
+    <li>A <strong>square</strong> (2D) extends in two perpendicular directions</li>
+    <li>A <strong>cube</strong> (3D) extends in three perpendicular directions</li>
+    <li>A <strong>tesseract</strong> (4D) extends in four perpendicular directions</li>
+  </ul>
+
+  <p>When we "extrude" a shape into a new dimension, we create a higher-dimensional object. Drag a point to make a line. Drag a line to make a square. Drag a square to make a cube. Drag a cube to make a tesseract.</p>
+
+  <h2>What is a Polychoron?</h2>
+
+  <p>A <strong>polychoron</strong> (plural: polychora) is a four-dimensional polytope—the 4D analogue of a polyhedron. The term, coined by George Olshevsky, combines Greek roots: <em>poly</em> (many) and <em>choros</em> (room/space), referring to the cells that bound these objects.</p>
+
+  <p>Just as a cube is bounded by six square faces, a polychoron is bounded by three-dimensional cells. A tesseract, for example, has eight cubic cells.</p>
+
+  <h2>The Hierarchy of Elements</h2>
+
+  <p>A polychoron is a bounded region of 4D space composed of lower-dimensional elements:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Element</th>
+        <th>Dimension</th>
+        <th>3D Analogue</th>
+        <th>Example (Tesseract)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Vertices</strong></td><td>0D</td><td>Corners</td><td>16 vertices</td></tr>
+      <tr><td><strong>Edges</strong></td><td>1D</td><td>Edges</td><td>32 edges</td></tr>
+      <tr><td><strong>Faces</strong></td><td>2D</td><td>Faces</td><td>24 square faces</td></tr>
+      <tr><td><strong>Cells</strong></td><td>3D</td><td>(the whole shape)</td><td>8 cubic cells</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The 4D Euler Characteristic</h3>
+
+  <p>For convex polychora, these elements obey a topological constraint:</p>
+
+  <p class="text-center text-2xl font-mono text-cyber-cyan my-6">V - E + F - C = 0</p>
+
+  <p>Where V = vertices, E = edges, F = faces, C = cells.</p>
+
+  <p>For the tesseract: 16 - 32 + 24 - 8 = 0 ✓</p>
+
+  <h2>How Many Regular Polychora Exist?</h2>
+
+  <p>One of the most profound results in 4D geometry is that exactly <strong>six convex regular polychora</strong> exist:</p>
+
+  <ol>
+    <li><a href="/shapes/pentachoron"><strong>Pentachoron</strong></a> (5-cell) - The 4D tetrahedron</li>
+    <li><a href="/shapes/tesseract"><strong>Tesseract</strong></a> (8-cell) - The 4D cube</li>
+    <li><a href="/shapes/16-cell"><strong>Hexadecachoron</strong></a> (16-cell) - The 4D octahedron</li>
+    <li><a href="/shapes/24-cell"><strong>Icositetrachoron</strong></a> (24-cell) - A uniquely 4D shape</li>
+    <li><a href="/shapes/120-cell"><strong>Hecatonicosachoron</strong></a> (120-cell) - The 4D dodecahedron</li>
+    <li><a href="/shapes/600-cell"><strong>Hexacosichoron</strong></a> (600-cell) - The 4D icosahedron</li>
+  </ol>
+
+  <p>This is remarkable because:</p>
+  <ul>
+    <li>In 2D, infinitely many regular polygons exist</li>
+    <li>In 3D, exactly 5 Platonic solids exist</li>
+    <li>In 4D, exactly 6 regular polychora exist</li>
+    <li>In 5D and higher, only 3 regular polytopes exist</li>
+  </ul>
+
+  <p><strong>The fourth dimension is a "peak" of geometric richness!</strong></p>
+
+  <h2>Ana and Kata: The Fourth Direction</h2>
+
+  <p>Charles Howard Hinton, a Victorian mathematician who popularized 4D thinking, introduced specific terms for movement in the fourth dimension:</p>
+
+  <ul>
+    <li><strong>Ana</strong>: Movement "up" into the fourth dimension</li>
+    <li><strong>Kata</strong>: Movement "down" out of the fourth dimension</li>
+  </ul>
+
+  <p>Just as "up" and "down" are meaningless to a 2D creature, ana and kata are directions we cannot point to but can reason about mathematically.</p>
+
+  <h2>Why Can't We See 4D?</h2>
+
+  <p>Our visual system evolved in three dimensions. Our eyes project 3D scenes onto 2D retinas, and our brains reconstruct depth. To truly "see" 4D, we would need eyes that capture 3D images and brains wired to reconstruct the fourth spatial dimension.</p>
+
+  <p>Instead, we rely on:</p>
+  <ul>
+    <li><strong>Projections</strong>: Like shadows, we project 4D objects into 3D</li>
+    <li><strong>Cross-sections</strong>: We slice 4D objects with 3D hyperplanes</li>
+    <li><strong>Mathematical description</strong>: Coordinates and equations that extend naturally to any dimension</li>
+  </ul>
+
+  <h2>Further Reading</h2>
+
+  <ul>
+    <li><a href="/learn/history">History of 4D Geometry</a> - From Hinton's colored cubes to modern discoveries</li>
+    <li><a href="/learn/schlafli-symbols">Schläfli Symbols Explained</a> - The notation that describes all regular polytopes</li>
+    <li><a href="/learn/projections">Projection Methods</a> - How we visualize 4D objects</li>
+    <li><a href="/learn/regiments">The Regiment System</a> - How thousands of polychora are organized</li>
+  </ul>
+</ArticleLayout>

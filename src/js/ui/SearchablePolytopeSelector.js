@@ -181,7 +181,8 @@ export class SearchablePolytopeSelector {
     `;
 
     if (this.tier === 'free') {
-      badge.innerHTML += `<br><a href="https://pardesco.com/products/4d-viewer-creator" class="text-primary hover:underline text-xs">Upgrade for ${1717 - this.polytopes.length}+ more</a>`;
+      // TODO: Replace with your actual LemonSqueezy checkout URL
+      badge.innerHTML += `<br><a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" class="text-primary hover:underline text-xs">Upgrade for export features</a>`;
     }
 
     this.container.appendChild(badge);

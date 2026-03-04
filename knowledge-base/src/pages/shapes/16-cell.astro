@@ -1,0 +1,182 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Hexadecachoron: The Sixteen-Cell"
+  description="The 4D cross-polytope and dual of the tesseract—16 tetrahedral cells forming the spikiest regular polychoron."
+  ogImage="/images/og/16-cell.jpg"
+  polytopeId="3-hex"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}3,3,4{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">16 tetrahedra</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">32 triangles</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">8</div>
+    </div>
+  </div>
+
+  <h2>Understanding the 16-Cell</h2>
+
+  <p>The <strong>hexadecachoron</strong>, commonly called the 16-cell, is the four-dimensional cross-polytope—the dual of the tesseract. Where the tesseract extends cubic symmetry to 4D, the 16-cell extends octahedral symmetry. With 16 tetrahedral cells meeting in sharp points, it's the "spikiest" of the regular polychora.</p>
+
+  <h3>The Cross-Polytope Pattern</h3>
+
+  <p>The 16-cell follows a pattern that works in any dimension:</p>
+
+  <ul>
+    <li><strong>1D</strong>: 2 points at (±1) — a line segment</li>
+    <li><strong>2D</strong>: 4 points at (±1, 0) and (0, ±1) — a square</li>
+    <li><strong>3D</strong>: 6 points at (±1, 0, 0), (0, ±1, 0), (0, 0, ±1) — an octahedron</li>
+    <li><strong>4D</strong>: 8 points at (±1, 0, 0, 0), (0, ±1, 0, 0), (0, 0, ±1, 0), (0, 0, 0, ±1) — a 16-cell</li>
+  </ul>
+
+  <p>Each vertex lies on a coordinate axis, at distance 1 from the origin.</p>
+
+  <h3>The 16 Tetrahedral Cells</h3>
+
+  <p>The 16-cell is bounded by 16 tetrahedral cells. Each tetrahedron uses 4 vertices that include:</p>
+  <ul>
+    <li>2 opposite pairs (one pair from each of two coordinate axes)</li>
+    <li>No two vertices from the same axis</li>
+  </ul>
+
+  <h3>Duality with the Tesseract</h3>
+
+  <p>The 16-cell and tesseract are duals:</p>
+  <ul>
+    <li>The 16-cell has 8 vertices; the tesseract has 8 cells</li>
+    <li>The 16-cell has 16 cells; the tesseract has 16 vertices</li>
+    <li>Edges (24 each) and faces (32 vs 24) swap roles</li>
+  </ul>
+
+  <p>If you place a point at the center of each tetrahedral cell of a 16-cell and connect adjacent ones, you get a tesseract. And vice versa.</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}3,3,4{'}'}</h3>
+
+  <p>The symbol {'{'}3,3,4{'}'} encodes the 16-cell:</p>
+
+  <ol>
+    <li><strong>{'{'}3{'}'}</strong> = Faces are triangles</li>
+    <li><strong>{'{'}3,3{'}'}</strong> = Cells are tetrahedra (3 triangles at each vertex)</li>
+    <li><strong>{'{'}3,3,4{'}'}</strong> = Four tetrahedra meet around each edge</li>
+  </ol>
+
+  <p>Compare to the tesseract {'{'}4,3,3{'}'}: the 16-cell's symbol is the reverse, reflecting their duality.</p>
+
+  <h3>Symmetry: The B₄ Group</h3>
+
+  <p>The 16-cell shares the tesseract's B₄ symmetry group (384 elements). Both are part of the hypercube/orthoplex family, and their symmetries are interchangeable.</p>
+
+  <h3>Coordinates</h3>
+
+  <p>The 8 vertices of a 16-cell with circumradius 1:</p>
+
+  <pre><code>(±1, 0, 0, 0)
+(0, ±1, 0, 0)
+(0, 0, ±1, 0)
+(0, 0, 0, ±1)</code></pre>
+
+  <p>These are the simplest possible vertex coordinates for a regular polychoron.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a 16-cell with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>1/√2 ≈ 0.707</td></tr>
+      <tr><td>Inradius</td><td>1/4</td></tr>
+      <tr><td>Hypervolume</td><td>1/6</td></tr>
+      <tr><td>Surface volume</td><td>8/3 × √2 ≈ 3.771</td></tr>
+      <tr><td>Dihedral angle</td><td>arccos(1/3) ≈ 70.53°</td></tr>
+    </tbody>
+  </table>
+
+  <p>The 16-cell has a smaller circumradius than the tesseract, making it more "compact."</p>
+
+  <h2>Unique Properties</h2>
+
+  <h3>Tiling 4D Space</h3>
+
+  <p>Like the tesseract, the 16-cell can tile 4D Euclidean space. The <strong>16-cell honeycomb</strong> is a regular tiling where 24 cells meet at each vertex and 8 cells surround each edge. This is one of only three regular 4D honeycombs.</p>
+
+  <h3>The Demihypercube Connection</h3>
+
+  <p>The 16-cell is also known as the <strong>demitesseract</strong>—it can be obtained by taking alternating vertices of a tesseract. If you select half the tesseract's 16 vertices (those with an even number of minus signs in their coordinates), you get the 8 vertices of a 16-cell.</p>
+
+  <h3>Sharp and Spiky</h3>
+
+  <p>The 16-cell is the "sharpest" regular polychoron:</p>
+  <ul>
+    <li>Its cells are tetrahedra, the simplest and most pointed cells</li>
+    <li>Four cells meet at each edge (the maximum for any regular polychoron)</li>
+    <li>Its dihedral angle (70.53°) is the smallest among the six regulars</li>
+  </ul>
+
+  <h3>The Rectified 16-Cell</h3>
+
+  <p>When you rectify a 16-cell (truncate it until edge midpoints become vertices), you get the <strong>24-cell</strong>! This remarkable fact connects three of the six regular polychora.</p>
+
+  <h2>The Quaternion Connection</h2>
+
+  <p>The 8 vertices of a 16-cell map beautifully to the 8 unit quaternions:</p>
+  <ul>
+    <li>(±1, 0, 0, 0) ↔ ±1</li>
+    <li>(0, ±1, 0, 0) ↔ ±i</li>
+    <li>(0, 0, ±1, 0) ↔ ±j</li>
+    <li>(0, 0, 0, ±1) ↔ ±k</li>
+  </ul>
+
+  <p>This makes the 16-cell fundamental to quaternion geometry.</p>
+
+  <h2>Visualizing the 16-Cell</h2>
+
+  <h3>Stereographic Projection</h3>
+
+  <p>In stereographic projection, the 16 tetrahedral cells appear as distorted tetrahedra. 4 cells cluster at each of the 8 vertex positions. The overall shape has an octahedral flavor, reflecting its cross-polytope nature.</p>
+
+  <h3>4D Rotation Effects</h3>
+
+  <p>During 4D rotation (especially in planes like XW or YW):</p>
+  <ul>
+    <li>The "spikes" of the 16-cell seem to poke in and out</li>
+    <li>Tetrahedral cells flip between inner and outer positions</li>
+    <li>The projection oscillates between different octahedral views</li>
+  </ul>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The hexadecachoron (16-cell), denoted {'{'}3,3,4{'}'}, is the four-dimensional cross-polytope and the dual of the tesseract. Discovered by Ludwig Schläfli in 1852, it consists of 16 tetrahedral cells, 32 triangular faces, 24 edges, and 8 vertices located on the coordinate axes. The 16-cell can tile 4D Euclidean space and is equivalent to the demitesseract. Its 8 vertices correspond to the 8 unit quaternions.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/tesseract">Tesseract</a></li>
+    <li><strong>Rectified form:</strong> <a href="/shapes/24-cell">24-Cell</a></li>
+    <li><strong>Same symmetry:</strong> <a href="/shapes/tesseract">Tesseract</a> (B₄ group)</li>
+    <li><strong>Simpler:</strong> <a href="/shapes/pentachoron">Pentachoron</a></li>
+  </ul>
+</ArticleLayout>

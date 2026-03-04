@@ -1,0 +1,74 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  polytopeId?: string;
+  showViewer?: boolean;
+}
+
+const { title, description, ogImage, polytopeId, showViewer = false } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage}>
+  <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Article header -->
+    <header class="mb-12">
+      <h1 class="font-display text-4xl md:text-5xl font-bold text-white mb-4 text-glow">
+        {title}
+      </h1>
+      {description && (
+        <p class="text-xl text-gray-400 max-w-2xl">
+          {description}
+        </p>
+      )}
+    </header>
+
+    <!-- Viewer embed (if polytope specified) -->
+    {showViewer && polytopeId && (
+      <div class="mb-12 cyber-panel-bright p-2 corner-decorations">
+        <div class="aspect-video relative">
+          <iframe
+            src={`/viewer?id=${polytopeId}&embed=true`}
+            class="w-full h-full rounded"
+            loading="lazy"
+            allow="fullscreen"
+            title={`Interactive view of ${title}`}
+          />
+        </div>
+        <div class="flex justify-between items-center mt-2 px-2 py-1">
+          <span class="text-xs text-gray-500 uppercase tracking-wider">Interactive Viewer</span>
+          <a
+            href={`/viewer?id=${polytopeId}`}
+            class="text-xs text-cyber-cyan hover:text-cyber-cyan-glow transition-colors"
+            target="_blank"
+          >
+            Open Fullscreen →
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- Article content -->
+    <div class="prose prose-invert prose-lg max-w-none">
+      <slot />
+    </div>
+
+    <!-- Back navigation -->
+    <nav class="mt-16 pt-8 border-t border-cyber-border">
+      <div class="flex justify-between items-center">
+        <a href="javascript:history.back()" class="text-gray-400 hover:text-cyber-cyan transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </a>
+        <a href="/shapes/regulars" class="text-gray-400 hover:text-cyber-cyan transition-colors">
+          All Regular Polychora
+        </a>
+      </div>
+    </nav>
+  </article>
+</BaseLayout>

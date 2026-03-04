@@ -1,0 +1,7 @@
+# Cloudflare Pages auto-strips .html extensions, so /viewer already serves viewer.html
+# Do NOT add /viewer -> /viewer.html redirects (causes infinite loop with CF's auto-strip)
+
+# Knowledge base convenience redirects
+/guide  /guide/  301
+/learn  /guide/  301
+/shapes  /shapes/regulars  301

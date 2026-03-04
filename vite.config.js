@@ -19,15 +19,15 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: false, // CHANGED: Keep logs for debugging
-        pure_funcs: [], // CHANGED: Keep console.log calls
+        drop_console: true,
+        pure_funcs: ['console.log', 'console.debug'],
         passes: 2
       }
     },
     // Chunk size warnings
     chunkSizeWarningLimit: 1000,
     // Source maps for debugging
-    sourcemap: true
+    sourcemap: false
   },
   server: {
     port: 3000,
@@ -35,6 +35,6 @@ export default defineConfig({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['three', 'gsap']
+    include: ['three']
   }
 });

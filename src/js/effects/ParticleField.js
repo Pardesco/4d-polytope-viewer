@@ -4,13 +4,35 @@ export class ParticleField {
     this.ctx = canvas.getContext('2d');
     this.particles = [];
     this.particleCount = 30; // Keep low for performance
-    
+    this.isRunning = false;
+    this.animationFrameId = null;
+
     this.resize();
     this.init();
+    this.start();
+
+    // Resize handler (store bound reference for cleanup)
+    this._boundResize = () => this.resize();
+    window.addEventListener('resize', this._boundResize);
+  }
+
+  start() {
+    if (this.isRunning) return;
+    this.isRunning = true;
     this.animate();
-    
-    // Resize handler
-    window.addEventListener('resize', () => this.resize());
+  }
+
+  stop() {
+    this.isRunning = false;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+
+  dispose() {
+    this.stop();
+    window.removeEventListener('resize', this._boundResize);
   }
   
   resize() {
@@ -62,21 +84,9 @@ export class ParticleField {
     this.ctx.globalAlpha = 1;
     this.ctx.shadowBlur = 0;
     
-    requestAnimationFrame(() => this.animate());
+    if (this.isRunning) {
+      this.animationFrameId = requestAnimationFrame(() => this.animate());
+    }
   }
 }
 
-// Initialize
-const bgCanvas = document.createElement('canvas');
-bgCanvas.style.cssText = `
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-`;
-document.body.insertBefore(bgCanvas, document.body.firstChild);
-
-new ParticleField(bgCanvas);

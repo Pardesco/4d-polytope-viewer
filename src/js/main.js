@@ -3,18 +3,16 @@ console.log('[Main] Module parsing started...');
 import { PolytopeViewer } from './polytope/viewer.js';
 import { ViewerControls } from './ui/controls.js';
 import { PolytopeSelector } from './ui/polytope-selector.js';
-import { MobileUI } from './ui/mobile/MobileUI.js';
 import { SimpleWatermark } from './ui/SimpleWatermark.js';
 import { licenseManager } from './license/LicenseManager.js';
 import { ParticleField } from './effects/ParticleField.js';
-import { DonationAvatar } from './ui/DonationAvatar.js';
+
 import '../styles/main.css';
 import '../styles/mobile.css';
 
 // Global viewer instance
 let viewer = null;
 let controls = null;
-let mobileUI = null;
 
 /**
  * Initialize application
@@ -68,10 +66,6 @@ async function init() {
   // Initialize viewer
   await viewer.init();
 
-  // Create mobile UI (automatically detects mobile/tablet)
-  // DISABLED: Using pure CSS responsive approach instead
-  // mobileUI = new MobileUI(viewer);
-
   // Create controls
   controls = new ViewerControls(viewer);
   controls.init();
@@ -87,11 +81,6 @@ async function init() {
     await selector.init();
     console.log('[Main] Polytope selector initialized');
 
-    // Connect selector to mobile UI (if mobile)
-    // DISABLED: Using pure CSS responsive approach
-    // if (mobileUI && mobileUI.isMobile) {
-    //   mobileUI.setSelector(selector);
-    // }
   } catch (error) {
     console.error('[Main] Failed to initialize selector:', error);
     showError('Failed to load polytope library. Using fallback list.');
@@ -105,7 +94,7 @@ async function init() {
 
   // ALL polytopes load from /data/polytopes/{id}.off
   // The tier system just controls which polytopes are AVAILABLE in the selector
-  const polytopePath = `/data/polytopes/${polytopeId}.off`;
+  const polytopePath = `/data/polytopes/${encodeURIComponent(polytopeId)}.off`;
 
   // Load default polytope geometry
   try {
@@ -116,15 +105,22 @@ async function init() {
     hideLoading();
     updateInfoPanel(polytopeId, viewer.polytopeData);
 
-    // Enable mesh view by default in embed mode
-    if (isEmbedMode) {
+    // Default visual state based on complexity
+    const edgeCount = viewer.polytopeData?.metadata?.edgeCount || 0;
+    const isSimple = edgeCount <= 1200;
+
+    if (isEmbedMode || isSimple) {
+      // Enable mesh view for simple polytopes (or embed mode)
       viewer.toggleMeshView(true);
-      // Update button state if it exists
-      const meshBtn = document.getElementById('toggle-mesh-btn');
-      if (meshBtn) {
-        meshBtn.classList.add('active');
-        meshBtn.textContent = 'Mesh: ON';
-      }
+      controls.updateMeshButton();
+    }
+
+    if (isSimple && !isEmbedMode) {
+      // Enable 4D rotation on XY plane for an immediate visual experience
+      viewer.rotation4D.togglePlane('xy');
+      viewer.rotating4D = true;
+      controls.updatePlaneButtons();
+      controls.updateRotate4DButton();
     }
 
     // Start rendering
@@ -153,24 +149,102 @@ async function init() {
     document.body.insertBefore(bgCanvas, document.body.firstChild);
     new ParticleField(bgCanvas);
 
-    // Donation avatar (appears after 3 minutes)
-    // Skip in embed mode
-    if (!isEmbedMode) {
-      const donationAvatar = new DonationAvatar({
-        // Hybrid timing: 2.5 min first visit, 1 min return visits
-        donationUrl: 'https://4d.pardesco.com/ebook/',
-        videoUrl: '/videos/donation-request.mp4'
-      });
-      donationAvatar.init();
-    }
   }
 
-  // Make viewer globally accessible for debugging
-  window.viewer = viewer;
-  window.controls = controls;
-  window.mobileUI = mobileUI;
-  window.licenseManager = licenseManager;
-  window.selector = selector;
+  // Mobile optimizations - collapsible panels
+  if (window.innerWidth < 1024) {
+    setupMobileCollapsiblePanels();
+  }
+
+  // Make viewer globally accessible for debugging (dev only)
+  if (import.meta.env.DEV) {
+    window.viewer = viewer;
+    window.controls = controls;
+    window.licenseManager = licenseManager;
+    window.selector = selector;
+  }
+}
+
+/**
+ * Setup collapsible panels for mobile - both start collapsed,
+ * tap pill to expand, auto-collapse on selection or outside tap
+ */
+function setupMobileCollapsiblePanels() {
+  const selectorPanel = document.querySelector('.hud-top-right');
+  const controlsPanel = document.querySelector('.hud-bottom-center');
+
+  // --- Collapsible Polytope Selector (top) ---
+  if (selectorPanel) {
+    const trigger = document.createElement('div');
+    trigger.className = 'mobile-selector-trigger';
+    trigger.innerHTML = `
+      <span class="mobile-selector-icon">&#x2B21;</span>
+      <span class="mobile-selector-name">Select Polytope</span>
+      <svg class="mobile-selector-chevron" width="10" height="10" viewBox="0 0 10 10">
+        <path d="M2 4l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    `;
+    selectorPanel.prepend(trigger);
+    selectorPanel.classList.add('mobile-collapsible');
+
+    // Read current polytope name from the select dropdown
+    const updateName = () => {
+      const sel = selectorPanel.querySelector('#polytope-select');
+      if (sel && sel.selectedIndex >= 0) {
+        const text = sel.options[sel.selectedIndex].text;
+        const name = text.split('(')[0].trim();
+        trigger.querySelector('.mobile-selector-name').textContent = name || 'Select Polytope';
+      }
+    };
+    updateName();
+
+    // Toggle expanded
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const expanding = !selectorPanel.classList.contains('mobile-expanded');
+      selectorPanel.classList.toggle('mobile-expanded');
+      if (expanding) controlsPanel?.classList.remove('mobile-expanded');
+    });
+
+    // Auto-collapse and update name on polytope change (event delegation)
+    selectorPanel.addEventListener('change', (e) => {
+      if (e.target.id === 'polytope-select') {
+        updateName();
+        setTimeout(() => selectorPanel.classList.remove('mobile-expanded'), 150);
+      }
+    });
+  }
+
+  // --- Collapsible Quick Controls (bottom) ---
+  if (controlsPanel) {
+    const trigger = document.createElement('div');
+    trigger.className = 'mobile-controls-trigger';
+    trigger.innerHTML = `
+      <span>Controls</span>
+      <svg class="mobile-controls-chevron" width="10" height="10" viewBox="0 0 10 10">
+        <path d="M2 6l3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    `;
+    controlsPanel.appendChild(trigger);
+    controlsPanel.classList.add('mobile-collapsible');
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const expanding = !controlsPanel.classList.contains('mobile-expanded');
+      controlsPanel.classList.toggle('mobile-expanded');
+      if (expanding) selectorPanel?.classList.remove('mobile-expanded');
+    });
+  }
+
+  // Close either panel on outside tap
+  document.addEventListener('click', (e) => {
+    if (selectorPanel && !selectorPanel.contains(e.target)) {
+      selectorPanel.classList.remove('mobile-expanded');
+    }
+    if (controlsPanel && !controlsPanel.contains(e.target)) {
+      controlsPanel.classList.remove('mobile-expanded');
+    }
+  });
 }
 
 /**
@@ -241,13 +315,6 @@ function updateInfoPanel(name, data) {
     cellsElement.textContent = data.metadata.cellCount;
   }
 
-  // Also update mobile sheet if it exists
-  // DISABLED: Using pure CSS responsive approach
-  // if (mobileUI && mobileUI.isMobile && mobileUI.sheet) {
-  //   const urlParams = new URLSearchParams(window.location.search);
-  //   const polytopeId = urlParams.get('id') || '2-tes';
-  //   mobileUI.updateMobileInfoPanel(polytopeId, data);
-  // }
 }
 
 // Initialize when DOM is ready

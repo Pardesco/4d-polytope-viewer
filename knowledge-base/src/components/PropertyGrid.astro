@@ -1,0 +1,19 @@
+---
+interface Props {
+  properties: {
+    label: string;
+    value: string | number;
+  }[];
+}
+
+const { properties } = Astro.props;
+---
+
+<div class="property-grid my-8">
+  {properties.map((prop) => (
+    <div class="property-item">
+      <div class="property-label">{prop.label}</div>
+      <div class="property-value">{prop.value}</div>
+    </div>
+  ))}
+</div>

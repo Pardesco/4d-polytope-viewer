@@ -73,7 +73,7 @@ export class VideoRecorder {
         const tier = licenseManager.getTier();
         if (tier === 'free') {
             console.warn('[VideoRecorder] Video recording blocked - requires Creator tier');
-            throw new Error('Video recording requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+            throw new Error('Video recording requires Creator tier. Upgrade at 4d.pardesco.com/activate');
         }
 
         if (this.isRecording) {

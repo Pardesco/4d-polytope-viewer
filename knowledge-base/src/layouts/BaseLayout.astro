@@ -1,0 +1,162 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description = 'Explore four-dimensional geometry with interactive visualizations', ogImage = '/images/og-default.jpg' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- SEO -->
+    <title>{title} | 4D Polytope Explorer</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="4D Polytope Explorer" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Preconnect to fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 cyber-panel border-t-0 rounded-none border-x-0">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo -->
+          <a href="/" class="flex items-center gap-3 group">
+            <div class="w-8 h-8 border border-cyber-cyan/50 rotate-45 group-hover:border-cyber-cyan transition-colors flex items-center justify-center">
+              <div class="w-4 h-4 bg-cyber-cyan/20 group-hover:bg-cyber-cyan/40 transition-colors"></div>
+            </div>
+            <span class="font-display font-semibold text-lg tracking-wider">
+              <span class="text-cyber-cyan">4D</span>
+              <span class="text-gray-400">.PARDESCO</span>
+            </span>
+          </a>
+
+          <!-- Navigation -->
+          <div class="hidden md:flex items-center gap-1">
+            <a href="/viewer" class="nav-link">Viewer</a>
+            <a href="/shapes/regulars" class="nav-link">Shapes</a>
+            <a href="/learn/what-is-4d" class="nav-link">Learn</a>
+            <a href="/explorer" class="nav-link">Explorer</a>
+          </div>
+
+          <!-- CTA -->
+          <a href="/viewer" class="cyber-button hidden sm:block">
+            Launch Viewer
+          </a>
+
+          <!-- Mobile menu button -->
+          <button class="md:hidden text-gray-400 hover:text-cyber-cyan" id="mobile-menu-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile menu -->
+      <div class="hidden md:hidden" id="mobile-menu">
+        <div class="px-4 py-4 space-y-2 border-t border-cyber-border">
+          <a href="/viewer" class="block py-2 text-gray-400 hover:text-cyber-cyan">Viewer</a>
+          <a href="/shapes/regulars" class="block py-2 text-gray-400 hover:text-cyber-cyan">Shapes</a>
+          <a href="/learn/what-is-4d" class="block py-2 text-gray-400 hover:text-cyber-cyan">Learn</a>
+          <a href="/explorer" class="block py-2 text-gray-400 hover:text-cyber-cyan">Explorer</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="cyber-panel border-b-0 rounded-none border-x-0 mt-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Brand -->
+          <div class="col-span-1 md:col-span-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-8 h-8 border border-cyber-cyan/50 rotate-45 flex items-center justify-center">
+                <div class="w-4 h-4 bg-cyber-cyan/20"></div>
+              </div>
+              <span class="font-display font-semibold text-lg tracking-wider">
+                <span class="text-cyber-cyan">4D</span>
+                <span class="text-gray-400">.PARDESCO</span>
+              </span>
+            </div>
+            <p class="text-gray-500 text-sm max-w-md">
+              Interactive visualization of four-dimensional polytopes.
+              Explore the mathematics of hyperspace through stereographic projection and true 4D rotation.
+            </p>
+          </div>
+
+          <!-- Explore -->
+          <div>
+            <h4 class="text-cyber-cyan font-semibold mb-4 text-sm uppercase tracking-wider">Explore</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="/shapes/regulars" class="text-gray-400 hover:text-cyber-cyan transition-colors">Regular Polychora</a></li>
+              <li><a href="/shapes/tesseract" class="text-gray-400 hover:text-cyber-cyan transition-colors">The Tesseract</a></li>
+              <li><a href="/shapes/24-cell" class="text-gray-400 hover:text-cyber-cyan transition-colors">The 24-Cell</a></li>
+              <li><a href="/explorer" class="text-gray-400 hover:text-cyber-cyan transition-colors">All Polytopes</a></li>
+            </ul>
+          </div>
+
+          <!-- Learn -->
+          <div>
+            <h4 class="text-cyber-cyan font-semibold mb-4 text-sm uppercase tracking-wider">Learn</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="/learn/what-is-4d" class="text-gray-400 hover:text-cyber-cyan transition-colors">What is 4D?</a></li>
+              <li><a href="/learn/schlafli-symbols" class="text-gray-400 hover:text-cyber-cyan transition-colors">Schläfli Symbols</a></li>
+              <li><a href="/learn/projections" class="text-gray-400 hover:text-cyber-cyan transition-colors">Projection Methods</a></li>
+              <li><a href="/learn/history" class="text-gray-400 hover:text-cyber-cyan transition-colors">History</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-cyber-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p class="text-gray-500 text-sm">
+            &copy; {new Date().getFullYear()} Pardesco. All rights reserved.
+          </p>
+          <p class="text-gray-600 text-xs">
+            Inspired by the work of Schläfli, Hinton, and the Polytope Discord community.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      btn?.addEventListener('click', () => {
+        menu?.classList.toggle('hidden');
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+---
+
+<ArticleLayout
+  title="The Six Regular Convex Polychora"
+  description="The Platonic solids of the fourth dimension—discovered by Ludwig Schläfli in 1852."
+>
+  <p class="lead text-xl text-gray-300 mb-8">
+    In 1852, Swiss mathematician Ludwig Schläfli made a discovery that would define four-dimensional geometry: there are exactly six regular convex polychora—the "Platonic solids" of the fourth dimension.
+  </p>
+
+  <h2>What Makes Them Special?</h2>
+
+  <p>A polychoron is <strong>regular</strong> if:</p>
+  <ul>
+    <li>All cells are identical regular polyhedra</li>
+    <li>All faces are identical regular polygons</li>
+    <li>All edges are identical</li>
+    <li>All vertices are identical</li>
+    <li>The symmetry group acts transitively on flags</li>
+  </ul>
+
+  <p>This is an extraordinarily restrictive definition. In 2D, infinitely many regular polygons exist. In 3D, only 5 Platonic solids exist. In 4D, exactly 6 regular convex forms exist. In 5D and higher, only 3 exist.</p>
+
+  <p class="text-cyber-cyan font-semibold text-lg">The fourth dimension is a peak of geometric richness.</p>
+
+  <h2>The Six Regular Convex Polychora</h2>
+
+  <div class="overflow-x-auto my-8">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Symbol</th>
+          <th>Cells</th>
+          <th>Faces</th>
+          <th>Edges</th>
+          <th>Vertices</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="/shapes/pentachoron">Pentachoron</a></td>
+          <td class="font-mono">{'{'}3,3,3{'}'}</td>
+          <td>5 tetrahedra</td>
+          <td>10 triangles</td>
+          <td>10</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td><a href="/shapes/tesseract">Tesseract</a></td>
+          <td class="font-mono">{'{'}4,3,3{'}'}</td>
+          <td>8 cubes</td>
+          <td>24 squares</td>
+          <td>32</td>
+          <td>16</td>
+        </tr>
+        <tr>
+          <td><a href="/shapes/16-cell">Hexadecachoron</a></td>
+          <td class="font-mono">{'{'}3,3,4{'}'}</td>
+          <td>16 tetrahedra</td>
+          <td>32 triangles</td>
+          <td>24</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td><a href="/shapes/24-cell">Icositetrachoron</a></td>
+          <td class="font-mono">{'{'}3,4,3{'}'}</td>
+          <td>24 octahedra</td>
+          <td>96 triangles</td>
+          <td>96</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td><a href="/shapes/120-cell">Hecatonicosachoron</a></td>
+          <td class="font-mono">{'{'}5,3,3{'}'}</td>
+          <td>120 dodecahedra</td>
+          <td>720 pentagons</td>
+          <td>1200</td>
+          <td>600</td>
+        </tr>
+        <tr>
+          <td><a href="/shapes/600-cell">Hexacosichoron</a></td>
+          <td class="font-mono">{'{'}3,3,5{'}'}</td>
+          <td>600 tetrahedra</td>
+          <td>1200 triangles</td>
+          <td>720</td>
+          <td>120</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Families and Relationships</h2>
+
+  <h3>The Simplex Family</h3>
+  <p>The <a href="/shapes/pentachoron">Pentachoron</a> {'{'}3,3,3{'}'} is the 4D simplex—the simplest possible polytope in any dimension. It's self-dual: its dual is another pentachoron.</p>
+
+  <h3>The Hypercube/Orthoplex Family</h3>
+  <p>The <a href="/shapes/tesseract">Tesseract</a> {'{'}4,3,3{'}'} and <a href="/shapes/16-cell">Hexadecachoron</a> {'{'}3,3,4{'}'} are duals of each other, extending the cube/octahedron duality to 4D.</p>
+
+  <h3>The Exceptional 24-Cell</h3>
+  <p>The <a href="/shapes/24-cell">Icositetrachoron</a> {'{'}3,4,3{'}'} is unique to four dimensions—it has no analogue in 3D or any other dimension. It's self-dual and possesses F₄ symmetry, a group that exists only in 4D.</p>
+
+  <h3>The Icosahedral Family</h3>
+  <p>The <a href="/shapes/120-cell">Hecatonicosachoron</a> {'{'}5,3,3{'}'} and <a href="/shapes/600-cell">Hexacosichoron</a> {'{'}3,3,5{'}'} are duals, extending the dodecahedron/icosahedron relationship to 4D. They are by far the most complex regular forms.</p>
+
+  <h2>The Geometry of Rarity</h2>
+
+  <p>Why exactly six? The answer lies in angular geometry.</p>
+
+  <p>For a regular polychoron {'{'}p,q,r{'}'} to exist:</p>
+  <ul>
+    <li>{'{'}p,q{'}'} must be a valid regular polyhedron (the cell type)</li>
+    <li>r copies of this cell must fit around an edge with total dihedral angle &lt; 360°</li>
+  </ul>
+
+  <p>This constraint eliminates almost all possibilities. The six survivors represent all ways to tile 4D space around an edge without overlapping or leaving gaps.</p>
+
+  <h2>Experiencing the Regulars</h2>
+
+  <p>Each of these six shapes can be explored in the <a href="/viewer">interactive viewer</a>. As they rotate through 4D, watch how:</p>
+
+  <ul>
+    <li>The <strong>pentachoron</strong> turns inside-out—every cell briefly takes the center</li>
+    <li>The <strong>tesseract</strong> reveals the cube-within-cube structure</li>
+    <li>The <strong>16-cell</strong> shows its spiky, octahedral nature</li>
+    <li>The <strong>24-cell</strong> flows with exceptional smoothness (F₄ symmetry)</li>
+    <li>The <strong>120-cell</strong> unfolds its 120 dodecahedral cells</li>
+    <li>The <strong>600-cell</strong> bristles with 600 tetrahedral spikes</li>
+  </ul>
+
+  <h2>Beyond the Convex Regulars</h2>
+
+  <p>Schläfli also discovered 4 of the 10 <strong>regular star polychora</strong>—non-convex forms with self-intersecting cells. Edmund Hess completed the enumeration in 1883. These Schläfli-Hess forms extend the concept of regularity to spectacular star-shaped geometries.</p>
+
+  <h2>Further Reading</h2>
+
+  <ul>
+    <li><a href="/learn/what-is-4d">What is the Fourth Dimension?</a></li>
+    <li><a href="/learn/schlafli-symbols">Schläfli Symbols Explained</a></li>
+    <li><a href="/learn/history">History of 4D Geometry</a></li>
+  </ul>
+</ArticleLayout>

@@ -20,7 +20,6 @@
   "author": "Pardesco LLC",
   "license": "ISC",
   "dependencies": {
-    "gsap": "^3.12.5",
     "three": "0.128.0"
   },
   "devDependencies": {

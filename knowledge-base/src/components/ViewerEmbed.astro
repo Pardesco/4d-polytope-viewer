@@ -1,0 +1,39 @@
+---
+interface Props {
+  polytopeId: string;
+  title?: string;
+  height?: string;
+}
+
+const { polytopeId, title = 'Interactive Viewer', height = 'aspect-video' } = Astro.props;
+const viewerUrl = `/viewer?id=${polytopeId}&embed=true`;
+---
+
+<div class="cyber-panel-bright p-2 corner-decorations my-8">
+  <div class={`relative ${height}`}>
+    <iframe
+      src={viewerUrl}
+      class="w-full h-full rounded bg-cyber-darker"
+      loading="lazy"
+      allow="fullscreen"
+      title={title}
+    />
+    <!-- Loading overlay -->
+    <div class="absolute inset-0 flex items-center justify-center bg-cyber-darker/80 pointer-events-none opacity-0 transition-opacity" id="viewer-loading">
+      <div class="text-cyber-cyan animate-pulse">Loading viewer...</div>
+    </div>
+  </div>
+  <div class="flex justify-between items-center mt-2 px-2 py-1">
+    <span class="text-xs text-gray-500 uppercase tracking-wider">{title}</span>
+    <a
+      href={`/viewer?id=${polytopeId}`}
+      class="text-xs text-cyber-cyan hover:text-cyber-cyan-glow transition-colors flex items-center gap-1"
+      target="_blank"
+    >
+      Open Fullscreen
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    </a>
+  </div>
+</div>

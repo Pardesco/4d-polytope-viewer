@@ -1,0 +1,148 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Tesseract: Gateway to the Fourth Dimension"
+  description="The hypercube is the most famous polychoron—a cube extended into the fourth dimension."
+  ogImage="/images/og/tesseract.jpg"
+  polytopeId="2-tes"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}4,3,3{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">8 cubes</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">24 squares</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">16</div>
+    </div>
+  </div>
+
+  <h2>Understanding the Tesseract</h2>
+
+  <p>The <strong>tesseract</strong> is the four-dimensional hypercube—the most famous and culturally significant polychoron. Just as a cube is a square extended into the third dimension, a tesseract is a cube extended into the fourth. Its name, coined by Charles Howard Hinton in 1888, has become synonymous with the fourth dimension itself.</p>
+
+  <h3>Building a Tesseract</h3>
+
+  <p>The tesseract can be understood through dimensional analogy:</p>
+
+  <ol>
+    <li><strong>Start with a point</strong> (0D)</li>
+    <li><strong>Extend it into a line</strong> (1D) — 2 vertices, 1 edge</li>
+    <li><strong>Extend the line into a square</strong> (2D) — 4 vertices, 4 edges, 1 face</li>
+    <li><strong>Extend the square into a cube</strong> (3D) — 8 vertices, 12 edges, 6 faces</li>
+    <li><strong>Extend the cube into a tesseract</strong> (4D) — 16 vertices, 32 edges, 24 faces, 8 cells</li>
+  </ol>
+
+  <p>At each step, you double the vertices (original + copy in new dimension) and add edges connecting corresponding vertices.</p>
+
+  <h3>The Eight Cubic Cells</h3>
+
+  <p>A tesseract is bounded by 8 cubic cells. Imagine two cubes: one is the "original" cube, and one is a copy displaced in the w-direction. The 6 faces of the original connect to the 6 faces of the copy, forming 6 more cubes between them.</p>
+
+  <p>Total: 2 (original + copy) + 6 (connecting) = 8 cubes</p>
+
+  <p>But unlike a prism, all 8 cubes are congruent and indistinguishable—the tesseract has no "top" or "bottom."</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}4,3,3{'}'}</h3>
+
+  <p>The symbol {'{'}4,3,3{'}'} encodes the tesseract recursively:</p>
+
+  <ol>
+    <li><strong>{'{'}4{'}'}</strong> = Faces are squares (4-sided)</li>
+    <li><strong>{'{'}4,3{'}'}</strong> = Cells are cubes (3 squares meet at each vertex)</li>
+    <li><strong>{'{'}4,3,3{'}'}</strong> = Three cubes meet around each edge</li>
+  </ol>
+
+  <h3>Duality with the 16-Cell</h3>
+
+  <p>The tesseract's dual is the <a href="/shapes/16-cell">hexadecachoron (16-cell)</a>. To find the dual, place a vertex at the center of each of the 8 cubic cells, then connect vertices whose cells share a face. The result is a 16-cell with 8 vertices and 16 tetrahedral cells.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a tesseract with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>1 (exactly!)</td></tr>
+      <tr><td>Inradius</td><td>1/2</td></tr>
+      <tr><td>Hypervolume</td><td>1</td></tr>
+      <tr><td>Surface volume</td><td>8</td></tr>
+      <tr><td>Dihedral angle</td><td>90°</td></tr>
+    </tbody>
+  </table>
+
+  <p>The tesseract is <strong>radially equilateral</strong>: the circumradius equals the edge length. Only the tesseract and the 24-cell share this property among regular polychora.</p>
+
+  <h2>Historical Context</h2>
+
+  <h3>Hinton and the Name "Tesseract"</h3>
+
+  <p>Charles Howard Hinton coined "tesseract" in his 1888 book <em>A New Era of Thought</em>. The name derives from Greek: <em>téssara</em> (four) and <em>aktís</em> (ray), referring to the four edges meeting at each vertex.</p>
+
+  <p>Hinton didn't just name the tesseract—he developed elaborate systems for visualizing it. His "colored cubes" method involved memorizing thousands of colored blocks representing cross-sections of a tesseract passing through 3D space.</p>
+
+  <h3>Cultural Impact</h3>
+
+  <p>The tesseract has penetrated popular culture more than any other polychoron:</p>
+  <ul>
+    <li><em>A Wrinkle in Time</em> (1962): Tesseracts as plot devices for space-folding</li>
+    <li><em>Interstellar</em> (2014): A tesseract as a 4D structure inside a black hole</li>
+    <li>Marvel's Tesseract: A cosmic cube inspired by the geometric object</li>
+    <li>Salvador Dalí's <em>Crucifixion</em> (1954): Features an unfolded tesseract (hypercross)</li>
+  </ul>
+
+  <h2>Unique Properties</h2>
+
+  <h3>Tiling 4D Space</h3>
+
+  <p>The tesseract is the only regular polychoron that can tile Euclidean 4-space without gaps or overlaps. This tiling is called the <strong>tesseractic honeycomb</strong>, denoted {'{'}4,3,3,4{'}'}.</p>
+
+  <h3>The Tesseract Cross</h3>
+
+  <p>An unfolded tesseract—its 8 cubic cells laid flat in 3D—forms a cross-like shape called a <strong>hypercross</strong>. Salvador Dalí's famous 1954 painting <em>Corpus Hypercubus</em> depicts Christ crucified on an unfolded tesseract.</p>
+
+  <h2>Visualizing the Tesseract</h2>
+
+  <p>When a tesseract rotates in a plane involving w (like XW, YW, or ZW):</p>
+  <ul>
+    <li>The small "inner" cube and large "outer" cube exchange sizes</li>
+    <li>The connecting cells turn inside-out</li>
+    <li>The tesseract appears to flow through itself</li>
+  </ul>
+
+  <p>This "turning inside-out" is not a trick of projection—it's the genuine appearance of 4D rotation from our 3D vantage point.</p>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The tesseract, denoted {'{'}4,3,3{'}'}, is the four-dimensional analogue of the cube. Named by Charles Howard Hinton in 1888 and first described mathematically by Ludwig Schläfli in 1852, it consists of 8 cubic cells, 24 square faces, 32 edges, and 16 vertices. The tesseract is the only regular convex polychoron that can tile Euclidean 4-space, and is radially equilateral—its circumradius equals its edge length.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/16-cell">Hexadecachoron (16-cell)</a></li>
+    <li><strong>Same family:</strong> <a href="/shapes/24-cell">24-cell</a> (also radially equilateral)</li>
+    <li><strong>Simpler:</strong> <a href="/shapes/pentachoron">Pentachoron</a></li>
+    <li><strong>More complex:</strong> <a href="/shapes/120-cell">120-cell</a></li>
+  </ul>
+</ArticleLayout>

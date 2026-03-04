@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="4D Polytope Knowledge Base" description="Explore the mathematics of four-dimensional geometry through interactive visualizations and deep educational content.">
+  <!-- Hero Section -->
+  <section class="relative py-20 md:py-32 overflow-hidden">
+    <!-- Background grid -->
+    <div class="absolute inset-0 bg-grid-pattern bg-grid opacity-50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="font-display text-5xl md:text-7xl font-bold mb-6">
+        <span class="text-white">Explore the</span>
+        <br />
+        <span class="text-cyber-cyan text-glow-strong">Fourth Dimension</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12">
+        Interactive visualizations and deep mathematical guides to four-dimensional polytopes.
+        From the tesseract to the 600-cell.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/viewer" class="cyber-button-primary text-center">
+          Launch Viewer
+        </a>
+        <a href="/shapes/regulars" class="cyber-button text-center">
+          Explore Shapes
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Shapes -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="font-display text-3xl font-bold text-white mb-4 text-center">
+        The Six <span class="text-cyber-cyan">Regular</span> Polychora
+      </h2>
+      <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+        The Platonic solids of the fourth dimension—discovered by Ludwig Schläfli in 1852.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { id: '1-pen', name: 'Pentachoron', slug: 'pentachoron', cells: 5, desc: 'The 4D tetrahedron' },
+          { id: '2-tes', name: 'Tesseract', slug: 'tesseract', cells: 8, desc: 'The hypercube' },
+          { id: '3-hex', name: 'Hexadecachoron', slug: '16-cell', cells: 16, desc: 'The 4D octahedron' },
+          { id: '4-ico', name: 'Icositetrachoron', slug: '24-cell', cells: 24, desc: 'The anomaly' },
+          { id: '5-hi', name: 'Hecatonicosachoron', slug: '120-cell', cells: 120, desc: 'The 4D dodecahedron' },
+          { id: '6-ex', name: 'Hexacosichoron', slug: '600-cell', cells: 600, desc: 'The 4D icosahedron' },
+        ].map((shape) => (
+          <a href={`/shapes/${shape.slug}`} class="cyber-panel p-6 group hover:border-cyber-cyan transition-colors">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h3 class="font-display text-xl font-semibold text-white group-hover:text-cyber-cyan transition-colors">
+                  {shape.name}
+                </h3>
+                <p class="text-gray-500 text-sm">{shape.desc}</p>
+              </div>
+              <span class="text-cyber-cyan font-mono text-2xl">{shape.cells}</span>
+            </div>
+            <div class="text-xs text-gray-600 uppercase tracking-wider">
+              {shape.cells} cells →
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="text-center mt-8">
+        <a href="/shapes/regulars" class="cyber-link">
+          View all regular polychora →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Learn Section -->
+  <section class="py-20 bg-cyber-darker/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="font-display text-3xl font-bold text-white mb-4 text-center">
+        Learn <span class="text-cyber-cyan">4D Geometry</span>
+      </h2>
+      <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+        From basic concepts to advanced classification systems.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { slug: 'what-is-4d', title: 'What is the Fourth Dimension?', desc: 'Understand 4D space through analogy and mathematics.' },
+          { slug: 'schlafli-symbols', title: 'Schläfli Symbols', desc: 'The notation that describes all regular polytopes.' },
+          { slug: 'projections', title: 'Projection Methods', desc: 'How we visualize 4D objects in 3D space.' },
+          { slug: 'history', title: 'History of 4D Geometry', desc: 'From Hinton to the Discord discoveries.' },
+          { slug: 'regiments', title: 'The Regiment System', desc: 'How 2,000+ polychora are organized.' },
+        ].map((article) => (
+          <a href={`/learn/${article.slug}`} class="cyber-panel p-6 group hover:border-cyber-cyan transition-colors">
+            <h3 class="font-semibold text-white group-hover:text-cyber-cyan transition-colors mb-2">
+              {article.title}
+            </h3>
+            <p class="text-gray-500 text-sm">
+              {article.desc}
+            </p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="cyber-panel-bright p-12 corner-decorations">
+        <h2 class="font-display text-3xl font-bold text-white mb-4">
+          Ready to explore?
+        </h2>
+        <p class="text-gray-400 mb-8 max-w-xl mx-auto">
+          Launch the interactive viewer to rotate, project, and explore 1,700+ four-dimensional polytopes.
+        </p>
+        <a href="/viewer" class="cyber-button-primary">
+          Launch Interactive Viewer
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

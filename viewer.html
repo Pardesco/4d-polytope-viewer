@@ -206,14 +206,6 @@
                     </div>
                   </div>
                   <button id="toggle-mesh-btn" class="btn-highlighted btn-purple w-full py-1 text-xs">Mesh: OFF</button>
-                  <!-- Mesh Quality (shown when mesh is enabled) -->
-                  <div id="mesh-quality-selector" class="hidden mt-2">
-                    <label class="text-xs text-gray-400 mb-1 block">Quality:</label>
-                    <div class="quality-toggle">
-                      <button id="quality-low-btn" class="quality-btn active" data-quality="low">Low</button>
-                      <button id="quality-high-btn" class="quality-btn" data-quality="high">High</button>
-                    </div>
-                  </div>
                   <!-- Material Selection (Desktop only, shown when mesh is enabled) -->
                   <div id="material-selector" class="desktop-only hidden">
                     <label class="text-xs text-gray-400 mb-1 block">Material:</label>
@@ -303,6 +295,12 @@
       </div>
     </div>
   </div>
+
+  <noscript>
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#050505;color:#00ffff;font-family:monospace;text-align:center;padding:2rem;">
+      <p>JavaScript is required to run the 4D Polytope Viewer.<br>Please enable JavaScript in your browser settings.</p>
+    </div>
+  </noscript>
 
   <!-- Main Script -->
   <script type="module" src="/src/js/main.js"></script>

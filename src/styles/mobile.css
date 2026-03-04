@@ -287,114 +287,38 @@
   }
 }
 
-/* Show mobile UI and hide desktop panels on mobile/tablet */
+/* === Mobile Collapsible Panel Triggers (hidden on desktop) === */
+.mobile-selector-trigger,
+.mobile-controls-trigger {
+  display: none;
+}
+
+/* Collapsible mobile UI - panels start collapsed, tap to expand */
 @media (max-width: 1023px) {
-  /* Hide desktop control panels (legacy) */
+  /* Hide desktop panels */
   .info-panel,
   .control-panel {
     display: none !important;
   }
 
-  /* Hide most HUD panels, keep only selector and quick controls */
   .hud-top-left,
   .hud-bottom-left,
   .hud-bottom-right {
     display: none !important;
   }
 
-  /* Keep polytope selector visible at top - REDUCED SIZE */
-  .hud-top-right {
-    display: block !important;
-    position: fixed !important;
-    top: 10px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    max-width: calc(100% - 40px) !important;
-    width: auto !important;
-    min-width: 280px !important;
-    z-index: 100 !important;
-  }
-
-  /* Reduce polytope selector height by ~50% */
-  .hud-top-right .hud-content {
-    padding: 0.5rem !important;
-  }
-
-  .hud-top-right .hud-title {
-    font-size: 0.7rem !important;
-    margin-bottom: 0.25rem !important;
-  }
-
-  .hud-top-right h4 {
-    font-size: 0.65rem !important;
-    margin-bottom: 0.25rem !important;
-  }
-
-  .hud-top-right #polytope-selector select {
-    padding: 0.4rem 0.6rem !important;
-    font-size: 0.75rem !important;
-    min-height: 32px !important;
-  }
-
-  .hud-top-right #tier-indicator {
-    font-size: 0.7rem !important;
-    padding: 0.25rem 0.5rem !important;
-  }
-
-  .hud-top-right .hud-divider {
-    margin: 0.5rem 0 !important;
-  }
-
-  /* Keep Quick Controls visible at bottom - REDUCED SIZE */
-  .hud-bottom-center {
-    display: block !important;
-    position: fixed !important;
-    bottom: 10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    min-width: calc(100% - 40px) !important;
-    max-width: calc(100% - 40px) !important;
-    z-index: 100 !important;
-  }
-
-  /* Reduce quick controls size by ~50% */
-  .hud-bottom-center .hud-content {
-    padding: 0.4rem 0.8rem !important;
-  }
-
-  .hud-bottom-center .hud-title {
-    font-size: 0.65rem !important;
-    margin-bottom: 0.3rem !important;
-  }
-
-  .hud-bottom-center .hud-divider {
-    margin: 0.3rem 0 !important;
-  }
-
-  .hud-bottom-center .rotation-controls {
-    gap: 0.4rem !important;
-  }
-
-  .hud-bottom-center .rotation-controls button {
-    padding: 0.3rem 0.6rem !important;
-    font-size: 0.65rem !important;
-    min-width: auto !important;
-  }
-
-  /* Hide desktop-only elements */
   .desktop-only {
     display: none !important;
   }
 
-  /* Hide the complex mobile UI components (we're using simplified approach) */
+  /* Hide unused MobileUI.js components */
   .mobile-overlay,
   .mobile-fab,
   .mobile-sheet {
     display: none !important;
   }
 
-  /* Let canvas fill viewport naturally - overlay sits on top */
+  /* Canvas fills viewport */
   #viewer-canvas {
     position: fixed;
     top: 0;
@@ -403,9 +327,263 @@
     height: 100vh;
   }
 
-  /* Adjust watermark position for mobile */
+  /* -------------------------------------------
+     POLYTOPE SELECTOR — Collapsible (Top)
+     ------------------------------------------- */
+  .hud-top-right {
+    display: block !important;
+    position: fixed !important;
+    top: 12px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 100 !important;
+    width: auto !important;
+    max-width: calc(100vw - 32px) !important;
+    min-width: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .hud-top-right::before {
+    display: none !important;
+  }
+
+  /* Collapsed: hide panel content (only when JS has set up triggers) */
+  .hud-top-right.mobile-collapsible .hud-content {
+    display: none;
+  }
+
+  /* Expanded: reveal panel content */
+  .hud-top-right.mobile-expanded .hud-content {
+    display: block;
+    background: rgba(5, 5, 15, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-top: 8px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5),
+                0 0 12px rgba(0, 255, 255, 0.1);
+    animation: mobileSlideDown 0.2s ease-out;
+  }
+
+  /* Hide non-essential selector chrome on mobile */
+  .hud-top-right .hud-title,
+  .hud-top-right h4,
+  .hud-top-right .hud-divider,
+  .hud-top-right #tier-indicator {
+    display: none !important;
+  }
+
+  /* Show only the select dropdown, hide filters & tier badge */
+  .hud-top-right #polytope-selector > *:not(select) {
+    display: none !important;
+  }
+
+  /* Mobile-optimized select dropdown */
+  .hud-top-right #polytope-select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    min-height: 44px;
+    background: rgba(10, 20, 40, 0.9) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #00ffff !important;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Selector trigger pill */
+  .mobile-selector-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(5, 5, 15, 0.85);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3),
+                0 0 6px rgba(0, 255, 255, 0.06);
+  }
+
+  .mobile-selector-trigger:active {
+    transform: scale(0.97);
+  }
+
+  .hud-top-right.mobile-expanded .mobile-selector-trigger {
+    background: rgba(0, 255, 255, 0.06);
+    border-color: rgba(0, 255, 255, 0.35);
+  }
+
+  .mobile-selector-icon {
+    color: rgba(0, 255, 255, 0.5);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .mobile-selector-name {
+    color: #00ffff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  }
+
+  .mobile-selector-chevron {
+    color: rgba(0, 255, 255, 0.4);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .hud-top-right.mobile-expanded .mobile-selector-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* -------------------------------------------
+     QUICK CONTROLS — Collapsible (Bottom)
+     ------------------------------------------- */
+  .hud-bottom-center {
+    display: block !important;
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 100 !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: calc(100vw - 32px) !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .hud-bottom-center::before {
+    display: none !important;
+  }
+
+  /* Collapsed: hide panel content (only when JS has set up triggers) */
+  .hud-bottom-center.mobile-collapsible .hud-content {
+    display: none;
+  }
+
+  /* Expanded: reveal panel content */
+  .hud-bottom-center.mobile-expanded .hud-content {
+    display: block;
+    background: rgba(5, 5, 15, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 8px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5),
+                0 0 12px rgba(0, 255, 255, 0.1);
+    animation: mobileSlideUp 0.2s ease-out;
+  }
+
+  /* Compact controls layout */
+  .hud-bottom-center .hud-title {
+    font-size: 0.6rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .hud-bottom-center .hud-divider {
+    margin: 0.25rem 0 !important;
+  }
+
+  .hud-bottom-center .rotation-controls {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem !important;
+  }
+
+  .hud-bottom-center .rotation-controls button {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.7rem !important;
+    min-height: 40px;
+    min-width: auto !important;
+  }
+
+  /* Hide Matrix mode toggle on mobile */
+  .hud-bottom-center #matrix-mode-toggle {
+    display: none !important;
+  }
+
+  /* Controls trigger pill */
+  .mobile-controls-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 20px;
+    margin: 0 auto;
+    width: fit-content;
+    background: rgba(5, 5, 15, 0.85);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3),
+                0 0 6px rgba(0, 255, 255, 0.06);
+  }
+
+  .mobile-controls-trigger:active {
+    transform: scale(0.97);
+  }
+
+  .hud-bottom-center.mobile-expanded .mobile-controls-trigger {
+    background: rgba(0, 255, 255, 0.06);
+    border-color: rgba(0, 255, 255, 0.35);
+  }
+
+  .mobile-controls-trigger span {
+    color: #00ffff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  }
+
+  .mobile-controls-chevron {
+    color: rgba(0, 255, 255, 0.4);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .hud-bottom-center.mobile-expanded .mobile-controls-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Watermark position */
   .watermark-top-center {
-    top: 60px !important; /* Below polytope selector */
+    top: 50px !important;
+  }
+
+  /* Slide animations */
+  @keyframes mobileSlideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes mobileSlideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -451,6 +629,20 @@
   .mobile-section {
     padding: 12px;
     margin-bottom: 16px;
+  }
+
+  .mobile-selector-trigger {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .mobile-selector-name {
+    font-size: 0.7rem;
+    max-width: 160px;
+  }
+
+  .mobile-controls-trigger {
+    padding: 6px 16px;
   }
 }
 
@@ -524,7 +716,11 @@
   .mobile-sheet,
   .mobile-overlay,
   .fab-icon,
-  .sheet-handle {
+  .sheet-handle,
+  .mobile-selector-trigger,
+  .mobile-controls-trigger,
+  .mobile-selector-chevron,
+  .mobile-controls-chevron {
     transition: none;
   }
 }

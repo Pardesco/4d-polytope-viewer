@@ -33,6 +33,8 @@ export class MatrixDisplay {
     if (this.element && this.container) {
       this.container.removeChild(this.element);
     }
+    this._cells = null; // Invalidate cached cells
+    this._prevMatrix = null;
     this.element = this.create();
     this.container.appendChild(this.element);
   }
@@ -73,30 +75,37 @@ export class MatrixDisplay {
 
   /**
    * Update matrix from rotation system
+   * Skips DOM updates if matrix values haven't changed (avoids 60fps DOM thrashing)
    * @param {Array} rotationMatrix - NxN array (4x4 or 5x5)
    */
   update(rotationMatrix) {
     if (!rotationMatrix || !this.element) return;
 
-    const cells = this.element.querySelectorAll('.matrix-cell');
+    // Quick check: has the matrix actually changed?
+    if (this._prevMatrix && this._matrixEqual(rotationMatrix, this._prevMatrix)) {
+      return; // No change, skip DOM updates
+    }
+
+    // Cache cells reference (avoid querySelectorAll every frame)
+    if (!this._cells) {
+      this._cells = this.element.querySelectorAll('.matrix-cell');
+    }
 
     rotationMatrix.forEach((row, i) => {
       row.forEach((value, j) => {
         const index = i * this.dimension + j;
-        const cell = cells[index];
+        const cell = this._cells[index];
         if (!cell) return;
 
         const displayValue = value.toFixed(2);
 
         if (cell.textContent !== displayValue) {
-          // Value changed - highlight it
           cell.style.background = 'rgba(0, 255, 255, 0.3)';
           cell.style.color = '#ffffff';
           cell.style.transform = 'scale(1.1)';
 
           cell.textContent = displayValue;
 
-          // Fade back
           setTimeout(() => {
             cell.style.background = 'rgba(0, 255, 255, 0.05)';
             cell.style.color = '#00ffff';
@@ -105,5 +114,20 @@ export class MatrixDisplay {
         }
       });
     });
+
+    // Store a deep copy for comparison
+    this._prevMatrix = rotationMatrix.map(row => [...row]);
+  }
+
+  /**
+   * Compare two matrices for equality (within floating point tolerance)
+   */
+  _matrixEqual(a, b) {
+    for (let i = 0; i < a.length; i++) {
+      for (let j = 0; j < a[i].length; j++) {
+        if (Math.abs(a[i][j] - b[i][j]) > 0.005) return false;
+      }
+    }
+    return true;
   }
 }

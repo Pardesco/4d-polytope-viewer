@@ -1,0 +1,26 @@
+# Security headers for all pages
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Immutable cache for hashed assets (Vite adds content hashes)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Short cache for HTML pages
+/*.html
+  Cache-Control: public, max-age=3600
+
+# Short cache for root page
+/
+  Cache-Control: public, max-age=3600
+
+# Cache for static data files
+/data/*
+  Cache-Control: public, max-age=86400
+
+# Cache for images
+/images/*
+  Cache-Control: public, max-age=604800

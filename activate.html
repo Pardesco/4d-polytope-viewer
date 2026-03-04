@@ -152,8 +152,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎉 Activate Your License</h1>
-        <p class="subtitle">Enter your license key and email to unlock Creator features</p>
+        <h1>Activate Your License</h1>
+        <p class="subtitle">Enter your license key to unlock Creator features</p>
 
         <div id="message" class="message"></div>
 
@@ -164,21 +164,9 @@
                     type="text"
                     id="license-key"
                     name="license-key"
-                    placeholder="XXXX-XXXX-XXXX-XXXX"
-                    pattern="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}"
+                    placeholder="Enter your license key"
                     required
                     autocomplete="off"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    required
                 >
             </div>
 
@@ -189,8 +177,9 @@
 
         <div class="help-text">
             <p>Don't have a license yet?</p>
-            <a href="https://pardesco.com/products/4d-viewer-creator" target="_blank">
-                Purchase Creator Tier ($49/year)
+            <!-- TODO: Replace with your actual LemonSqueezy checkout URL -->
+            <a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" target="_blank">
+                Purchase Creator License
             </a>
         </div>
     </div>
@@ -201,25 +190,15 @@
         const licenseManager = new LicenseManager();
         const form = document.getElementById('activation-form');
         const licenseKeyInput = document.getElementById('license-key');
-        const emailInput = document.getElementById('email');
         const submitBtn = document.getElementById('submit-btn');
         const message = document.getElementById('message');
 
         // Pre-fill from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const keyParam = urlParams.get('key');
-        const emailParam = urlParams.get('email');
 
         if (keyParam) {
             licenseKeyInput.value = keyParam;
-        }
-
-        if (emailParam) {
-            emailInput.value = decodeURIComponent(emailParam);
-        }
-
-        // Show info message if pre-filled
-        if (keyParam && emailParam) {
             showMessage('Your license key has been pre-filled. Click "Activate License" to continue.', 'info');
         }
 
@@ -227,12 +206,10 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const licenseKey = licenseKeyInput.value.trim().toUpperCase();
-            const email = emailInput.value.trim();
+            const licenseKey = licenseKeyInput.value.trim();
 
-            // Validate format
-            if (!licenseKey.match(/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/)) {
-                showMessage('Invalid license key format. Should be: XXXX-XXXX-XXXX-XXXX', 'error');
+            if (!licenseKey) {
+                showMessage('Please enter a license key.', 'error');
                 return;
             }
 
@@ -241,8 +218,8 @@
             submitBtn.innerHTML = '<span class="spinner"></span>Activating...';
 
             try {
-                // Validate with backend
-                const result = await licenseManager.validate(licenseKey, email);
+                // Validate with LemonSqueezy
+                const result = await licenseManager.validate(licenseKey);
 
                 if (result.success) {
                     showMessage(`Success! Your ${result.tier} tier has been activated. Redirecting...`, 'success');
@@ -252,7 +229,7 @@
                         window.location.href = '/';
                     }, 2000);
                 } else {
-                    showMessage(result.error || 'Activation failed. Please check your license key and email.', 'error');
+                    showMessage(result.error || 'Activation failed. Please check your license key.', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Activate License';
                 }

@@ -236,7 +236,7 @@ export class SeamlessLoopRecorder {
         const tier = licenseManager.getTier();
         if (tier === 'free') {
             console.warn('[SeamlessLoopRecorder] Video export blocked - requires Creator tier');
-            throw new Error('Video export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+            throw new Error('Video export requires Creator tier. Upgrade at 4d.pardesco.com/activate');
         }
 
         if (!SeamlessLoopRecorder.isSupported()) {

@@ -1,0 +1,189 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Hecatonicosachoron: The 120-Cell"
+  description="The largest regular polychoron—120 dodecahedral cells, 600 vertices, and the pinnacle of 4D geometric complexity."
+  ogImage="/images/og/120-cell.jpg"
+  polytopeId="5-hi"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}5,3,3{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">120 dodecahedra</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">720 pentagons</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">600</div>
+    </div>
+  </div>
+
+  <h2>Understanding the 120-Cell</h2>
+
+  <p>The <strong>hecatonicosachoron</strong>, commonly called the 120-cell, is the largest and most complex of the regular convex polychora. Bounded by 120 dodecahedral cells, it extends the dodecahedron's five-fold symmetry to four dimensions. With 600 vertices and 1,200 edges, it represents the pinnacle of regular 4D geometry.</p>
+
+  <h3>120 Dodecahedral Cells</h3>
+
+  <p>The 120-cell is bounded by 120 regular dodecahedra. Each dodecahedron has 12 pentagonal faces, shares each face with one neighboring dodecahedron, and connects to 12 other cells.</p>
+
+  <p>In total: 120 cells × 12 faces ÷ 2 (shared) = 720 pentagonal faces.</p>
+
+  <h3>Scale and Complexity</h3>
+
+  <p>The 120-cell dwarfs the other regular polychora:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Polychoron</th>
+        <th>Vertices</th>
+        <th>Edges</th>
+        <th>Faces</th>
+        <th>Cells</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Pentachoron</td><td>5</td><td>10</td><td>10</td><td>5</td></tr>
+      <tr><td>Tesseract</td><td>16</td><td>32</td><td>24</td><td>8</td></tr>
+      <tr><td>16-cell</td><td>8</td><td>24</td><td>32</td><td>16</td></tr>
+      <tr><td>24-cell</td><td>24</td><td>96</td><td>96</td><td>24</td></tr>
+      <tr><td class="text-cyber-cyan font-bold">120-cell</td><td class="text-cyber-cyan font-bold">600</td><td class="text-cyber-cyan font-bold">1,200</td><td class="text-cyber-cyan font-bold">720</td><td class="text-cyber-cyan font-bold">120</td></tr>
+      <tr><td>600-cell</td><td>120</td><td>720</td><td>1,200</td><td>600</td></tr>
+    </tbody>
+  </table>
+
+  <p>Its 600 vertices are 37× more than the tesseract. This complexity makes visualization challenging but rewarding.</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}5,3,3{'}'}</h3>
+
+  <p>The symbol {'{'}5,3,3{'}'} encodes the 120-cell:</p>
+
+  <ol>
+    <li><strong>{'{'}5{'}'}</strong> = Faces are pentagons (5-sided)</li>
+    <li><strong>{'{'}5,3{'}'}</strong> = Cells are dodecahedra (3 pentagons at each vertex)</li>
+    <li><strong>{'{'}5,3,3{'}'}</strong> = Three dodecahedra meet around each edge</li>
+  </ol>
+
+  <p>The sequence 5-3-3 begins with 5, the signature of dodecahedral/icosahedral symmetry.</p>
+
+  <h3>Symmetry: The H₄ Group</h3>
+
+  <p>The 120-cell possesses H₄ symmetry, with 14,400 elements:</p>
+  <ul>
+    <li>10× larger than F₄ (1,152 elements)</li>
+    <li>37.5× larger than B₄ (384 elements)</li>
+  </ul>
+
+  <p>H₄ is an exceptional symmetry group existing only in 4D (like F₄). It governs both the 120-cell and 600-cell.</p>
+
+  <h3>Duality with the 600-Cell</h3>
+
+  <p>The 120-cell's dual is the 600-cell:</p>
+  <ul>
+    <li>120 cells ↔ 120 vertices</li>
+    <li>600 vertices ↔ 600 cells</li>
+    <li>1,200 edges ↔ 720 edges (via face duality)</li>
+  </ul>
+
+  <p>Place a vertex at each dodecahedron's center, connect adjacent cells, and you get a 600-cell.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a 120-cell with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>2φ² = φ√5 ≈ 3.702</td></tr>
+      <tr><td>Inradius</td><td>φ⁴/2 ≈ 3.427</td></tr>
+      <tr><td>Hypervolume</td><td>≈ 787.8</td></tr>
+      <tr><td>Dihedral angle</td><td>144°</td></tr>
+    </tbody>
+  </table>
+
+  <p>The 144° dihedral angle means the 120-cell is quite "round"—close to a hypersphere.</p>
+
+  <h3>The Golden Ratio Throughout</h3>
+
+  <p>The golden ratio φ = (1+√5)/2 ≈ 1.618 permeates the 120-cell:</p>
+  <ul>
+    <li>Pentagon diagonals relate to sides by φ</li>
+    <li>Circumradius/edge = 2φ²</li>
+    <li>Cell arrangement follows φ-based patterns</li>
+  </ul>
+
+  <p>This is inherited from the dodecahedron, where the golden ratio is fundamental.</p>
+
+  <h2>Unique Properties</h2>
+
+  <h3>Stellations</h3>
+
+  <p>The 120-cell is the core of a vast family of stellated forms. Extending its faces outward creates star polychora, including:</p>
+  <ul>
+    <li><strong>Small Stellated 120-cell (Sishi)</strong>: The first stellation</li>
+    <li><strong>Great 120-cell (Gohi)</strong>: A self-dual star form</li>
+    <li><strong>Great Grand Stellated 120-cell (Gogishi)</strong>: The most extreme stellation</li>
+  </ul>
+
+  <p>Many of the 10 regular star polychora are stellations or facetings of the 120-cell.</p>
+
+  <h3>The Most "Spherical" Regular</h3>
+
+  <p>With a dihedral angle of 144°, the 120-cell is the most spherical-looking regular polychoron. Its 600 vertices spread across the hypersphere more uniformly than any other regular form.</p>
+
+  <h2>Visualizing the 120-Cell</h2>
+
+  <h3>Stereographic Projection</h3>
+
+  <p>In stereographic projection:</p>
+  <ul>
+    <li>All 120 dodecahedral cells are visible</li>
+    <li>Cells near the "front" appear larger, those at the "back" appear smaller</li>
+    <li>The curved edges create a mandala-like appearance</li>
+  </ul>
+
+  <h3>4D Rotation Effects</h3>
+
+  <p>During 4D rotation:</p>
+  <ul>
+    <li>The 120 cells flow continuously</li>
+    <li>Patterns of 10s and 6s emerge (pentagon and dodecahedron symmetry)</li>
+    <li>The projection can seem to "bloom" and "contract"</li>
+  </ul>
+
+  <h3>The Schlegel Diagram</h3>
+
+  <p>The Schlegel diagram of a 120-cell shows one large outer dodecahedron (the cell nearest the projection point), one small inner dodecahedron (the opposite cell), and 118 cells of intermediate sizes filling the space between. This creates a complex nested structure of dodecahedra.</p>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The hecatonicosachoron (120-cell), denoted {'{'}5,3,3{'}'}, is the largest regular convex polychoron. Discovered by Ludwig Schläfli in 1852, it consists of 120 dodecahedral cells, 720 pentagonal faces, 1,200 edges, and 600 vertices. The 120-cell possesses H₄ symmetry (14,400 elements), shares this exceptional group with its dual the 600-cell, and is permeated by the golden ratio φ. Its dihedral angle of 144° makes it the most "spherical" of the regular polychora.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/600-cell">Hexacosichoron (600-cell)</a></li>
+    <li><strong>Same symmetry:</strong> <a href="/shapes/600-cell">600-cell</a> (H₄ group)</li>
+    <li><strong>Simpler:</strong> <a href="/shapes/24-cell">24-Cell</a></li>
+    <li><strong>Less complex regular:</strong> <a href="/shapes/tesseract">Tesseract</a></li>
+  </ul>
+</ArticleLayout>

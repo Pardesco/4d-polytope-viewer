@@ -58,76 +58,101 @@ export function parseOffFile(offData) {
 
   console.log(`[Parser] Header: ${nVertices} vertices, ${nFaces} faces, ${nEdges} edges, ${nCells} cells`);
 
+  // Check if file uses # Vertices / # Faces comment markers
+  let hasVertexMarker = false;
+  let hasFaceMarker = false;
+  for (let idx = headerIdx + 1; idx < lines.length; idx++) {
+    const trimmed = lines[idx].trim();
+    if (trimmed.startsWith('# Vertices')) hasVertexMarker = true;
+    if (trimmed === '# Faces') hasFaceMarker = true;
+    if (hasVertexMarker && hasFaceMarker) break;
+  }
+
   // Parse vertices
   const vertices = [];
   let i = headerIdx + 1;
 
-  // Skip to vertex section
-  while (i < lines.length && !lines[i].trim().startsWith('# Vertices')) {
-    i++;
+  if (hasVertexMarker) {
+    // Skip to "# Vertices" comment marker
+    while (i < lines.length && !lines[i].trim().startsWith('# Vertices')) {
+      i++;
+    }
+    i++; // Skip "# Vertices" comment line
+  } else {
+    // No marker — skip any blank/comment lines after header, then read positionally
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      if (line && !line.startsWith('#')) break;
+      i++;
+    }
   }
-  i++; // Skip "# Vertices" comment line
 
-  // Read vertices
+  // Read vertices (count-based)
   while (vertices.length < nVertices && i < lines.length) {
     const line = lines[i].trim();
     if (line && !line.startsWith('#')) {
       const coords = line.split(/\s+/).map(parseFloat);
-      if (coords.length === 4) {
-        vertices.push(coords);
+      if (coords.length >= 4) {
+        vertices.push(coords.slice(0, 4));
       }
     }
     i++;
   }
 
-  console.log(`[Parser] Parsed ${vertices.length} vertices`);
+  console.log(`[Parser] Parsed ${vertices.length} vertices (marker: ${hasVertexMarker})`);
 
   // Parse edges from faces
   const edgesSet = new Set();
-  let facesStart = null;
 
-  // Find face section
-  for (let idx = 0; idx < lines.length; idx++) {
-    if (lines[idx].trim() === '# Faces') {
-      facesStart = idx + 1;
-      break;
-    }
-  }
-
-  if (facesStart) {
-    i = facesStart;
-    let faceCount = 0;
-
-    // Read faces until we hit cells section
-    while (i < lines.length && !lines[i].trim().startsWith('# Cells')) {
-      const line = lines[i].trim();
-      if (line && !line.startsWith('#')) {
-        const parts = line.split(/\s+/);
-        if (parts.length >= 3) {
-          const nFaceVerts = parseInt(parts[0]);
-          if (parts.length >= nFaceVerts + 1) {
-            const faceVerts = [];
-            for (let j = 1; j <= nFaceVerts; j++) {
-              faceVerts.push(parseInt(parts[j]));
-            }
-
-            // Create edges from face vertices
-            for (let j = 0; j < nFaceVerts; j++) {
-              const v1 = faceVerts[j];
-              const v2 = faceVerts[(j + 1) % nFaceVerts];
-              // Store edge in canonical form (smaller index first)
-              const edge = v1 < v2 ? `${v1},${v2}` : `${v2},${v1}`;
-              edgesSet.add(edge);
-            }
-            faceCount++;
-          }
-        }
+  if (hasFaceMarker) {
+    // Find "# Faces" comment marker
+    for (let idx = 0; idx < lines.length; idx++) {
+      if (lines[idx].trim() === '# Faces') {
+        i = idx + 1;
+        break;
       }
+    }
+  } else {
+    // No marker — faces start right after vertices (skip blank/comment lines)
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      if (line && !line.startsWith('#')) break;
       i++;
     }
-
-    console.log(`[Parser] Processed ${faceCount} faces`);
   }
+
+  let faceCount = 0;
+
+  // Read faces until we've read nFaces, or hit cells section / end of file
+  while (faceCount < nFaces && i < lines.length) {
+    const line = lines[i].trim();
+    if (line.startsWith('# Cells')) break;
+    if (line && !line.startsWith('#')) {
+      const parts = line.split(/\s+/);
+      if (parts.length >= 3) {
+        const nFaceVerts = parseInt(parts[0]);
+        if (parts.length >= nFaceVerts + 1) {
+          const faceVerts = [];
+          for (let j = 1; j <= nFaceVerts; j++) {
+            faceVerts.push(parseInt(parts[j]));
+          }
+
+          // Create edges from face vertices
+          for (let j = 0; j < nFaceVerts; j++) {
+            const v1 = faceVerts[j];
+            const v2 = faceVerts[(j + 1) % nFaceVerts];
+            // Store edge in canonical form (smaller index first)
+            const edge = v1 < v2 ? `${v1},${v2}` : `${v2},${v1}`;
+            edgesSet.add(edge);
+          }
+          faceCount++;
+        }
+      }
+    }
+    i++;
+  }
+
+  console.log(`[Parser] Processed ${faceCount} faces (marker: ${hasFaceMarker})`)
 
   // Convert edges set to array
   const edges = Array.from(edgesSet).map(e => {

@@ -135,16 +135,14 @@ export class PolytopeSelector {
             ${categories.map(cat => `<option value="${cat}">${cat === 'all' ? 'All Categories' : cat}</option>`).join('')}
           </select>
         </div>
-        <div class="flex gap-2 items-center text-xs px-1">
-          <span class="text-gray-400">Edges:</span>
+        <div style="display:flex; gap:4px; align-items:center; font-size:11px; padding:0 4px;">
+          <span style="color:rgba(0,255,255,0.6); white-space:nowrap; font-size:10px;">Edges:</span>
           <input type="number" id="edge-min" placeholder="Min" value="${this.filters.edgeMin}"
-                 style="background-color: rgba(10, 20, 40, 0.9) !important; color: #00ffff !important;"
-                 class="w-20 text-cyan-300 border border-cyan-500/30 rounded px-2 py-1 text-xs focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all">
-          <span class="text-gray-400">-</span>
+                 style="flex:1; min-width:0; width:50px; background:rgba(10,20,40,0.9); color:#00ffff; border:1px solid rgba(0,255,255,0.3); border-radius:4px; padding:3px 5px; font-size:11px; font-family:'Share Tech Mono',monospace;">
+          <span style="color:rgba(0,255,255,0.4);">-</span>
           <input type="number" id="edge-max" placeholder="Max" value="${this.filters.edgeMax === Infinity ? '' : this.filters.edgeMax}"
-                 style="background-color: rgba(10, 20, 40, 0.9) !important; color: #00ffff !important;"
-                 class="w-20 text-cyan-300 border border-cyan-500/30 rounded px-2 py-1 text-xs focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 transition-all mr-2">
-          <button id="reset-filters" class="text-gray-400 hover:text-cyan-400 text-xs transition-colors">Reset</button>
+                 style="flex:1; min-width:0; width:50px; background:rgba(10,20,40,0.9); color:#00ffff; border:1px solid rgba(0,255,255,0.3); border-radius:4px; padding:3px 5px; font-size:11px; font-family:'Share Tech Mono',monospace;">
+          <button id="reset-filters" style="color:rgba(0,255,255,0.4); background:none; border:none; font-size:10px; cursor:pointer; white-space:nowrap;">Reset</button>
         </div>
         <div id="filter-count" class="text-xs text-gray-400 text-center"></div>
       `;
@@ -308,7 +306,8 @@ export class PolytopeSelector {
         <span class="text-gray-400">
           ${this.polytopes.length} polytopes available
         </span>
-        <br><a href="https://pardesco.com/products/4d-viewer-creator" class="text-primary hover:underline text-xs">Upgrade for export features</a>
+        <!-- TODO: Replace with your actual LemonSqueezy checkout URL -->
+        <br><a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" class="text-primary hover:underline text-xs">Upgrade for export features</a>
       `;
     } else {
       const tierLabels = {

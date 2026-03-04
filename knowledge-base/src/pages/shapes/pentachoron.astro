@@ -1,0 +1,158 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Pentachoron: The Simplest Four-Dimensional Shape"
+  description="The 4D simplex—the minimal regular polychoron with 5 vertices, 10 edges, 10 faces, and 5 tetrahedral cells."
+  ogImage="/images/og/pentachoron.jpg"
+  polytopeId="1-pen"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}3,3,3{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">5 tetrahedra</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">10 triangles</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">5</div>
+    </div>
+  </div>
+
+  <h2>Understanding the Pentachoron</h2>
+
+  <p>The <strong>pentachoron</strong> is the four-dimensional simplex—the simplest possible closed shape in 4D space. Just as a tetrahedron is the minimal 3D solid (4 vertices, 4 triangular faces), the pentachoron is the minimal 4D solid: 5 vertices, 5 tetrahedral cells, with every vertex connected to every other vertex.</p>
+
+  <h3>The Simplest 4D Shape</h3>
+
+  <p>Imagine the progression of simplest shapes in each dimension:</p>
+
+  <ul>
+    <li><strong>0D</strong>: A point (1 vertex)</li>
+    <li><strong>1D</strong>: A line segment (2 vertices)</li>
+    <li><strong>2D</strong>: A triangle (3 vertices)</li>
+    <li><strong>3D</strong>: A tetrahedron (4 vertices)</li>
+    <li><strong>4D</strong>: A pentachoron (5 vertices)</li>
+  </ul>
+
+  <p>Each is constructed by taking the previous shape and adding one vertex "above" it in the new dimension, then connecting the new vertex to all existing vertices.</p>
+
+  <h3>Complete Connectivity</h3>
+
+  <p>A remarkable property of the pentachoron is that <strong>every vertex is connected to every other vertex</strong>. This makes its edge skeleton a <em>complete graph</em> on 5 vertices, denoted K₅ in graph theory.</p>
+
+  <p>This complete connectivity means there's no "other side" of a pentachoron—from any vertex, you can reach any other in a single step.</p>
+
+  <h3>The Cell Structure</h3>
+
+  <p>The pentachoron has 5 tetrahedral cells. Each cell:</p>
+  <ul>
+    <li>Uses 4 of the 5 vertices</li>
+    <li>Shares each of its 4 triangular faces with another cell</li>
+    <li>Is "opposite" the single vertex not included in it</li>
+  </ul>
+
+  <p>This creates an elegant one-to-one correspondence: each cell corresponds to the vertex it doesn't contain.</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}3,3,3{'}'}</h3>
+
+  <p>The symbol {'{'}3,3,3{'}'} encodes the pentachoron's structure recursively:</p>
+
+  <ol>
+    <li><strong>{'{'}3{'}'}</strong> = Faces are triangles (3-sided polygons)</li>
+    <li><strong>{'{'}3,3{'}'}</strong> = Cells are tetrahedra (3 triangles meet at each vertex of a cell)</li>
+    <li><strong>{'{'}3,3,3{'}'}</strong> = Three tetrahedra meet around each edge</li>
+  </ol>
+
+  <p>This triple-3 pattern gives the pentachoron a beautiful regularity—the same number appears at every level of its structure.</p>
+
+  <h3>Symmetry: The A₄ Group</h3>
+
+  <p>The pentachoron's symmetry group is A₄, which has 120 elements. This is the symmetric group S₅ (all permutations of 5 objects) because any permutation of the 5 vertices is a valid symmetry.</p>
+
+  <p>Every vertex, edge, face, and cell is equivalent to every other. There are no "special" parts—perfect symmetry throughout.</p>
+
+  <h3>Self-Duality</h3>
+
+  <p>The pentachoron is <strong>self-dual</strong>: if you replace each cell with a vertex (at its center) and connect vertices whose cells shared a face, you get another pentachoron.</p>
+
+  <p>This self-duality is rare. Among the six convex regular polychora, only the pentachoron and the 24-cell are self-dual.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a pentachoron with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>√(2/5) ≈ 0.632</td></tr>
+      <tr><td>Inradius</td><td>1/(2√10) ≈ 0.158</td></tr>
+      <tr><td>Hypervolume</td><td>√5/96 ≈ 0.023</td></tr>
+      <tr><td>Surface volume</td><td>5√2/12 ≈ 0.589</td></tr>
+      <tr><td>Dihedral angle</td><td>arccos(1/4) ≈ 75.52°</td></tr>
+    </tbody>
+  </table>
+
+  <p>The small hypervolume relative to edge length reflects how "thin" simplices become in higher dimensions.</p>
+
+  <h2>Historical Context</h2>
+
+  <h3>Schläfli's Discovery</h3>
+
+  <p>Ludwig Schläfli first described the pentachoron in his 1852 manuscript <em>Theorie der vielfachen Kontinuität</em>. Working in mathematical isolation, Schläfli proved that the pentachoron was one of exactly six regular convex polychora—a result that wouldn't be widely known until his work was published posthumously in 1901.</p>
+
+  <h3>The Simplex in Higher Mathematics</h3>
+
+  <p>The pentachoron generalizes to the n-simplex in n dimensions:</p>
+  <ul>
+    <li>0-simplex: point</li>
+    <li>1-simplex: line segment</li>
+    <li>2-simplex: triangle</li>
+    <li>3-simplex: tetrahedron</li>
+    <li>4-simplex: pentachoron</li>
+    <li>n-simplex: (n+1) mutually connected vertices</li>
+  </ul>
+
+  <p>Simplices are fundamental in topology, optimization (the simplex algorithm), and triangulation.</p>
+
+  <h2>Visualizing the Pentachoron</h2>
+
+  <h3>Stereographic Appearance</h3>
+
+  <p>When stereographically projected, the pentachoron appears as a tetrahedron with a smaller tetrahedron inside, connected by 4 edges. During 4D rotation, these two tetrahedra continuously trade places—sometimes the "inner" one grows larger and the "outer" shrinks, creating a hypnotic flow.</p>
+
+  <h3>The "Turning Inside-Out" Phenomenon</h3>
+
+  <p>When a pentachoron rotates in 4D (particularly in planes involving w), it appears to turn inside-out. This is because each tetrahedral cell takes its turn being "closest" to the viewer, then recedes while another advances. With only 5 cells, this cycle is easy to follow.</p>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The pentachoron (5-cell), denoted {'{'}3,3,3{'}'}, is the four-dimensional simplex and the simplest regular polychoron. Discovered by Ludwig Schläfli in 1852, it consists of 5 tetrahedral cells, 10 triangular faces, 10 edges, and 5 vertices. As a self-dual polytope, the pentachoron's dual is another pentachoron. Its edge skeleton forms the complete graph K₅.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/pentachoron">Pentachoron</a> (self-dual)</li>
+    <li><strong>Same family:</strong> <a href="/shapes/tesseract">Tesseract</a></li>
+    <li><strong>Also self-dual:</strong> <a href="/shapes/24-cell">24-Cell</a></li>
+    <li><strong>More complex:</strong> <a href="/shapes/16-cell">16-Cell</a></li>
+  </ul>
+</ArticleLayout>

@@ -1,0 +1,282 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+---
+
+<ArticleLayout
+  title="The Regiment System: Organizing Thousands of Polychora"
+  description="How over 2,000 uniform polychora are classified using military terminology—armies, regiments, and OBSA naming."
+>
+  <p class="lead text-xl text-gray-300 mb-8">
+    With over 2,000 known uniform polychora, mathematicians needed a systematic way to organize them. The regiment system, developed by researchers like Jonathan Bowers and Richard Klitzing, groups polychora by their shared skeletal structure.
+  </p>
+
+  <h2>The Core Insight</h2>
+
+  <p>Multiple distinct polychora can share the exact same <strong>vertices and edges</strong>—their wireframe skeleton is identical. What differs is how faces and cells are arranged on that skeleton.</p>
+
+  <p>Think of it like this: given the same set of vertices and edges, you can connect them into different 2D faces, and group those faces into different 3D cells, creating entirely different 4D shapes.</p>
+
+  <h2>Military Terminology</h2>
+
+  <p>The classification uses military ranks as a memorable hierarchy:</p>
+
+  <h3>Army</h3>
+
+  <p>An <strong>army</strong> is the largest grouping: all polychora that share the same <strong>vertex set</strong>.</p>
+
+  <ul>
+    <li>The convex hull of these vertices (the "most convex" shape with those vertices) is called the <strong>General</strong></li>
+    <li>All army members have vertices at the same positions</li>
+  </ul>
+
+  <p><strong>Example</strong>: The 600-cell army contains every polychoron whose 120 vertices match the 600-cell's vertex arrangement.</p>
+
+  <h3>Regiment</h3>
+
+  <p>A <strong>regiment</strong> is a subset of an army: all polychora that share the same <strong>vertices AND edges</strong>.</p>
+
+  <ul>
+    <li>The most symmetric member is called the <strong>Colonel</strong></li>
+    <li>Regiment members differ only in their faces and cells</li>
+    <li>The regiment is named after its colonel</li>
+  </ul>
+
+  <p><strong>Example</strong>: The Ico (24-cell) regiment contains 14 polychora that all have the same 24 vertices and 96 edges as the 24-cell, but different face/cell arrangements.</p>
+
+  <h3>Company</h3>
+
+  <p>A <strong>company</strong> is an even finer grouping: polychora that share the same <strong>vertices, edges, AND faces</strong>.</p>
+
+  <ul>
+    <li>Company members differ only in how faces are grouped into cells</li>
+    <li>The leading member is the <strong>Captain</strong></li>
+  </ul>
+
+  <h2>Why Regiments Matter</h2>
+
+  <h3>Shared Properties</h3>
+
+  <p>Regiment members share:</p>
+  <ul>
+    <li>Vertex count and positions</li>
+    <li>Edge count and connections</li>
+    <li>Often similar symmetry properties</li>
+    <li>The same "wireframe" appearance in projections</li>
+  </ul>
+
+  <h3>Different Properties</h3>
+
+  <p>Regiment members differ in:</p>
+  <ul>
+    <li>Face types and arrangements</li>
+    <li>Cell types and counts</li>
+    <li>Convexity (some members may be non-convex)</li>
+    <li>Orientability (some may be non-orientable)</li>
+  </ul>
+
+  <h3>Research Applications</h3>
+
+  <p>The regiment system helps researchers:</p>
+  <ul>
+    <li>Systematically search for new polychora</li>
+    <li>Understand relationships between shapes</li>
+    <li>Predict what forms might exist</li>
+    <li>Organize the massive catalog of known shapes</li>
+  </ul>
+
+  <h2>The Category System</h2>
+
+  <p>In addition to regiments, polychora are organized into <strong>categories</strong> based on how they're constructed. This system, developed by <strong>Jonathan Bowers</strong>, groups the 2,191+ known uniform polychora by their geometric operations.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Cat 1</strong></td>
+        <td>Regular polychora — the 6 convex and 10 star regular 4D analogs of Platonic solids</td>
+      </tr>
+      <tr>
+        <td><strong>Cat 2</strong></td>
+        <td>Truncated forms — vertices cut off from regular polychora</td>
+      </tr>
+      <tr>
+        <td><strong>Cat 3</strong></td>
+        <td>Rectified forms — edges become vertices, creating new geometries</td>
+      </tr>
+      <tr>
+        <td><strong>Cat 4+</strong></td>
+        <td>Increasingly complex operations: cantellation, runcination, and combinations</td>
+      </tr>
+      <tr>
+        <td><strong>Cat S1–S26</strong></td>
+        <td>Scaliform polychora — uniform faces but not vertex-transitive</td>
+      </tr>
+      <tr>
+        <td><strong>Compounds</strong></td>
+        <td>Multiple polychora combined into single figures</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Understanding Category Numbers</h3>
+
+  <p>The numeric categories (1–29) represent progressively more complex <strong>Wythoffian operations</strong>:</p>
+
+  <ul>
+    <li><strong>Lower numbers</strong> = simpler operations on regular forms</li>
+    <li><strong>Higher numbers</strong> = combinations of multiple operations</li>
+    <li><strong>"S" categories</strong> = scaliform (non-uniform but with uniform faces)</li>
+  </ul>
+
+  <p>For example, a Cat 4 polychoron might be a <strong>cantellated</strong> form (edges and vertices both modified), while Cat 7+ involves applying multiple operations like truncation AND cantellation together.</p>
+
+  <h3>Categories vs. Regiments</h3>
+
+  <p>These two systems classify polychora differently:</p>
+
+  <ul>
+    <li><strong>Categories</strong> group by <em>construction method</em> — how the shape was derived</li>
+    <li><strong>Regiments</strong> group by <em>shared structure</em> — which shapes have the same skeleton</li>
+  </ul>
+
+  <p>A single regiment can contain members from different categories, and a single category spans many regiments. Together, they form a complete organizational framework for the vast world of uniform polychora.</p>
+
+  <h2>Notable Regiments</h2>
+
+  <h3>The Ico Regiment (24-cell)</h3>
+
+  <p><strong>Colonel</strong>: Icositetrachoron (24-cell)<br>
+  <strong>Symmetry</strong>: F₄ (unique to 4D)<br>
+  <strong>Members</strong>: 14 uniform polychora</p>
+
+  <p>The Ico regiment is fascinating because it includes:</p>
+  <ul>
+    <li>The convex 24-cell itself</li>
+    <li>Non-convex members like the Octahemihexadecachoron</li>
+    <li>Non-orientable members with "hemi" facets</li>
+    <li>The compound of three tesseracts (Gico)</li>
+  </ul>
+
+  <p>All 14 shapes have identical wireframes but dramatically different cell structures.</p>
+
+  <h3>The Ex Regiment (600-cell)</h3>
+
+  <p><strong>Colonel</strong>: Hexacosichoron (600-cell)<br>
+  <strong>Symmetry</strong>: H₄<br>
+  <strong>Members</strong>: Multiple, including star polychora</p>
+
+  <p>The 600-cell's 120 vertices and 720 edges support many arrangements, including several of the 10 regular star polychora.</p>
+
+  <h3>The Gap Regiment (Grand Antiprism)</h3>
+
+  <p><strong>Colonel</strong>: Grand Antiprism<br>
+  <strong>Members</strong>: 2 (the smallest non-trivial regiment)</p>
+
+  <p>The Grand Antiprism is unique: it's the only convex uniform polychoron that cannot be generated by the standard Wythoff construction. Its regiment is correspondingly unusual.</p>
+
+  <h2>OBSA: Bowers Style Acronyms</h2>
+
+  <p>To manage the unwieldy names of thousands of polychora, <strong>Jonathan Bowers</strong> developed the <strong>OBSA</strong> (Official Bowers Style Acronym) system.</p>
+
+  <h3>Naming Logic</h3>
+
+  <p>Base names derive from the regular forms:</p>
+  <ul>
+    <li><strong>Pen</strong> = Pentachoron</li>
+    <li><strong>Tes</strong> = Tesseract</li>
+    <li><strong>Hex</strong> = Hexadecachoron</li>
+    <li><strong>Ico</strong> = Icositetrachoron</li>
+    <li><strong>Hi</strong> = Hecatonicosachoron</li>
+    <li><strong>Ex</strong> = Hexacosichoron</li>
+  </ul>
+
+  <p>Prefixes indicate modifications:</p>
+  <ul>
+    <li><strong>s-</strong> = Small (e.g., Sidpith)</li>
+    <li><strong>g-</strong> = Great or Grand (e.g., Gahi)</li>
+    <li><strong>r-</strong> = Rectified (e.g., Rit)</li>
+    <li><strong>t-</strong> = Truncated (e.g., Thi)</li>
+    <li><strong>p-</strong> = Prismato- (e.g., Prit)</li>
+  </ul>
+
+  <h3>Examples</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>OBSA</th>
+        <th>Full Name</th>
+        <th>Derivation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Rit</td><td>Rectified Tesseract</td><td>r + Tes → Rit</td></tr>
+      <tr><td>Srit</td><td>Small Rhombated Tesseract</td><td>s + r + Tes → Srit</td></tr>
+      <tr><td>Grahi</td><td>Great Rhombated Hecatonicosachoron</td><td>g + r + Hi → Grahi</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Pronunciation</h3>
+
+  <p>OBSA names are designed to be pronounceable:</p>
+  <ul>
+    <li>Rit = "rit" (rhymes with "bit")</li>
+    <li>Sishi = "shee-shee"</li>
+    <li>Grahi = "grah-hee"</li>
+    <li>Sidpith = "sid-pith"</li>
+  </ul>
+
+  <h2>The 2021 Discovery: Idtessids</h2>
+
+  <p>For 14 years (2006-2020), the count of uniform polychora was stable. Then the <strong>Polytope Discord</strong> community discovered the <strong>Idtessid</strong> family—333 new uniform polychora hiding in previously unexplored regiment territory.</p>
+
+  <p>This demonstrates that the regiment system isn't just organizational—it's a roadmap for discovery. By systematically exploring regiment skeletons, researchers continue to find new valid polychora.</p>
+
+  <h2>Special Cases</h2>
+
+  <h3>Fissaries</h3>
+
+  <p>Some regiment members are <strong>fissary</strong>: they look like compounds (multiple overlapping shapes) but share elements in ways that make them arguably single entities.</p>
+
+  <h3>Exotics</h3>
+
+  <p><strong>Exotic</strong> polychora have coinciding cells—multiple cells occupying the same 3D space. These are mathematically valid but usually excluded from "standard" uniform counts.</p>
+
+  <h3>Non-Wythoffian Forms</h3>
+
+  <p>Most uniform polychora can be generated by the <strong>Wythoff construction</strong> (reflection groups and kaleidoscopes). The Grand Antiprism is the only convex uniform that cannot—making its regiment uniquely interesting.</p>
+
+  <h2>Using This Knowledge</h2>
+
+  <p>When exploring polychora in the viewer:</p>
+
+  <ol>
+    <li><strong>Regiment members</strong> share the same wireframe—watch for this when toggling between related shapes</li>
+    <li><strong>OBSA names</strong> tell you about a shape's derivation—"Rit" is rectified, "Srit" adds rhombation</li>
+    <li><strong>Category numbers</strong> group similar construction methods</li>
+    <li><strong>Army membership</strong> tells you which shapes share vertices</li>
+  </ol>
+
+  <p>Understanding regiments transforms the vast catalog from an overwhelming list into a structured map of 4D geometry.</p>
+
+  <h2>Further Reading</h2>
+
+  <ul>
+    <li><a href="/learn/what-is-4d">What is the Fourth Dimension?</a> - Basic concepts</li>
+    <li><a href="/learn/history">History of 4D Geometry</a> - How the classification developed</li>
+    <li><a href="/shapes/24-cell">The 24-Cell</a> - Colonel of a fascinating 14-member regiment</li>
+  </ul>
+
+  <h3>External Resources</h3>
+
+  <ul>
+    <li><a href="https://polytope.miraheze.org/wiki/List_of_uniform_polychora" target="_blank" rel="noopener">List of Uniform Polychora</a> - Complete catalog on Polytope Wiki</li>
+    <li><a href="https://polytope.miraheze.org/wiki/Jonathan_Bowers" target="_blank" rel="noopener">Jonathan Bowers</a> - Creator of the OBSA system and category classification</li>
+    <li><a href="https://en.wikipedia.org/wiki/Uniform_4-polytope" target="_blank" rel="noopener">Uniform 4-polytope</a> - Wikipedia overview</li>
+  </ul>
+</ArticleLayout>

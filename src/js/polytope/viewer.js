@@ -30,7 +30,7 @@ import { GlitchEffect } from '../effects/GlitchEffect.js'; // NEW: For visual fe
 import { licenseManager } from '../license/LicenseManager.js'; // Security: For feature gating
 import { FilmGrainEffect } from '../effects/FilmGrainEffect.js'; // Film grain post-processing
 import { createMatrix5LineMaterial, createMatrix5PointMaterial, Matrix5Controller } from '../shaders/Matrix5Shader.js'; // Matrix-5 (5D) projection
-import { Rotation5D, embedAllIn5D, generateCurvePoints5D, rotateVertex5D, getRotationMatrix5D } from './projection5d.js'; // 5D math utilities
+import { Rotation5D, embedAllIn5D, generateCurvePoints5D, rotateVertex5D, getRotationMatrix5D, projectVertex5Dto3D, stereographicProjectVertex5Dto3D } from './projection5d.js'; // 5D math utilities
 
 export class PolytopeViewer {
   constructor(canvasContainer, options = {}) {
@@ -117,8 +117,8 @@ export class PolytopeViewer {
     this.TUBE_UPDATE_INTERVAL = 4; // Update tubes every N frames (Frenet frames are expensive)
     this._tubeUpdateCounter = 0;  // Frame counter for tube updates
 
-    // Mesh quality settings ('standard' for real-time, 'high' for export quality)
-    this.meshQuality = 'standard';
+    // Mesh quality (always high - line view serves as the optimized mode)
+    this.meshQuality = 'high';
 
     // Matrix-5 (5D projection) mode - experimental
     this.projectionMode = 'matrix4'; // 'matrix4' (standard) or 'matrix5' (5D scanner effect)
@@ -235,8 +235,9 @@ export class PolytopeViewer {
     directionalLight2.position.set(-1, -1, -1);
     this.scene.add(directionalLight2);
 
-    // Handle window resize
-    window.addEventListener('resize', () => this.onWindowResize());
+    // Handle window resize (store bound reference for cleanup)
+    this._boundOnWindowResize = () => this.onWindowResize();
+    window.addEventListener('resize', this._boundOnWindowResize);
 
     // Create manual rotation controller (desktop only)
     if (window.innerWidth >= 1024) {
@@ -650,22 +651,12 @@ export class PolytopeViewer {
    * @returns {{ tubularSegments: number, radialSegments: number, curvePoints: number }}
    */
   getMeshSettings() {
-    if (this.meshQuality === 'high') {
-      // High quality for exports
-      // Stereographic projection creates curved lines, needs more segments
-      if (this.projectionType === 'stereographic') {
-        return { tubularSegments: 64, radialSegments: 16, curvePoints: 50 };
-      } else {
-        // Perspective projection: straighter lines, fewer segments needed
-        return { tubularSegments: 32, radialSegments: 12, curvePoints: 30 };
-      }
+    // Stereographic projection creates curved lines, needs more segments
+    if (this.projectionType === 'stereographic') {
+      return { tubularSegments: 64, radialSegments: 16, curvePoints: 50 };
     } else {
-      // Standard quality for real-time
-      return {
-        tubularSegments: this.TUBE_SEGMENTS, // 6
-        radialSegments: null, // Use LOD-based calculation
-        curvePoints: this.NUM_CURVE_POINTS   // 20
-      };
+      // Perspective projection: straighter lines, fewer segments needed
+      return { tubularSegments: 32, radialSegments: 12, curvePoints: 30 };
     }
   }
 
@@ -693,25 +684,6 @@ export class PolytopeViewer {
       tubularSegments,
       radialSegments
     };
-  }
-
-  /**
-   * Set mesh quality and rebuild geometry if needed
-   * @param {'standard' | 'high'} quality - Quality preset
-   */
-  setMeshQuality(quality) {
-    if (this.meshQuality === quality) return;
-
-    const oldQuality = this.meshQuality;
-    this.meshQuality = quality;
-
-    console.log(`[MeshQuality] Changed from ${oldQuality} to ${quality}`);
-
-    // If in mesh view, rebuild geometry with new quality settings
-    if (this.showMeshView && this.tubeMeshes.length > 0) {
-      console.log('[MeshQuality] Rebuilding mesh geometry...');
-      this.rebuildMeshGeometry();
-    }
   }
 
   /**
@@ -752,6 +724,10 @@ export class PolytopeViewer {
       const newMaterial = this.getCurrentTubeMaterial();
       this.tubeMeshes.forEach(mesh => {
         if (mesh) {
+          // Dispose old material to prevent GPU memory leak
+          if (mesh.material && mesh.material !== newMaterial) {
+            mesh.material.dispose();
+          }
           mesh.material = newMaterial;
         }
       });
@@ -1090,17 +1066,13 @@ export class PolytopeViewer {
     }
 
     // Update vertex positions and visibility
-    if (this.showVertices) {
+    // Vertex spheres disabled in Matrix-5 mesh view (GPU shader handles its own points)
+    const hideVertexSpheres = this.projectionMode === 'matrix5' && this.showMeshView;
+    if (this.showVertices && !hideVertexSpheres) {
       this.updateVertexPositions();
-      // Ensure vertices are visible
-      this.vertexMeshes.forEach(mesh => {
-        mesh.visible = true;
-      });
+      this.vertexMeshes.forEach(mesh => { mesh.visible = true; });
     } else {
-      // Hide vertices when toggled off
-      this.vertexMeshes.forEach(mesh => {
-        mesh.visible = false;
-      });
+      this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
     }
   }
 
@@ -1109,12 +1081,25 @@ export class PolytopeViewer {
    */
   updateVertexBuffers() {
     // Project all vertices to 3D
-    for (let i = 0; i < this.vertices4DCurrent.length; i++) {
-      const v4d = this.vertices4DCurrent[i];
-      if (this.projectionType === 'stereographic') {
-        this.vertex3DBuffer[i] = stereographicProject(v4d);
-      } else {
-        this.vertex3DBuffer[i] = perspectiveProject(v4d, this.perspectiveDistance);
+    if (this.projectionMode === 'matrix5' && this.vertices5DRotated) {
+      // Matrix-5: project 5D rotated vertices through 5D→4D→3D pipeline
+      for (let i = 0; i < this.vertices5DRotated.length; i++) {
+        const v5d = this.vertices5DRotated[i];
+        if (this.matrix5ProjectionType === 'stereographic') {
+          this.vertex3DBuffer[i] = stereographicProjectVertex5Dto3D(v5d);
+        } else {
+          this.vertex3DBuffer[i] = projectVertex5Dto3D(v5d, 2.5, this.perspectiveDistance);
+        }
+      }
+    } else {
+      // Matrix-4: project 4D vertices to 3D
+      for (let i = 0; i < this.vertices4DCurrent.length; i++) {
+        const v4d = this.vertices4DCurrent[i];
+        if (this.projectionType === 'stereographic') {
+          this.vertex3DBuffer[i] = stereographicProject(v4d);
+        } else {
+          this.vertex3DBuffer[i] = perspectiveProject(v4d, this.perspectiveDistance);
+        }
       }
     }
   }
@@ -1622,10 +1607,10 @@ export class PolytopeViewer {
         // Hide GPU shader objects
         if (this.matrix5Lines) this.matrix5Lines.visible = false;
         if (this.matrix5Points) this.matrix5Points.visible = false;
-        // Show tube meshes
+        // Show tube meshes - vertex spheres hidden (5D projection not supported)
         this.edgeLines.forEach(line => { line.visible = false; });
         this.tubeMeshes.forEach(mesh => { mesh.visible = true; });
-        this.vertexMeshes.forEach(mesh => { mesh.visible = this.showVertices; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
         // Ensure 5D vertices are embedded
         if (!this.vertices5D || this.vertices5D.length === 0) {
           this.vertices5D = embedAllIn5D(this.vertices4DOriginal);
@@ -1718,10 +1703,10 @@ export class PolytopeViewer {
         // Hide GPU shader objects if they exist
         if (this.matrix5Lines) this.matrix5Lines.visible = false;
         if (this.matrix5Points) this.matrix5Points.visible = false;
-        // Show tube meshes - they'll be updated with 5D projection
+        // Show tube meshes - vertex spheres hidden (5D projection not supported)
         this.edgeLines.forEach(line => { line.visible = false; });
         this.tubeMeshes.forEach(mesh => { mesh.visible = true; });
-        this.vertexMeshes.forEach(mesh => { mesh.visible = this.showVertices; });
+        this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
         // Force geometry rebuild with 5D projection
         this.geometryInitialized = false;
         this.updateProjection();
@@ -1898,6 +1883,9 @@ export class PolytopeViewer {
 
       // Rotate all 5D vertices
       this.vertices5DRotated = this.vertices5D.map(v => rotateVertex5D(v, rotationMatrix5D));
+
+      // Hide vertex spheres in Matrix-5 mesh view (5D projection not supported for spheres)
+      this.vertexMeshes.forEach(mesh => { mesh.visible = false; });
 
       // Update geometry with 5D-projected curves
       this.updateAllGeometry();
@@ -2104,7 +2092,7 @@ export class PolytopeViewer {
     const tier = licenseManager.getTier();
     if (tier === 'free') {
       console.warn('[PolytopeViewer] OBJ export blocked - requires Creator tier');
-      throw new Error('OBJ export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+      throw new Error('OBJ export requires Creator tier. Upgrade at 4d.pardesco.com/activate');
     }
 
     console.log('[PolytopeViewer] exportOBJ called with type:', type);
@@ -2335,7 +2323,7 @@ export class PolytopeViewer {
     const tier = licenseManager.getTier();
     if (tier === 'free') {
       console.warn('[PolytopeViewer] Animation JSON export blocked - requires Creator tier');
-      throw new Error('Animation JSON export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+      throw new Error('Animation JSON export requires Creator tier. Upgrade at 4d.pardesco.com/activate');
     }
 
     const chunkFrameCount = endFrame - startFrame;
@@ -2542,7 +2530,7 @@ export class PolytopeViewer {
     const tier = licenseManager.getTier();
     if (tier === 'free') {
       console.warn('[PolytopeViewer] Animation JSON export blocked - requires Creator tier');
-      throw new Error('Animation JSON export requires Creator tier. Upgrade at pardesco.com/products/4d-viewer-creator');
+      throw new Error('Animation JSON export requires Creator tier. Upgrade at 4d.pardesco.com/activate');
     }
 
     console.log(`[PolytopeViewer] Starting animation export: ${frameCount} frames at ${fps} FPS`);

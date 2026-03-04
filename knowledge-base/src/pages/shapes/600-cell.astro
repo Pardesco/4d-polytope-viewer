@@ -1,0 +1,187 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Hexacosichoron: The 600-Cell"
+  description="The densest regular polychoron—600 tetrahedral cells forming the 4D analogue of the icosahedron."
+  ogImage="/images/og/600-cell.jpg"
+  polytopeId="6-ex"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}3,3,5{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">600 tetrahedra</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">1,200 triangles</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">120</div>
+    </div>
+  </div>
+
+  <h2>Understanding the 600-Cell</h2>
+
+  <p>The <strong>hexacosichoron</strong>, commonly called the 600-cell, is the densest of the regular convex polychora. Bounded by 600 tetrahedral cells—with 5 meeting around every edge—it represents the four-dimensional analogue of the icosahedron. Its 120 vertices form the binary icosahedral group, connecting it to deep mathematics.</p>
+
+  <h3>600 Tetrahedral Cells</h3>
+
+  <p>The 600-cell is bounded by 600 regular tetrahedra. This is:</p>
+  <ul>
+    <li>100× more cells than the pentachoron (5)</li>
+    <li>75× more cells than the tesseract (8)</li>
+    <li>5× more cells than the 120-cell (120)</li>
+  </ul>
+
+  <p>Five tetrahedra meet around each edge—the maximum possible for any convex regular polychoron. This creates an extremely dense, tightly-packed structure.</p>
+
+  <h3>Comparison with the 120-Cell</h3>
+
+  <p>The 600-cell and 120-cell are duals with reciprocal counts:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>600-cell</th>
+        <th>120-cell</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Vertices</td><td>120</td><td>600</td></tr>
+      <tr><td>Edges</td><td>720</td><td>1,200</td></tr>
+      <tr><td>Faces</td><td>1,200</td><td>720</td></tr>
+      <tr><td>Cells</td><td>600</td><td>120</td></tr>
+      <tr><td>Cell type</td><td>Tetrahedra</td><td>Dodecahedra</td></tr>
+    </tbody>
+  </table>
+
+  <p>The 600-cell is "spikier" (more cells, smaller cells); the 120-cell is "rounder" (fewer cells, larger cells).</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}3,3,5{'}'}</h3>
+
+  <p>The symbol {'{'}3,3,5{'}'} encodes the 600-cell:</p>
+
+  <ol>
+    <li><strong>{'{'}3{'}'}</strong> = Faces are triangles</li>
+    <li><strong>{'{'}3,3{'}'}</strong> = Cells are tetrahedra (3 triangles at each vertex)</li>
+    <li><strong>{'{'}3,3,5{'}'}</strong> = Five tetrahedra meet around each edge</li>
+  </ol>
+
+  <p>The ending 5 signals icosahedral (H₄) symmetry.</p>
+
+  <h3>Symmetry: The H₄ Group</h3>
+
+  <p>Like the 120-cell, the 600-cell has H₄ symmetry with 14,400 elements. The two shapes share this exceptional group because dual polytopes always share symmetry groups, and H₄ is the unique exceptional group governing pentagonal/icosahedral symmetry in 4D.</p>
+
+  <h3>The 120 Vertices</h3>
+
+  <p>The 120 vertices of a 600-cell form the <strong>binary icosahedral group</strong> (times 2). These can be expressed as unit quaternions involving the golden ratio φ = (1+√5)/2.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a 600-cell with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>φ = (1+√5)/2 ≈ 1.618</td></tr>
+      <tr><td>Inradius</td><td>φ²/2 ≈ 1.309</td></tr>
+      <tr><td>Hypervolume</td><td>≈ 55.68</td></tr>
+      <tr><td>Dihedral angle</td><td>≈ 164.48°</td></tr>
+    </tbody>
+  </table>
+
+  <p>The circumradius equals the golden ratio—another manifestation of φ in this icosahedral structure.</p>
+
+  <h2>Unique Properties</h2>
+
+  <h3>Maximum Density</h3>
+
+  <p>The 600-cell is the "densest" regular polychoron:</p>
+  <ul>
+    <li>5 cells meet at each edge (maximum among regulars)</li>
+    <li>20 cells meet at each vertex</li>
+    <li>The dihedral angle (164.48°) is the largest—almost flat</li>
+  </ul>
+
+  <h3>The Binary Icosahedral Group</h3>
+
+  <p>The 600-cell's 120 vertices form the <strong>binary icosahedral group</strong> 2I, which has 120 elements. This group is:</p>
+  <ul>
+    <li>The double cover of the icosahedral rotation group (60 elements)</li>
+    <li>Isomorphic to SL(2,5), the 2×2 matrices over the field with 5 elements</li>
+    <li>Central to the classification of finite subgroups of SU(2)</li>
+  </ul>
+
+  <h3>Decomposition into 24-Cells</h3>
+
+  <p>The 600-cell can be partitioned into five 24-cells! Its 120 vertices divide perfectly into 5 groups of 24, each forming a 24-cell. This decomposition reveals deep connections between the H₄ and F₄ symmetry groups.</p>
+
+  <h3>The Grand Antiprism</h3>
+
+  <p>In 1965, John Conway and Michael Guy discovered the <strong>Grand Antiprism</strong>—the only convex uniform polychoron that cannot be constructed by Wythoff's method. It's obtained by removing a specific ring of vertices from the 600-cell.</p>
+
+  <h2>Visualizing the 600-Cell</h2>
+
+  <h3>Stereographic Projection</h3>
+
+  <p>In stereographic projection:</p>
+  <ul>
+    <li>The 600 tetrahedral cells appear as a dense, intricate mesh</li>
+    <li>The structure looks bristly, with tetrahedra pointing outward</li>
+    <li>4D rotation creates rapid, complex motion</li>
+  </ul>
+
+  <h3>The "Exploding" Appearance</h3>
+
+  <p>During 4D rotation, the 600-cell can appear to:</p>
+  <ul>
+    <li>Explode outward (as cells move toward the viewer)</li>
+    <li>Collapse inward (as cells recede)</li>
+    <li>Form and reform icosahedral patterns</li>
+  </ul>
+
+  <h3>Cross-Sections</h3>
+
+  <p>The 600-cell's 3D cross-sections include icosahedra (through vertex centers), dodecahedra (related to dual structure), and various Archimedean solids.</p>
+
+  <h2>The E8 Connection</h2>
+
+  <p>Two 600-cells can be combined to form a 240-vertex structure related to the <strong>E8 root system</strong>—one of the most important structures in mathematics and theoretical physics. This connects the humble 600-cell to:</p>
+  <ul>
+    <li>The largest exceptional Lie group</li>
+    <li>Heterotic string theory</li>
+    <li>Proposed theories of everything</li>
+  </ul>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The hexacosichoron (600-cell), denoted {'{'}3,3,5{'}'}, is the densest regular convex polychoron, bounded by 600 tetrahedral cells with 5 meeting at each edge. Discovered by Ludwig Schläfli in 1852, it has 1,200 triangular faces, 720 edges, and 120 vertices that form the binary icosahedral group. The 600-cell possesses H₄ symmetry (14,400 elements), shares this with its dual the 120-cell, and can be decomposed into five 24-cells. Its circumradius equals the golden ratio φ.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/120-cell">Hecatonicosachoron (120-cell)</a></li>
+    <li><strong>Same symmetry:</strong> <a href="/shapes/120-cell">120-cell</a> (H₄ group)</li>
+    <li><strong>Contains:</strong> Five <a href="/shapes/24-cell">24-cells</a></li>
+    <li><strong>Same cell type:</strong> <a href="/shapes/pentachoron">Pentachoron</a>, <a href="/shapes/16-cell">16-cell</a></li>
+  </ul>
+</ArticleLayout>

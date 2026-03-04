@@ -183,7 +183,7 @@ export class MobileUI {
       }
 
       // ALL polytopes load from /data/polytopes/{id}.off
-      const polytopePath = `/data/polytopes/${polytopeId}.off`;
+      const polytopePath = `/data/polytopes/${encodeURIComponent(polytopeId)}.off`;
 
       const data = await this.viewer.loadPolytope(polytopePath, polytopeInfo.name);
 
@@ -389,7 +389,7 @@ export class MobileUI {
    */
   setupResponsive() {
     let resizeTimeout;
-    window.addEventListener('resize', () => {
+    this._boundResizeHandler = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         const nowMobile = this.detectMobile();
@@ -400,6 +400,13 @@ export class MobileUI {
           window.location.reload();
         }
       }, 250);
-    });
+    };
+    window.addEventListener('resize', this._boundResizeHandler);
+  }
+
+  dispose() {
+    if (this._boundResizeHandler) {
+      window.removeEventListener('resize', this._boundResizeHandler);
+    }
   }
 }

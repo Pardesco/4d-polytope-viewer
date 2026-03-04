@@ -1,0 +1,223 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+---
+
+<ArticleLayout
+  title="Schläfli Symbols: The Language of Regular Polytopes"
+  description="Understanding the compact notation that completely describes any regular polytope in any dimension."
+>
+  <p class="lead text-xl text-gray-300 mb-8">
+    The Schläfli symbol is a compact notation that completely describes the local structure of any regular polytope. Invented by Ludwig Schläfli in the 1850s, it remains the primary way mathematicians denote regular shapes in any dimension.
+  </p>
+
+  <h2>The Basic Idea</h2>
+
+  <p>A Schläfli symbol is a sequence of numbers in curly braces that recursively defines a polytope's structure:</p>
+
+  <ul>
+    <li><strong>{'{'}p{'}'}</strong> describes a regular polygon with p sides</li>
+    <li><strong>{'{'}p, q{'}'}</strong> describes a regular polyhedron</li>
+    <li><strong>{'{'}p, q, r{'}'}</strong> describes a regular polychoron (4D)</li>
+    <li><strong>{'{'}p, q, r, s{'}'}</strong> describes a regular 5-polytope</li>
+  </ul>
+
+  <p>Each number tells you about the local arrangement of elements.</p>
+
+  <h2>Two-Dimensional: Polygons</h2>
+
+  <p>For polygons, the Schläfli symbol is simply the number of sides:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Polygon</th>
+        <th>Sides</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-mono">{'{'}3{'}'}</td><td>Triangle</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}4{'}'}</td><td>Square</td><td>4</td></tr>
+      <tr><td class="font-mono">{'{'}5{'}'}</td><td>Pentagon</td><td>5</td></tr>
+      <tr><td class="font-mono">{'{'}6{'}'}</td><td>Hexagon</td><td>6</td></tr>
+      <tr><td class="font-mono">{'{'}n{'}'}</td><td>n-gon</td><td>n</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Star Polygons</h3>
+
+  <p>For star polygons (those that self-intersect), we use fractions:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Star Polygon</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-mono">{'{'}5/2{'}'}</td><td>Pentagram</td><td>5 points, skip 2 vertices</td></tr>
+      <tr><td class="font-mono">{'{'}7/2{'}'}</td><td>Heptagram</td><td>7 points, skip 2 vertices</td></tr>
+      <tr><td class="font-mono">{'{'}7/3{'}'}</td><td>Heptagram</td><td>7 points, skip 3 vertices</td></tr>
+    </tbody>
+  </table>
+
+  <p>The notation {'{'}p/q{'}'} means: connect every q-th vertex of a regular p-gon.</p>
+
+  <h2>Three-Dimensional: Polyhedra</h2>
+
+  <p>For polyhedra, {'{'}p, q{'}'} means:</p>
+  <ul>
+    <li><strong>p</strong>: The face type is a regular {'{'}p{'}'} polygon</li>
+    <li><strong>q</strong>: Exactly q faces meet at each vertex</li>
+  </ul>
+
+  <h3>The Platonic Solids</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Polyhedron</th>
+        <th>Face</th>
+        <th>Faces at Vertex</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-mono">{'{'}3, 3{'}'}</td><td>Tetrahedron</td><td>Triangle</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}4, 3{'}'}</td><td>Cube</td><td>Square</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}3, 4{'}'}</td><td>Octahedron</td><td>Triangle</td><td>4</td></tr>
+      <tr><td class="font-mono">{'{'}5, 3{'}'}</td><td>Dodecahedron</td><td>Pentagon</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}3, 5{'}'}</td><td>Icosahedron</td><td>Triangle</td><td>5</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Reading the Symbol</h3>
+
+  <p>Take the cube {'{'}4, 3{'}'}:</p>
+  <ul>
+    <li>{'{'}4{'}'} = Faces are squares (4-sided)</li>
+    <li>3 = Three squares meet at each vertex</li>
+  </ul>
+
+  <p>Take the icosahedron {'{'}3, 5{'}'}:</p>
+  <ul>
+    <li>{'{'}3{'}'} = Faces are triangles</li>
+    <li>5 = Five triangles meet at each vertex</li>
+  </ul>
+
+  <h2>Four-Dimensional: Polychora</h2>
+
+  <p>For polychora, {'{'}p, q, r{'}'} means:</p>
+  <ul>
+    <li><strong>{'{'}p, q{'}'}</strong>: The cell type (a regular polyhedron)</li>
+    <li><strong>r</strong>: Exactly r cells meet around each edge</li>
+  </ul>
+
+  <h3>The Six Convex Regular Polychora</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Polychoron</th>
+        <th>Cell</th>
+        <th>Cells per Edge</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-mono">{'{'}3, 3, 3{'}'}</td><td><a href="/shapes/pentachoron">Pentachoron</a></td><td>Tetrahedron</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}4, 3, 3{'}'}</td><td><a href="/shapes/tesseract">Tesseract</a></td><td>Cube</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}3, 3, 4{'}'}</td><td><a href="/shapes/16-cell">Hexadecachoron</a></td><td>Tetrahedron</td><td>4</td></tr>
+      <tr><td class="font-mono">{'{'}3, 4, 3{'}'}</td><td><a href="/shapes/24-cell">Icositetrachoron</a></td><td>Octahedron</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}5, 3, 3{'}'}</td><td><a href="/shapes/120-cell">Hecatonicosachoron</a></td><td>Dodecahedron</td><td>3</td></tr>
+      <tr><td class="font-mono">{'{'}3, 3, 5{'}'}</td><td><a href="/shapes/600-cell">Hexacosichoron</a></td><td>Tetrahedron</td><td>5</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Reading a 4D Symbol</h3>
+
+  <p>Take the tesseract {'{'}4, 3, 3{'}'}:</p>
+  <ul>
+    <li>{'{'}4, 3{'}'} = Cells are cubes</li>
+    <li>The final 3 = Three cubes meet around each edge</li>
+  </ul>
+
+  <p>Take the 600-cell {'{'}3, 3, 5{'}'}:</p>
+  <ul>
+    <li>{'{'}3, 3{'}'} = Cells are tetrahedra</li>
+    <li>The final 5 = Five tetrahedra meet around each edge</li>
+  </ul>
+
+  <h2>The Vertex Figure</h2>
+
+  <p>The Schläfli symbol also encodes the <strong>vertex figure</strong>—the shape you see if you slice the polytope near a vertex:</p>
+
+  <ul>
+    <li>For {'{'}p, q{'}'}: The vertex figure is {'{'}q{'}'}</li>
+    <li>For {'{'}p, q, r{'}'}: The vertex figure is {'{'}q, r{'}'}</li>
+  </ul>
+
+  <p><strong>Example</strong>: The tesseract {'{'}4, 3, 3{'}'} has vertex figure {'{'}3, 3{'}'}, which is a tetrahedron. If you slice a tesseract near any vertex, the cross-section is a tetrahedron.</p>
+
+  <h2>Duality</h2>
+
+  <p>A remarkable property: reversing a Schläfli symbol gives the <strong>dual</strong> polytope!</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Polytope</th>
+        <th>Dual Symbol</th>
+        <th>Dual Polytope</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="font-mono">{'{'}4, 3{'}'}</td><td>Cube</td><td class="font-mono">{'{'}3, 4{'}'}</td><td>Octahedron</td></tr>
+      <tr><td class="font-mono">{'{'}4, 3, 3{'}'}</td><td>Tesseract</td><td class="font-mono">{'{'}3, 3, 4{'}'}</td><td>16-cell</td></tr>
+      <tr><td class="font-mono">{'{'}5, 3, 3{'}'}</td><td>120-cell</td><td class="font-mono">{'{'}3, 3, 5{'}'}</td><td>600-cell</td></tr>
+    </tbody>
+  </table>
+
+  <p>Self-dual polytopes have palindromic symbols:</p>
+  <ul>
+    <li><span class="font-mono">{'{'}3, 3{'}'}</span> Tetrahedron (self-dual)</li>
+    <li><span class="font-mono">{'{'}3, 3, 3{'}'}</span> Pentachoron (self-dual)</li>
+    <li><span class="font-mono">{'{'}3, 4, 3{'}'}</span> 24-cell (self-dual)</li>
+  </ul>
+
+  <h2>Constraints on Valid Symbols</h2>
+
+  <p>Not every combination of numbers produces a valid polytope. The constraints relate to angular defect:</p>
+
+  <h3>For Polyhedra {'{'}p, q{'}'}</h3>
+
+  <p>The angles around a vertex must sum to less than 360°. This limits us to exactly 5 convex regular polyhedra (Platonic solids).</p>
+
+  <h3>For Polychora {'{'}p, q, r{'}'}</h3>
+
+  <p>The cell's dihedral angles must allow r of them to fit around an edge without exceeding 360°. This analysis yields exactly 6 convex regular polychora.</p>
+
+  <h2>Summary</h2>
+
+  <p>The Schläfli symbol packs enormous information into a compact form:</p>
+
+  <ul>
+    <li>It completely specifies local topology</li>
+    <li>It works in any dimension</li>
+    <li>Reversing it gives the dual</li>
+    <li>It reveals impossibility through angular constraints</li>
+  </ul>
+
+  <p>When you see <span class="font-mono text-cyber-cyan">{'{'}4, 3, 3{'}'}</span>, you know immediately: cubic cells, three per edge—a tesseract. This elegant notation remains central to polytope theory 170 years after its invention.</p>
+
+  <h2>Further Reading</h2>
+
+  <ul>
+    <li><a href="/learn/what-is-4d">What is the Fourth Dimension?</a> - Basic 4D concepts</li>
+    <li><a href="/shapes/regulars">The Six Regular Polychora</a> - The shapes these symbols describe</li>
+    <li><a href="/learn/regiments">The Regiment System</a> - How non-regular polychora are organized</li>
+  </ul>
+</ArticleLayout>

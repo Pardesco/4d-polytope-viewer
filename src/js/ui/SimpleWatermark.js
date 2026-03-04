@@ -32,9 +32,14 @@ export class SimpleWatermark {
    * Handle responsive adjustments
    */
   setupResponsive() {
-    window.addEventListener('resize', () => {
-      this.updatePositions();
-    });
+    this._boundUpdatePositions = () => this.updatePositions();
+    window.addEventListener('resize', this._boundUpdatePositions);
+  }
+
+  dispose() {
+    if (this._boundUpdatePositions) {
+      window.removeEventListener('resize', this._boundUpdatePositions);
+    }
   }
 
   /**

@@ -268,15 +268,6 @@ export class ViewerControls {
       meshBtn.addEventListener('click', () => this.toggleMeshView());
     }
 
-    // Mesh quality toggle buttons
-    const qualityBtns = document.querySelectorAll('.quality-btn');
-    qualityBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const quality = e.currentTarget.dataset.quality;
-        this.handleQualityChange(quality);
-      });
-    });
-
     // Projection type toggle switch
     const projectionStereo = document.getElementById('projection-stereo');
     const projectionPerspective = document.getElementById('projection-perspective');
@@ -1047,16 +1038,11 @@ export class ViewerControls {
   updateMeshButton() {
     const button = document.getElementById('toggle-mesh-btn');
     const materialSelector = document.getElementById('material-selector');
-    const qualitySelector = document.getElementById('mesh-quality-selector');
 
     if (button) {
       if (this.viewer.showMeshView) {
         button.classList.add('active');
         button.textContent = 'Mesh View: ON';
-        // Show quality selector when mesh view is enabled
-        if (qualitySelector) {
-          qualitySelector.classList.remove('hidden');
-        }
         // Show material selector when mesh view is enabled (desktop only)
         if (materialSelector && window.innerWidth >= 1024) {
           materialSelector.classList.remove('hidden');
@@ -1064,39 +1050,12 @@ export class ViewerControls {
       } else {
         button.classList.remove('active');
         button.textContent = 'Mesh View: OFF';
-        // Hide quality selector when mesh view is disabled
-        if (qualitySelector) {
-          qualitySelector.classList.add('hidden');
-        }
         // Hide material selector when mesh view is disabled
         if (materialSelector) {
           materialSelector.classList.add('hidden');
         }
       }
     }
-  }
-
-  /**
-   * Handle mesh quality change
-   * @param {string} quality - 'low' or 'high'
-   */
-  handleQualityChange(quality) {
-    // Update button states
-    const lowBtn = document.getElementById('quality-low-btn');
-    const highBtn = document.getElementById('quality-high-btn');
-
-    if (lowBtn && highBtn) {
-      lowBtn.classList.toggle('active', quality === 'low');
-      highBtn.classList.toggle('active', quality === 'high');
-    }
-
-    // Update viewer mesh quality (map 'low' to 'standard' for viewer)
-    if (this.viewer) {
-      const viewerQuality = quality === 'low' ? 'standard' : 'high';
-      this.viewer.setMeshQuality(viewerQuality);
-    }
-
-    console.log(`[ViewerControls] Mesh quality set to: ${quality}`);
   }
 
   /**

@@ -1,0 +1,189 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ViewerEmbed from '../../components/ViewerEmbed.astro';
+---
+
+<ArticleLayout
+  title="The Icositetrachoron: The 24-Cell Anomaly"
+  description="The most extraordinary regular polychoron—24 octahedral cells with no analogue in any other dimension. Unique F₄ symmetry."
+  ogImage="/images/og/24-cell.jpg"
+  polytopeId="4-ico"
+  showViewer={true}
+>
+  <!-- Quick Facts -->
+  <div class="property-grid not-prose mb-12">
+    <div class="property-item">
+      <div class="property-label">Schläfli Symbol</div>
+      <div class="property-value">{'{'}3,4,3{'}'}</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Cells</div>
+      <div class="property-value">24 octahedra</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Faces</div>
+      <div class="property-value">96 triangles</div>
+    </div>
+    <div class="property-item">
+      <div class="property-label">Vertices</div>
+      <div class="property-value">24</div>
+    </div>
+  </div>
+
+  <h2>Why the 24-Cell is Unique</h2>
+
+  <p>The <strong>icositetrachoron</strong>, commonly called the 24-cell, is the most extraordinary of the six regular convex polychora. It has no analogue in three dimensions—or any other dimension. It exists only in four dimensions, a geometric anomaly born from the exceptional F₄ symmetry group.</p>
+
+  <h3>No Analogue in Any Other Dimension</h3>
+
+  <p>Consider the six regular convex polychora:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>4D Shape</th>
+        <th>3D Analogue</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Pentachoron</td><td>Tetrahedron</td></tr>
+      <tr><td>Tesseract</td><td>Cube</td></tr>
+      <tr><td>16-cell</td><td>Octahedron</td></tr>
+      <tr><td><strong>24-cell</strong></td><td><strong>Nothing</strong></td></tr>
+      <tr><td>120-cell</td><td>Dodecahedron</td></tr>
+      <tr><td>600-cell</td><td>Icosahedron</td></tr>
+    </tbody>
+  </table>
+
+  <p>The 24-cell stands alone. It's not a 4D extension of any 3D shape. It emerges from a symmetry group—F₄—that exists exclusively in four dimensions.</p>
+
+  <h3>The F₄ Symmetry Group</h3>
+
+  <p>In mathematics, symmetry groups form families. Most exist in all dimensions, but <strong>F₄ exists ONLY in dimension 4</strong>. The F₄ group has 1152 elements—more than triple the B₄ group (384 elements). This exceptional symmetry allows the 24-cell to exist.</p>
+
+  <h3>Self-Dual</h3>
+
+  <p>The 24-cell is self-dual: its dual is another 24-cell. Place a point at the center of each octahedral cell, connect points whose cells share a face, and you get a congruent 24-cell rotated 30°.</p>
+
+  <p>Only the pentachoron also shares this property among regular convex polychora.</p>
+
+  <h2>Understanding the 24-Cell</h2>
+
+  <h3>24 Octahedral Cells</h3>
+
+  <p>The 24-cell is bounded by 24 octahedral cells. Each octahedron shares each of its 8 triangular faces with another octahedron, connects to 8 neighboring cells, and is indistinguishable from every other cell.</p>
+
+  <h3>Where Does It Come From?</h3>
+
+  <p>Several constructions reveal the 24-cell:</p>
+
+  <ul>
+    <li><strong>Rectified 16-cell</strong>: Truncate a 16-cell until the vertices become the edge midpoints. The result is a 24-cell!</li>
+    <li><strong>Compound decomposition</strong>: The 24-cell can be decomposed into three mutually perpendicular tesseracts, or into three mutually perpendicular 16-cells.</li>
+    <li><strong>Vertex-first</strong>: Its 24 vertices are the midpoints of the 24 edges of a 16-cell (or equivalently, a tesseract).</li>
+  </ul>
+
+  <h3>The 24 Vertices</h3>
+
+  <p>The vertices of a 24-cell can be given as:</p>
+  <ul>
+    <li><strong>First set (8 vertices)</strong>: Permutations of (±1, 0, 0, 0)</li>
+    <li><strong>Second set (16 vertices)</strong>: All combinations of (±½, ±½, ±½, ±½)</li>
+  </ul>
+
+  <p>The first set forms a 16-cell; the second set forms a tesseract (scaled). Together, they form the 24-cell.</p>
+
+  <h2>Mathematical Structure</h2>
+
+  <h3>The Schläfli Symbol {'{'}3,4,3{'}'}</h3>
+
+  <p>The symbol {'{'}3,4,3{'}'} is palindromic, hinting at self-duality:</p>
+
+  <ol>
+    <li><strong>{'{'}3{'}'}</strong> = Faces are triangles</li>
+    <li><strong>{'{'}3,4{'}'}</strong> = Cells are octahedra (4 triangles meet at each vertex)</li>
+    <li><strong>{'{'}3,4,3{'}'}</strong> = Three octahedra meet around each edge</li>
+  </ol>
+
+  <p>The symmetry of the symbol—3 at both ends—reflects the 24-cell's self-dual nature.</p>
+
+  <h3>Euler Characteristic</h3>
+
+  <p>V - E + F - C = 0:</p>
+  <p class="text-center text-2xl font-mono text-cyber-cyan my-6">24 - 96 + 96 - 24 = 0 ✓</p>
+  <p>Notice the beautiful symmetry: 24 vertices, 24 cells; 96 edges, 96 faces.</p>
+
+  <h3>Measurements</h3>
+
+  <p>For a 24-cell with edge length 1:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Measure</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Circumradius</td><td>1 (exactly!)</td></tr>
+      <tr><td>Inradius</td><td>1/√2 ≈ 0.707</td></tr>
+      <tr><td>Hypervolume</td><td>2</td></tr>
+      <tr><td>Surface volume</td><td>8√2 ≈ 11.31</td></tr>
+      <tr><td>Dihedral angle</td><td>120°</td></tr>
+    </tbody>
+  </table>
+
+  <p>Like the tesseract, the 24-cell is <strong>radially equilateral</strong>—its circumradius equals its edge length.</p>
+
+  <h2>Unique Properties</h2>
+
+  <h3>The Rectification Cycle</h3>
+
+  <p>The 24-cell participates in a beautiful cycle: the 24-cell is its own rectification! Truncating a 24-cell to its edge midpoints produces another 24-cell.</p>
+
+  <h3>Tiling 4D Space</h3>
+
+  <p>The 24-cell tiles 4D space, forming the <strong>24-cell honeycomb</strong>. This honeycomb is self-dual (like the 24-cell itself), related to the D₄ root lattice, and connected to optimal sphere-packing in 4D.</p>
+
+  <h3>Smoothest Rotation</h3>
+
+  <p>When rotating in 4D, the 24-cell appears to flow more smoothly than other regular polychora. This is because its F₄ symmetry distributes cells evenly across the hypersphere, its 1152 symmetries allow many "equivalent" orientations, and the octahedral cells are more uniform than cubic or tetrahedral ones.</p>
+
+  <h3>The Hurwitz Quaternion Connection</h3>
+
+  <p>The 24 vertices of a 24-cell correspond to the 24 Hurwitz unit quaternions:</p>
+  <ul>
+    <li>±1, ±i, ±j, ±k (8 quaternions)</li>
+    <li>(±1 ± i ± j ± k)/2 (16 quaternions)</li>
+  </ul>
+
+  <p>These 24 quaternions form a group under multiplication, making the 24-cell fundamental to quaternion algebra.</p>
+
+  <h2>Visualizing the 24-Cell</h2>
+
+  <h3>The Characteristic Flow</h3>
+
+  <p>During 4D rotation, the 24-cell exhibits a characteristic "flowing" motion unlike other polychora:</p>
+  <ul>
+    <li>Cells don't poke out sharply (unlike the 16-cell)</li>
+    <li>The motion is continuous and wave-like</li>
+    <li>Symmetries create repeating patterns every 30° of rotation</li>
+  </ul>
+
+  <h3>Cross-Sections</h3>
+
+  <p>A 24-cell passing through 3D space vertex-first produces distinctive cross-sections including octahedra and cuboctahedra. The cuboctahedron cross-section is distinctive and doesn't appear for other regular polychora.</p>
+
+  <blockquote>
+    <p><strong>Citation:</strong> The icositetrachoron (24-cell), denoted {'{'}3,4,3{'}'}, is a regular convex polychoron with no analogue in any other dimension. Discovered by Ludwig Schläfli in 1852, it consists of 24 octahedral cells, 96 triangular faces, 96 edges, and 24 vertices. The 24-cell is self-dual and possesses F₄ symmetry—an exceptional group existing only in four dimensions. Its 24 vertices correspond to the 24 unit Hurwitz quaternions. Like the tesseract, it is radially equilateral.</p>
+  </blockquote>
+
+  <h2>Related Polychora</h2>
+
+  <ul>
+    <li><strong>Dual:</strong> <a href="/shapes/24-cell">Icositetrachoron</a> (self-dual)</li>
+    <li><strong>Derived from:</strong> <a href="/shapes/16-cell">16-Cell</a> (rectification)</li>
+    <li><strong>Same radial property:</strong> <a href="/shapes/tesseract">Tesseract</a></li>
+    <li><strong>More complex:</strong> <a href="/shapes/120-cell">120-Cell</a></li>
+  </ul>
+</ArticleLayout>

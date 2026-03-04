@@ -45,25 +45,24 @@ export class LicenseManager {
     }
 
     /**
-     * Validate license with backend API and save if valid
+     * Validate license with LemonSqueezy API and save if valid
      * @param {string} licenseKey - License key
-     * @param {string} email - User email
      * @returns {Promise<Object>} Validation result
      */
-    async validate(licenseKey, email) {
+    async validate(licenseKey) {
         try {
-            const result = await validateLicense(licenseKey, email);
+            const result = await validateLicense(licenseKey);
 
             if (result.success && result.data.valid) {
                 // Save license data
                 this.license = {
                     key: licenseKey,
-                    email: email,
                     tier: result.data.tier,
                     expirationDate: result.data.expirationDate,
                     status: result.data.status,
                     purchaseDate: result.data.purchaseDate,
-                    daysRemaining: result.data.daysRemaining,
+                    customerName: result.data.customerName,
+                    productName: result.data.productName,
                     validatedAt: new Date().toISOString()
                 };
 
@@ -77,7 +76,7 @@ export class LicenseManager {
             } else {
                 return {
                     success: false,
-                    error: result.data?.error || result.error || 'License validation failed'
+                    error: result.error || 'License validation failed'
                 };
             }
         } catch (error) {
@@ -105,8 +104,13 @@ export class LicenseManager {
      * @returns {boolean}
      */
     isExpired() {
-        if (!this.license || !this.license.expirationDate) {
+        if (!this.license) {
             return true;
+        }
+
+        // LemonSqueezy lifetime licenses have null expiration — never expire
+        if (!this.license.expirationDate) {
+            return false;
         }
 
         const now = new Date();
@@ -203,7 +207,7 @@ export class LicenseManager {
         return {
             tier: this.getTier(),
             hasLicense: true,
-            email: this.license.email,
+            customerName: this.license.customerName,
             expirationDate: this.license.expirationDate,
             daysRemaining: this.getDaysUntilExpiration(),
             isExpired: this.isExpired(),

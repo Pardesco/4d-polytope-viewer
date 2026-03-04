@@ -190,8 +190,9 @@ export class ExportMenu {
                     <li>📐 Mesh & linework .obj exports</li>
                     <li>✨ No watermarks</li>
                 </ul>
-                <a href="https://pardesco.com/products/4d-viewer-creator" target="_blank" class="upgrade-btn">
-                    Upgrade to Creator - $49/year
+                <!-- TODO: Replace with your actual LemonSqueezy checkout URL -->
+                <a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" target="_blank" class="upgrade-btn">
+                    Upgrade to Creator
                 </a>
             </div>
         `;
@@ -836,8 +837,8 @@ export class ExportMenu {
      * @param {string} feature - Feature name
      */
     showUpgradeModal(feature) {
-        // TODO: Implement modal UI
-        alert(`🔒 ${feature} export requires Creator tier.\n\nUpgrade at: pardesco.com/products/4d-viewer-creator`);
+        // TODO: Replace URL with your actual LemonSqueezy checkout URL
+        alert(`${feature} export requires Creator tier.\n\nUpgrade at: https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0`);
     }
 
     /**
