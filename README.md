@@ -1,193 +1,93 @@
 # 4D Polytope Viewer
 
-Interactive visualization of 4-dimensional polytopes using stereographic projection and true 4D rotation.
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Live Site:** https://4d.pardesco.com *(coming soon)*
+Interactive visualizations of 4D polytopes using stereographic projection and true 4D rotation.
 
----
+**[Live Demo](https://4d.pardesco.com)**
 
-## 🎯 Quick Start
+![4D Polytope Viewer - 120-cell with bloom and mesh view](.github/images/polytope-open-source-viewer.png)
 
-### **Development**
+![4D Polytope Viewer - 24-cell stereographic projection](.github/images/polytope-open-source-viewer-02.png)
+
+## Features
+
+- **True 4D rotation** across all 6 fundamental planes (XY, XZ, XW, YZ, YW, ZW)
+- **Stereographic projection** with curved edges preserving conformal structure
+- **1,700+ polytopes** -- the most comprehensive 4D polytope library online
+- **Mesh view** with iridescent shader material
+- **Bloom post-processing** for a glowing wireframe aesthetic
+- **Matrix-5 mode** -- experimental 5D projection visualization
+- **Manual rotation** with keyboard/mouse control and presets (Clifford, Hopf, Isoclinic)
+- **Mobile support** with touch controls and responsive layout
+
+## Quick Start
+
 ```bash
 npm install
 npm run dev
-# Opens http://localhost:3000
 ```
 
-### **Production Build**
-```bash
-npm run build
-# Output in dist/
-```
+Open `http://localhost:3000` to launch the viewer.
 
-### **Preview Production**
-```bash
-npm run preview
-# Opens http://localhost:4173
-```
+## Tech Stack
 
----
+- **Three.js** (r128) -- 3D rendering
+- **Vite** -- build tooling
+- **Vanilla JavaScript** -- no framework dependencies
+- **Tailwind CSS** -- utility-first styling
 
-## ✨ Features
-
-- 🔄 **True 4D Rotation** - Rotate in 6 fundamental planes (XY, XZ, XW, YZ, YW, ZW)
-- 📐 **Stereographic Projection** - Beautiful curved edges from 4D to 3D
-- 🎮 **Interactive Controls** - Mouse, keyboard, and touch support
-- 📊 **17 Polytopes** - From simple 5-cell to complex 600-cell
-- ⚡ **Performance Safety** - Smart edge limiting prevents crashes
-- 🎨 **Beautiful UI** - Glassmorphism design with smooth animations
-- 📱 **Responsive** - Works on desktop and mobile
-
----
-
-## 🎮 Controls
-
-### **Mouse**
-- **Drag** - Rotate 3D view
-- **Scroll** - Zoom in/out
-
-### **Keyboard**
-- **Space** - Toggle 4D rotation
-- **R** - Reset view
-- **M** - Toggle mesh view
-- **V** - Toggle vertices
-- **P** - Toggle projection type
-- **3** - Toggle 3D auto-rotation
-
-### **UI**
-- **Dropdown** - Select polytope (top-right panel)
-- **Plane Buttons** - Enable/disable rotation planes
-- **View Toggles** - Switch between line/mesh, show/hide vertices
-
----
-
-## 📦 Project Structure
+## Architecture
 
 ```
-src/js/
-├── polytope/          # Core 4D math and rendering
-│   ├── stereographic.js
-│   ├── rotation4d.js
-│   ├── parser.js
-│   └── viewer.js
-├── ui/                # User interface
-│   ├── controls.js
-│   └── polytope-selector.js
-├── performance/       # Safety and optimization
-│   └── manager.js
-└── main.js           # Entry point
+src/
+├── js/
+│   ├── main.js                  # App entry point
+│   ├── polytope/
+│   │   ├── viewer.js            # Core PolytopeViewer class
+│   │   ├── parser.js            # .off file parser
+│   │   ├── stereographic.js     # 4D→3D projection math
+│   │   ├── rotation4d.js        # 4D rotation matrices
+│   │   └── projection5d.js      # 5D math utilities
+│   ├── ui/
+│   │   ├── controls.js          # Viewer controls
+│   │   ├── polytope-selector.js # Polytope dropdown
+│   │   └── MatrixDisplay.js     # Rotation matrix HUD
+│   ├── effects/
+│   │   ├── BloomEffect.js       # Post-processing glow
+│   │   └── ParticleField.js     # Background particles
+│   ├── materials/
+│   │   └── IridescentMaterial.js # Holographic shader
+│   └── shaders/
+│       └── Matrix5Shader.js     # 5D projection shader
+├── styles/
+│   ├── main.css
+│   └── mobile.css
+└── data/
+    ├── polytopes/               # .off geometry files
+    └── polytope-lists/          # Polytope catalog JSON
 ```
 
----
+## How It Works
 
-## 🔧 Tech Stack
+1. Load a `.off` file containing 4D vertex coordinates and edge connectivity
+2. Apply 4D rotation matrices across user-selected planes
+3. Project 4D vertices to 3D via stereographic or perspective projection
+4. Generate curved edge geometry using CatmullRom interpolation
+5. Render as wireframe lines or tube meshes with bloom post-processing
 
-- **Three.js r128** - 3D rendering engine
-- **Vite 5.4** - Build system
-- **Tailwind CSS 3.4** - Styling
-- **ES6 Modules** - Modern JavaScript
-- **Cloudflare Pages** - Hosting (planned)
+## Support the Project
 
----
+If you find this viewer useful, consider supporting development with a **Creator License** -- it unlocks export features and helps keep this project alive.
 
-## 📊 Available Polytopes
+[![4D Polytope Viewer - Creator License](.github/images/polytope-creator-tier-01.jpeg)](https://4d.pardesco.com)
 
-| Polytope | Edges | Complexity | Notes |
-|----------|-------|------------|-------|
-| 5-Cell (1-Pen) | 10 | Simple | Simplest regular polytope |
-| Tesseract (2-Tes) | 32 | Simple | 4D hypercube, default |
-| 16-Cell (3-Hex) | 32 | Simple | 4D cross-polytope |
-| 24-Cell (4-Ico) | 96 | Simple | Self-dual |
-| 120-Cell (5-Hi) | 1200 | Medium | Performance warning |
-| 600-Cell (6-Ex) | 1200 | Medium | Performance warning |
-| *+ 11 more* | varies | varies | See dropdown |
+[![Export 4D Geometry - OBJ Mesh, 4K Screenshots, Video Loops](.github/images/polytope-creator-tier-03.jpeg)](https://4d.pardesco.com)
 
----
+[![1,700+ Polytopes, 6 Export Formats, $9/year](.github/images/polytope-creator-tier-02.jpeg)](https://4d.pardesco.com)
 
-## 🚀 Deployment
+**[Get Creator License at 4d.pardesco.com](https://4d.pardesco.com)** -- OBJ mesh export, 4K screenshots, video loops, animation JSON for Blender. $9/year.
 
-See `DEPLOY.md` for detailed deployment instructions.
+## License
 
-**Quick Deploy to Cloudflare Pages:**
-1. Build: `npm run build`
-2. Upload `dist/` folder to Cloudflare Pages
-3. Configure custom domain
-4. Done!
-
----
-
-## 🧪 Testing
-
-See `TESTING.md` for comprehensive test procedures.
-
-**Quick Test:**
-```bash
-npm run dev
-# Visit http://localhost:3000/viewer.html
-# Try switching polytopes with dropdown
-# Enable mesh view, test 4D rotation
-```
-
----
-
-## 📝 Documentation
-
-- `PROJECT_STATUS.md` - Detailed project status and progress
-- `TESTING.md` - Test procedures and checklists
-- `DEPLOY.md` - Deployment guide
-- `README.md` - This file
-
----
-
-## 🎨 Design Philosophy
-
-**Visual Quality:** Prioritize beauty over aggressive performance limiting
-**User Trust:** Show warnings but allow overrides
-**Accessibility:** Clear labels, keyboard shortcuts, responsive design
-**Performance:** Smart but generous edge limits, FPS monitoring
-
----
-
-## 🐛 Known Limitations
-
-- Gallery page is placeholder (Sprint 2)
-- Mobile touch gestures basic (pinch-zoom coming)
-- Export functionality removed (was server-dependent)
-- Very complex polytopes (>2400 edges) show reduced detail
-
----
-
-## 🤝 Contributing
-
-This is a Pardesco LLC project. For issues or suggestions:
-1. Test thoroughly with `npm run dev`
-2. Document expected vs actual behavior
-3. Include browser console output
-4. Note which polytope was loaded
-
----
-
-## 📄 License
-
-Copyright © 2025 Pardesco LLC. All rights reserved.
-
----
-
-## 🙏 Credits
-
-**Powered by:**
-- Three.js community
-- Vite build system
-- Tailwind CSS framework
-- Claude AI (development assistance)
-
-**Polytope Data:**
-- Based on uniform polychora classifications
-- .off file format for 4D geometry
-
----
-
-**Built with ❤️ for exploring the fourth dimension**
-
-For detailed project information, see `PROJECT_STATUS.md`
+[MIT](LICENSE)

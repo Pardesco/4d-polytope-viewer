@@ -3,8 +3,7 @@ console.log('[Main] Module parsing started...');
 import { PolytopeViewer } from './polytope/viewer.js';
 import { ViewerControls } from './ui/controls.js';
 import { PolytopeSelector } from './ui/polytope-selector.js';
-import { SimpleWatermark } from './ui/SimpleWatermark.js';
-import { licenseManager } from './license/LicenseManager.js';
+
 import { ParticleField } from './effects/ParticleField.js';
 
 import '../styles/main.css';
@@ -35,19 +34,6 @@ async function init() {
   }
 
   console.log('[Main] Initializing Polytope Viewer...');
-
-  // Initialize license manager
-  console.log('[Main] License Manager initialized');
-  const licenseInfo = licenseManager.getLicenseInfo();
-  console.log(`[Main] Current tier: ${licenseInfo.tier}`);
-
-  // Update UI based on license tier
-  if (licenseInfo.hasLicense) {
-    console.log(`[Main] License active until: ${licenseInfo.expirationDate}`);
-  }
-
-  // Create persistent watermark (always visible on canvas)
-  const watermark = new SimpleWatermark();
 
   // Get canvas container
   const container = document.getElementById('viewer-canvas');
@@ -160,7 +146,6 @@ async function init() {
   if (import.meta.env.DEV) {
     window.viewer = viewer;
     window.controls = controls;
-    window.licenseManager = licenseManager;
     window.selector = selector;
   }
 }

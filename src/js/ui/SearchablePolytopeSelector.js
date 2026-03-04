@@ -10,8 +10,6 @@
  * - Performance optimized
  */
 
-import { licenseManager } from '../license/LicenseManager.js';
-
 export class SearchablePolytopeSelector {
   constructor(viewer, containerId = 'polytope-selector') {
     this.viewer = viewer;
@@ -38,8 +36,7 @@ export class SearchablePolytopeSelector {
     }
 
     try {
-      this.tier = licenseManager.getTier();
-      console.log(`[SearchableSelector] Loading polytopes for tier: ${this.tier}`);
+      console.log(`[SearchableSelector] Loading polytopes...`);
 
       await this.loadPolytopeList();
       this.filteredPolytopes = [...this.polytopes];
@@ -62,7 +59,7 @@ export class SearchablePolytopeSelector {
     this.isLoading = true;
 
     try {
-      const listPath = `/data/polytope-lists/${this.tier}-tier.json`;
+      const listPath = `/data/polytope-lists/creator-tier.json`;
       console.log(`[SearchableSelector] Fetching: ${listPath}`);
 
       const response = await fetch(listPath);
@@ -165,26 +162,11 @@ export class SearchablePolytopeSelector {
   addTierBadge() {
     const badge = document.createElement('div');
     badge.className = 'mt-2 text-xs text-center';
-
-    const tierLabels = {
-      free: { text: 'Free Tier', color: 'text-gray-400' },
-      creator: { text: 'Creator Tier', color: 'text-purple-400' },
-      professional: { text: 'Professional Tier', color: 'text-pink-400' }
-    };
-
-    const tierInfo = tierLabels[this.tier] || tierLabels.free;
-
     badge.innerHTML = `
-      <span class="${tierInfo.color}">
-        ${tierInfo.text} - ${this.polytopes.length} polytopes available
+      <span class="text-gray-400">
+        ${this.polytopes.length} polytopes available
       </span>
     `;
-
-    if (this.tier === 'free') {
-      // TODO: Replace with your actual LemonSqueezy checkout URL
-      badge.innerHTML += `<br><a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" class="text-primary hover:underline text-xs">Upgrade for export features</a>`;
-    }
-
     this.container.appendChild(badge);
   }
 

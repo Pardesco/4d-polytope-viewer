@@ -8,8 +8,6 @@
  * - Professional tier: ~2,670 polytopes (all)
  */
 
-import { licenseManager } from '../license/LicenseManager.js';
-
 export class PolytopeSelector {
   constructor(viewer, containerId = 'polytope-selector') {
     this.viewer = viewer;
@@ -39,9 +37,7 @@ export class PolytopeSelector {
     }
 
     try {
-      // Get user's license tier
-      this.tier = licenseManager.getTier();
-      console.log(`[PolytopeSelector] Loading polytopes for tier: ${this.tier}`);
+      console.log(`[PolytopeSelector] Loading polytopes...`);
 
       // Load tier-specific polytope list (metadata only, no geometry)
       await this.loadPolytopeList();
@@ -299,29 +295,11 @@ export class PolytopeSelector {
   addTierBadge() {
     const badge = document.createElement('div');
     badge.className = 'mt-2 text-xs text-center';
-
-    // All users see all polytopes - tier only affects exports
-    if (this.tier === 'free') {
-      badge.innerHTML = `
-        <span class="text-gray-400">
-          ${this.polytopes.length} polytopes available
-        </span>
-        <!-- TODO: Replace with your actual LemonSqueezy checkout URL -->
-        <br><a href="https://pardesco.lemonsqueezy.com/checkout/buy/9ad7313d-9bc5-42da-b955-a86fc201518c?logo=0" class="text-primary hover:underline text-xs">Upgrade for export features</a>
-      `;
-    } else {
-      const tierLabels = {
-        creator: { text: 'Creator Tier', color: 'text-purple-400' },
-        professional: { text: 'Professional Tier', color: 'text-pink-400' }
-      };
-      const tierInfo = tierLabels[this.tier] || tierLabels.creator;
-      badge.innerHTML = `
-        <span class="${tierInfo.color}">
-          ${tierInfo.text} - exports enabled
-        </span>
-      `;
-    }
-
+    badge.innerHTML = `
+      <span class="text-gray-400">
+        ${this.polytopes.length} polytopes available
+      </span>
+    `;
     this.container.appendChild(badge);
   }
 

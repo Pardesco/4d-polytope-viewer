@@ -10,8 +10,7 @@
  */
 
 import { ROTATION_PLANES } from '../polytope/rotation4d.js';
-import { ExportMenu } from './ExportMenu.js';
-import { licenseManager } from '../license/LicenseManager.js';
+
 
 export class ViewerControls {
   constructor(viewer) {
@@ -36,22 +35,8 @@ export class ViewerControls {
     this.setupMaterialControls();
     this.setupManualRotationControls();
     this.setupKeyboardShortcuts();
-    this.setupExportMenu();
     this.setupMatrix5Controls();
     console.log('[ViewerControls] Initialized');
-  }
-
-  /**
-   * Setup export menu with license-based feature gating
-   */
-  setupExportMenu() {
-    const exportContainer = document.getElementById('export-container');
-    if (exportContainer) {
-      this.exportMenu = new ExportMenu(exportContainer, licenseManager, this.viewer);
-      console.log('[ViewerControls] Export menu initialized');
-    } else {
-      console.warn('[ViewerControls] Export container not found');
-    }
   }
 
   /**

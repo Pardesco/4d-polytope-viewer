@@ -10,9 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         viewer: resolve(__dirname, 'viewer.html'),
-        gallery: resolve(__dirname, 'gallery.html'),
-        previewGenerator: resolve(__dirname, 'preview-generator.html'),
-        activate: resolve(__dirname, 'activate.html')
+        gallery: resolve(__dirname, 'gallery.html')
       }
     },
     // Optimize for production
