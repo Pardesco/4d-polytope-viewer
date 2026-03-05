@@ -88,6 +88,10 @@ If you find this viewer useful, consider supporting development with a **Creator
 
 **[Get Creator License at 4d.pardesco.com](https://4d.pardesco.com)** -- OBJ mesh export, 4K screenshots, video loops, animation JSON for Blender. $9/year.
 
+---
+
+Made by [Randall Morgan](https://github.com/Pardesco) 2025
+
 ## License
 
 [MIT](LICENSE)
